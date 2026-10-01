@@ -127,8 +127,11 @@ namespace ProjectMayham.Vision
             }
         }
 
-        /// <summary>True when a world point is inside the current field of view and not blocked by obstacles.</summary>
-        public bool IsPointVisible(Vector2 point)
+        /// <summary>
+        /// True when a world point is inside the current field of view and not blocked by obstacles.
+        /// Colliders under <paramref name="ignoreRoot"/> (the object being tested) never block the line.
+        /// </summary>
+        public bool IsPointVisible(Vector2 point, Transform ignoreRoot = null)
         {
             if (settings == null) return false;
 
@@ -141,7 +144,12 @@ namespace ProjectMayham.Vision
                           Mathf.Abs(Mathf.DeltaAngle(currentAngle, Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg)) <= settings.coneAngle * 0.5f;
             if (!inAmbient && !inCone) return false;
 
-            return Physics2D.Linecast(origin, point, filter, hits) == 0;
+            int count = Physics2D.Linecast(origin, point, filter, hits);
+            for (int i = 0; i < count; i++)
+            {
+                if (ignoreRoot == null || !hits[i].collider.transform.IsChildOf(ignoreRoot)) return false;
+            }
+            return true;
         }
     }
 }
