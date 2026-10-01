@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c195ee7f8cd1ae94fade52f10e8f9ad8, type: 3}
+  m_Name: DefaultVisionSettings
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Vision.VisionSettings
+  coneAngle: 90
+  radius: 9
+  softEdgeAngle: 10
+  radialFalloffStart: 0.6
+  rayCount: 96
+  rotationSmoothing: 14
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 64
+  ambientRadius: 1.6
+  ambientIntensity: 0.35
+  ambientRayCount: 48
+  darknessColor: {r: 0.05, g: 0.05, b: 0.08, a: 1}
+  memoryEnabled: 1
+  memoryBrightness: 0.3
+  memoryForgetSeconds: 40
+  memoryWorldCenter: {x: 0, y: 0}
+  memoryWorldSize: 64
+  memoryTexelsPerUnit: 8
+  positionThreshold: 0.02
+  angleThreshold: 0.5
+  maskResolutionScale: 0.5
