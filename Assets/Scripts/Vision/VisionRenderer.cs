@@ -20,6 +20,7 @@ namespace ProjectMayham.Vision
         private static readonly int MemoryRect = Shader.PropertyToID("_MemoryRect");
         private static readonly int DarkColor = Shader.PropertyToID("_DarkColor");
         private static readonly int MemoryBrightness = Shader.PropertyToID("_MemoryBrightness");
+        private static readonly int MemoryWrap = Shader.PropertyToID("_MemoryWrap");
 
         [SerializeField] private VisionSettings settings;
         [SerializeField] private VisionCone cone;
@@ -190,12 +191,14 @@ namespace ProjectMayham.Vision
                 compositeMaterial.SetTexture(MemoryTex, memory.Texture);
                 compositeMaterial.SetVector(MemoryRect, memory.WorldRect);
                 compositeMaterial.SetFloat(MemoryBrightness, settings.memoryBrightness);
+                compositeMaterial.SetFloat(MemoryWrap, memory.Wraps ? 1f : 0f);
             }
             else
             {
                 compositeMaterial.SetTexture(MemoryTex, Texture2D.blackTexture);
                 compositeMaterial.SetVector(MemoryRect, new Vector4(0, 0, 1, 1));
                 compositeMaterial.SetFloat(MemoryBrightness, 0f);
+                compositeMaterial.SetFloat(MemoryWrap, 0f);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using ProjectMayham.World;
+using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace ProjectMayham.Vision
@@ -26,27 +27,34 @@ namespace ProjectMayham.Vision
         public RenderTexture Texture { get; }
         /// <summary>xy = world min corner, zw = world size.</summary>
         public Vector4 WorldRect { get; }
+        /// <summary>True when the memory repeats with the wrapped level.</summary>
+        public bool Wraps { get; }
 
         public VisionMemory(VisionSettings settings, Material maskMaterial)
         {
             this.settings = settings;
             this.maskMaterial = maskMaterial;
 
-            float size = settings.memoryWorldSize;
-            Vector2 min = settings.memoryWorldCenter - Vector2.one * (size * 0.5f);
-            WorldRect = new Vector4(min.x, min.y, size, size);
+            // In a wrapped level the memory covers exactly one domain and repeats, so an area seen across
+            // the seam is remembered on the other side too.
+            var wrap = WrapWorld.Active;
+            Wraps = wrap != null;
+            Vector2 size = Wraps ? wrap.Size : Vector2.one * settings.memoryWorldSize;
+            Vector2 min = Wraps ? wrap.Min : settings.memoryWorldCenter - size * 0.5f;
+            WorldRect = new Vector4(min.x, min.y, size.x, size.y);
 
-            int texels = Mathf.Clamp(Mathf.RoundToInt(size * settings.memoryTexelsPerUnit), 64, 4096);
-            Texture = new RenderTexture(texels, texels, 0, RenderTextureFormat.R8, RenderTextureReadWrite.Linear)
+            int texelsX = Mathf.Clamp(Mathf.RoundToInt(size.x * settings.memoryTexelsPerUnit), 64, 4096);
+            int texelsY = Mathf.Clamp(Mathf.RoundToInt(size.y * settings.memoryTexelsPerUnit), 64, 4096);
+            Texture = new RenderTexture(texelsX, texelsY, 0, RenderTextureFormat.R8, RenderTextureReadWrite.Linear)
             {
                 name = "VisionMemory",
                 filterMode = FilterMode.Bilinear,
-                wrapMode = TextureWrapMode.Clamp,
+                wrapMode = Wraps ? TextureWrapMode.Repeat : TextureWrapMode.Clamp,
                 hideFlags = HideFlags.HideAndDontSave
             };
             Texture.Create();
 
-            Matrix4x4 proj = Matrix4x4.Ortho(min.x, min.x + size, min.y, min.y + size, -1f, 1f);
+            Matrix4x4 proj = Matrix4x4.Ortho(min.x, min.x + size.x, min.y, min.y + size.y, -1f, 1f);
             viewProjection = GL.GetGPUProjectionMatrix(proj, true);
 
             fullScreenQuad = new Mesh { name = "VisionFadeQuad", hideFlags = HideFlags.HideAndDontSave };
@@ -64,7 +72,23 @@ namespace ProjectMayham.Vision
             BindTarget(cmd);
             cmd.SetGlobalMatrix(VisionVP, viewProjection);
             cmd.SetGlobalFloat(FalloffStart, settings.radialFalloffStart);
-            cmd.DrawMesh(visionMesh, Matrix4x4.identity, maskMaterial, 0, 0);
+            if (!Wraps)
+            {
+                cmd.DrawMesh(visionMesh, Matrix4x4.identity, maskMaterial, 0, 0);
+                return;
+            }
+
+            // The part of the mesh that sticks out of the domain lands on the opposite side.
+            // The mask shader ignores the model matrix, so the offset goes into the view-projection.
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    var offset = Matrix4x4.Translate(new Vector3(x * WorldRect.z, y * WorldRect.w, 0f));
+                    cmd.SetGlobalMatrix(VisionVP, viewProjection * offset);
+                    cmd.DrawMesh(visionMesh, Matrix4x4.identity, maskMaterial, 0, 0);
+                }
+            }
         }
 
         /// <summary>Accumulates elapsed time and subtracts from the texture once the step is large enough.</summary>

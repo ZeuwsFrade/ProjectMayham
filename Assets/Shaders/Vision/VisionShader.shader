@@ -27,6 +27,7 @@ Shader "ProjectMayham/Vision/Composite"
                 float4 _MemoryRect;   // xy = memory min corner (world), zw = memory world size
                 half4 _DarkColor;
                 half _MemoryBrightness;
+                half _MemoryWrap;     // 1 = the memory texture repeats (wrapped level)
             CBUFFER_END
 
             struct appdata { float3 pos : POSITION; float2 uv : TEXCOORD0; };
@@ -46,7 +47,7 @@ Shader "ProjectMayham/Vision/Composite"
 
                 float2 world = _CamRect.xy + (i.uv - 0.5) * _CamRect.zw;
                 float2 memUV = (world - _MemoryRect.xy) / _MemoryRect.zw;
-                float inside = step(0.0, memUV.x) * step(memUV.x, 1.0) * step(0.0, memUV.y) * step(memUV.y, 1.0);
+                float inside = max(_MemoryWrap, step(0.0, memUV.x) * step(memUV.x, 1.0) * step(0.0, memUV.y) * step(memUV.y, 1.0));
                 half memory = SAMPLE_TEXTURE2D(_VisionMemory, sampler_VisionMemory, memUV).r * _MemoryBrightness * inside;
 
                 half lit = saturate(max(current, memory));
