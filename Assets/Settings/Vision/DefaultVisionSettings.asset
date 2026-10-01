@@ -21,12 +21,12 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 64
-  ambientRadius: 1.6
-  ambientIntensity: 0.35
+  ambientRadius: 2
+  ambientIntensity: 0.8
   ambientRayCount: 48
-  darknessColor: {r: 0.05, g: 0.05, b: 0.08, a: 1}
+  darknessColor: {r: 0.041918844, g: 0.041918844, b: 0.05660379, a: 1}
   memoryEnabled: 1
-  memoryBrightness: 0.3
+  memoryBrightness: 0.05
   memoryForgetSeconds: 40
   memoryWorldCenter: {x: 0, y: 0}
   memoryWorldSize: 64
