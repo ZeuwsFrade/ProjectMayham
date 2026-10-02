@@ -15,4 +15,5 @@ MonoBehaviour:
   displayName: "\u041A\u043D\u0438\u0433\u0438"
   icon: {fileID: 21300000, guid: 6abdc4b8a3227564faa71259222e1a67, type: 3}
   maxStack: 5
+  weight: 2
   worldPrefab: {fileID: 8217352054659401380, guid: 9edb4f8c1f21b3a4f942c8f538cf5f08, type: 3}
