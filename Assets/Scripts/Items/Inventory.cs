@@ -20,7 +20,7 @@ namespace ProjectMayham.Items
         }
 
         // Keeps float sums like 0.1 + 0.2 from refusing an item that fits exactly.
-        private const float WeightEpsilon = 0.0001f;
+        protected const float WeightEpsilon = 0.0001f;
 
         [SerializeField, Min(1)] private int slotCount = 5;
 
@@ -42,15 +42,15 @@ namespace ProjectMayham.Items
         /// <summary>Raised with the new index when the selected slot changes.</summary>
         public event Action<int> SelectionChanged;
 
-        public int SlotCount => Slots.Length;
-        public int Selected => selected;
-        public Slot this[int index] => Slots[index];
+        public virtual int SlotCount => Slots.Length;
+        public virtual int Selected => selected;
+        public virtual Slot this[int index] => Slots[index];
 
-        public float TotalWeight => totalWeight;
+        public virtual float TotalWeight => totalWeight;
         public float ComfortableWeight => comfortableWeight;
         public float MaxWeight => Mathf.Max(maxWeight, comfortableWeight);
         /// <summary>True above the comfortable weight: slower movement, no sprinting.</summary>
-        public bool IsOverloaded => totalWeight > comfortableWeight + WeightEpsilon;
+        public bool IsOverloaded => TotalWeight > comfortableWeight + WeightEpsilon;
         /// <summary>0 at or below the comfortable weight, 1 at the max weight.</summary>
         public float Encumbrance
         {
@@ -58,7 +58,7 @@ namespace ProjectMayham.Items
             {
                 float range = MaxWeight - comfortableWeight;
                 if (range <= WeightEpsilon) return IsOverloaded ? 1f : 0f;
-                return Mathf.Clamp01((totalWeight - comfortableWeight) / range);
+                return Mathf.Clamp01((TotalWeight - comfortableWeight) / range);
             }
         }
 
@@ -66,7 +66,7 @@ namespace ProjectMayham.Items
         public bool CanAdd(ItemDefinition item) => HasRoomFor(item) && FitsByWeight(item);
 
         /// <summary>True when a slot could take one more item of this kind, ignoring weight.</summary>
-        public bool HasRoomFor(ItemDefinition item)
+        public virtual bool HasRoomFor(ItemDefinition item)
         {
             if (item == null) return false;
             foreach (var slot in Slots)
@@ -80,7 +80,7 @@ namespace ProjectMayham.Items
         public bool FitsByWeight(ItemDefinition item) => item != null && CountByWeight(item) > 0;
 
         /// <summary>Adds items to existing stacks first, then to empty slots. Returns how many did not fit.</summary>
-        public int Add(ItemDefinition item, int count)
+        public virtual int Add(ItemDefinition item, int count)
         {
             if (item == null || count <= 0) return count;
 
@@ -111,7 +111,7 @@ namespace ProjectMayham.Items
         }
 
         /// <summary>Empties the selected slot and hands back what was in it.</summary>
-        public bool TakeSelected(out ItemDefinition item, out int count)
+        public virtual bool TakeSelected(out ItemDefinition item, out int count)
         {
             item = null;
             count = 0;
@@ -125,7 +125,7 @@ namespace ProjectMayham.Items
             return true;
         }
 
-        public void Select(int index)
+        public virtual void Select(int index)
         {
             index = Mathf.Clamp(index, 0, Slots.Length - 1);
             if (index == selected) return;
@@ -134,15 +134,21 @@ namespace ProjectMayham.Items
         }
 
         /// <summary>Moves the selection by <paramref name="step"/> slots and wraps around.</summary>
-        public void Cycle(int step) => Select((int)Mathf.Repeat(selected + step, Slots.Length));
+        public virtual void Cycle(int step) => Select((int)Mathf.Repeat(selected + step, Slots.Length));
 
         /// <summary>How many items of this kind the remaining weight allowance can take.</summary>
-        private int CountByWeight(ItemDefinition item)
+        protected int CountByWeight(ItemDefinition item)
         {
             if (item.Weight <= 0f) return int.MaxValue;
-            float free = MaxWeight - totalWeight;
+            float free = MaxWeight - TotalWeight;
             return Mathf.Max(0, Mathf.FloorToInt((free + WeightEpsilon) / item.Weight));
         }
+
+        /// <summary>For subclasses that store items differently: raises <see cref="Changed"/>.</summary>
+        protected void NotifyChanged() => Changed?.Invoke();
+
+        /// <summary>For subclasses: raises <see cref="SelectionChanged"/>.</summary>
+        protected void NotifySelectionChanged(int index) => SelectionChanged?.Invoke(index);
 
         private void RecalculateWeight()
         {
