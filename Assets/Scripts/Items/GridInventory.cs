@@ -36,6 +36,10 @@ namespace ProjectMayham.Items
         private Stack[,] cells;
         private readonly List<Stack> selection = new List<Stack>();
         private float weight;
+        private ItemDefinition held;
+
+        /// <summary>Raised when the item in the hands changes.</summary>
+        public event Action HeldChanged;
 
         /// <summary>Raised whenever the set of selected stacks changes.</summary>
         public event Action SelectedStackChanged;
@@ -49,7 +53,11 @@ namespace ProjectMayham.Items
         public IReadOnlyList<Stack> SelectedStacks => selection;
         public bool IsSelected(Stack stack) => selection.Contains(stack);
 
-        public override float TotalWeight => weight;
+        /// <summary>The item in the hands (one piece, outside of the grid), or null.</summary>
+        public ItemDefinition HeldItem => held;
+
+        // What is carried in the hands weighs as much as what is in the grid.
+        public override float TotalWeight => weight + (held != null ? held.Weight : 0f);
         // The slot members of Inventory do not apply to a grid.
         public override int SlotCount => 0;
         public override int Selected => -1;
@@ -80,6 +88,20 @@ namespace ProjectMayham.Items
             if (selection.Count == 1 && selection[0] == stack) return;
             selection.Clear();
             selection.Add(stack);
+            SelectedStackChanged?.Invoke();
+        }
+
+        /// <summary>Replaces the selection with these stacks (nothing happens when it is the same set).</summary>
+        public void SetSelection(IReadOnlyCollection<Stack> chosen)
+        {
+            bool same = chosen.Count == selection.Count && chosen.All(selection.Contains);
+            if (same) return;
+
+            selection.Clear();
+            foreach (var stack in chosen)
+            {
+                if (stacks.Contains(stack) && !selection.Contains(stack)) selection.Add(stack);
+            }
             SelectedStackChanged?.Invoke();
         }
 
@@ -160,6 +182,110 @@ namespace ProjectMayham.Items
             return true;
         }
 
+        /// <summary>
+        /// Takes one piece out of the stack and puts it into the hands. Whatever was in the hands goes back to
+        /// the grid first; if there is no room for it nothing changes.
+        /// </summary>
+        public bool Hold(Stack stack)
+        {
+            if (stack == null || !stacks.Contains(stack) || !stack.Item.Holdable) return false;
+
+            var item = stack.Item;
+            if (held != null && !Unhold()) return false;
+
+            // The stack may have been merged away while the old item was put back.
+            if (!stacks.Contains(stack)) return false;
+            stack.Count -= 1;
+            if (stack.Count <= 0) Remove(stack);
+            else { Recalculate(); NotifyChanged(); }
+
+            held = item;
+            HeldChanged?.Invoke();
+            NotifyChanged();
+            return true;
+        }
+
+        /// <summary>Puts the item in the hands back into the grid. Returns false when there is no room.</summary>
+        public bool Unhold()
+        {
+            if (held == null) return true;
+
+            var item = held;
+            held = null; // not counted while it looks for a place
+            if (Add(item, 1) > 0)
+            {
+                held = item;
+                return false;
+            }
+            HeldChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>Empties the hands without putting anything back (to drop the item).</summary>
+        public bool TakeHeld(out ItemDefinition item)
+        {
+            item = held;
+            if (held == null) return false;
+            held = null;
+            HeldChanged?.Invoke();
+            NotifyChanged();
+            return true;
+        }
+
+        /// <summary>What dropping the item in the hands at <paramref name="origin"/> would do.</summary>
+        public MoveKind EvaluateHeld(Vector2Int origin, bool rotated)
+        {
+            if (held == null) return MoveKind.Invalid;
+            return EvaluateCells(new Stack { Item = held, Count = 1, Origin = origin, Rotated = rotated }, origin, rotated, false);
+        }
+
+        /// <summary>Puts the item in the hands into the grid at a chosen place (or on a matching stack).</summary>
+        public bool PlaceHeld(Vector2Int origin, bool rotated)
+        {
+            var item = held;
+            var temp = item != null ? new Stack { Item = item, Count = 1, Origin = origin, Rotated = rotated } : null;
+            var kind = EvaluateHeld(origin, rotated);
+            if (kind == MoveKind.Invalid) return false;
+
+            held = null;
+            if (kind == MoveKind.Move)
+            {
+                stacks.Add(temp);
+                Place(temp);
+                SelectStack(temp);
+            }
+            else
+            {
+                var target = FindOverlapped(temp, origin, rotated);
+                target.Count += 1;
+                SelectStack(target);
+            }
+            Recalculate();
+            HeldChanged?.Invoke();
+            NotifyChanged();
+            return true;
+        }
+
+        /// <summary>Splits <paramref name="amount"/> items off a stack into a new stack in the first free spot.</summary>
+        public Stack Split(Stack stack, int amount)
+        {
+            if (stack == null || !stacks.Contains(stack)) return null;
+            if (amount < 1 || amount >= stack.Count) return null;
+            if (!FindSpot(stack.Item, out var origin, out bool rotated)) return null;
+
+            stack.Count -= amount;
+            var piece = new Stack { Item = stack.Item, Count = amount, Origin = origin, Rotated = rotated };
+            stacks.Add(piece);
+            Place(piece);
+            Recalculate();
+            NotifyChanged();
+            SelectStack(piece);
+            return piece;
+        }
+
+        /// <summary>True when a free spot exists for a stack of this item (used before splitting).</summary>
+        public bool HasFreeSpotFor(ItemDefinition item) => item != null && FindSpot(item, out _, out _);
+
         /// <summary>Removes a whole stack (to drop it, for example).</summary>
         public bool Remove(Stack stack)
         {
@@ -174,9 +300,11 @@ namespace ProjectMayham.Items
         }
 
         /// <summary>Tells what putting the stack at <paramref name="origin"/> would do.</summary>
-        public MoveKind Evaluate(Stack stack, Vector2Int origin, bool rotated)
+        public MoveKind Evaluate(Stack stack, Vector2Int origin, bool rotated) => EvaluateCells(stack, origin, rotated, true);
+
+        private MoveKind EvaluateCells(Stack stack, Vector2Int origin, bool rotated, bool mustBeInGrid)
         {
-            if (stack == null || !stacks.Contains(stack)) return MoveKind.Invalid;
+            if (stack == null || (mustBeInGrid && !stacks.Contains(stack))) return MoveKind.Invalid;
             if (rotated != stack.Rotated && !stack.Item.CanRotate) return MoveKind.Invalid;
 
             var size = Oriented(stack.Item, rotated);

@@ -90,6 +90,8 @@ namespace ProjectMayham.Interaction
             // the floor can be put back without being taken again.
             var taken = new List<(ItemDefinition item, int count)>();
             while (inventory.TakeSelected(out var item, out int count)) taken.Add((item, count));
+            // With nothing selected G throws away what is in the hands.
+            if (taken.Count == 0 && inventory is GridInventory grid && grid.TakeHeld(out var heldItem)) taken.Add((heldItem, 1));
 
             for (int i = 0; i < taken.Count; i++)
             {
