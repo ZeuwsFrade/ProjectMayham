@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ProjectMayham.Items;
 using ProjectMayham.Player;
 using ProjectMayham.Vision;
@@ -85,19 +86,38 @@ namespace ProjectMayham.Interaction
 
         private void DropSelected()
         {
-            var slot = inventory[inventory.Selected];
-            if (slot.IsEmpty || slot.item.WorldPrefab == null) return;
-            if (!inventory.TakeSelected(out var item, out int count)) return;
+            // Everything selected goes at once; the list is filled first so that items that cannot lie on
+            // the floor can be put back without being taken again.
+            var taken = new List<(ItemDefinition item, int count)>();
+            while (inventory.TakeSelected(out var item, out int count)) taken.Add((item, count));
+            // With nothing selected G throws away what is in the hands.
+            if (taken.Count == 0 && inventory is GridInventory grid && grid.TakeHeld(out var heldItem)) taken.Add((heldItem, 1));
+
+            for (int i = 0; i < taken.Count; i++)
+            {
+                // A small ring keeps several dropped items from lying exactly on top of each other.
+                Vector2 spread = taken.Count > 1
+                    ? new Vector2(Mathf.Cos(i * Mathf.PI * 2f / taken.Count), Mathf.Sin(i * Mathf.PI * 2f / taken.Count)) * 0.35f
+                    : Vector2.zero;
+                if (!DropToWorld(taken[i].item, taken[i].count, spread)) inventory.Add(taken[i].item, taken[i].count);
+            }
+        }
+
+        /// <summary>Puts an item in front of the player (or at their feet when the spot is inside a wall).</summary>
+        public bool DropToWorld(ItemDefinition item, int count, Vector2 offset = default)
+        {
+            if (item == null || item.WorldPrefab == null || count <= 0) return false;
 
             Vector2 origin = transform.position;
             Vector2 facing = player != null ? player.AimPoint - origin : (Vector2)transform.up;
             facing = facing.sqrMagnitude > 0.0001f ? facing.normalized : Vector2.up;
 
-            Vector2 spot = origin + facing * dropDistance;
+            Vector2 spot = origin + facing * dropDistance + offset;
             if (Physics2D.OverlapCircle(spot, 0.2f, blockMask) != null) spot = origin;
 
             var dropped = Instantiate(item.WorldPrefab, spot, Quaternion.identity);
             if (dropped.TryGetComponent<ItemPickup>(out var pickup)) pickup.Set(item, count);
+            return true;
         }
     }
 }
