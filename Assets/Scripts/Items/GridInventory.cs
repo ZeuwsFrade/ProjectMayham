@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ProjectMayham.Core;
 using UnityEngine;
 
 namespace ProjectMayham.Items
@@ -299,6 +300,191 @@ namespace ProjectMayham.Items
             return true;
         }
 
+        // ---- counting, trading and moving items between inventories ----
+
+        /// <summary>How many items of this kind lie in the grid (the hands are not counted).</summary>
+        public int CountOf(ItemDefinition item)
+        {
+            int total = 0;
+            foreach (var stack in stacks)
+            {
+                if (stack.Item == item) total += stack.Count;
+            }
+            return total;
+        }
+
+        /// <summary>Takes up to <paramref name="count"/> items of this kind out of the grid (smallest stacks first). Returns how many were taken.</summary>
+        public int RemoveItems(ItemDefinition item, int count)
+        {
+            if (item == null || count <= 0) return 0;
+
+            var matching = stacks.Where(s => s.Item == item).OrderBy(s => s.Count).ToList();
+            int left = count;
+            foreach (var stack in matching)
+            {
+                if (left <= 0) break;
+                int taken = Mathf.Min(left, stack.Count);
+                left -= taken;
+                Reduce(stack, taken);
+            }
+            return count - left;
+        }
+
+        /// <summary>Takes <paramref name="amount"/> items out of a stack; the stack disappears when it is empty.</summary>
+        public void Reduce(Stack stack, int amount)
+        {
+            if (stack == null || amount <= 0 || !stacks.Contains(stack)) return;
+            if (amount >= stack.Count)
+            {
+                Remove(stack);
+                return;
+            }
+            stack.Count -= amount;
+            Recalculate();
+            NotifyChanged();
+        }
+
+        /// <summary>True when the grid could take this many items as a whole (room and weight), without placing them.</summary>
+        public bool CanFit(ItemDefinition item, int count)
+        {
+            if (item == null || count <= 0) return false;
+            if (CountByWeight(item) < count) return false;
+
+            // Try on a copy of the occupancy so nothing changes.
+            var grid = GridSize;
+            var occupied = new bool[grid.x, grid.y];
+            for (int x = 0; x < grid.x; x++)
+            {
+                for (int y = 0; y < grid.y; y++) occupied[x, y] = Cells[x, y] != null;
+            }
+
+            int left = count;
+            foreach (var stack in stacks)
+            {
+                if (stack.Item != item) continue;
+                left -= item.MaxStack - stack.Count;
+                if (left <= 0) return true;
+            }
+            while (left > 0)
+            {
+                if (!FindFreeSpot(item, occupied, out var origin, out bool rotated)) return false;
+                var size = Oriented(item, rotated);
+                for (int x = origin.x; x < origin.x + size.x; x++)
+                {
+                    for (int y = origin.y; y < origin.y + size.y; y++) occupied[x, y] = true;
+                }
+                left -= item.MaxStack;
+            }
+            return true;
+        }
+
+        /// <summary>What putting items of this kind at <paramref name="origin"/> would do.</summary>
+        public MoveKind EvaluateItem(ItemDefinition item, Vector2Int origin, bool rotated)
+        {
+            if (item == null) return MoveKind.Invalid;
+            return EvaluateCells(new Stack { Item = item, Count = 1, Origin = origin, Rotated = rotated }, origin, rotated, false);
+        }
+
+        /// <summary>
+        /// Puts items that come from outside (another inventory) at a chosen place: on free cells, or onto a stack
+        /// of the same item. Respects the max stack and the weight limit. Returns how many were placed.
+        /// </summary>
+        public int PlaceItem(ItemDefinition item, int count, Vector2Int origin, bool rotated)
+        {
+            var kind = EvaluateItem(item, origin, rotated);
+            if (kind == MoveKind.Invalid || count <= 0) return 0;
+
+            int amount = Mathf.Min(count, CountByWeight(item));
+            if (amount <= 0) return 0;
+
+            Stack target;
+            if (kind == MoveKind.Move)
+            {
+                amount = Mathf.Min(amount, item.MaxStack);
+                target = new Stack { Item = item, Count = amount, Origin = origin, Rotated = rotated };
+                stacks.Add(target);
+                Place(target);
+            }
+            else
+            {
+                var probe = new Stack { Item = item, Count = 1, Origin = origin, Rotated = rotated };
+                target = FindOverlapped(probe, origin, rotated);
+                amount = Mathf.Min(amount, item.MaxStack - target.Count);
+                target.Count += amount;
+            }
+
+            Recalculate();
+            NotifyChanged();
+            SelectStack(target);
+            return amount;
+        }
+
+        /// <summary>Empties the grid and the hands.</summary>
+        public void Clear()
+        {
+            stacks.Clear();
+            selection.Clear();
+            held = null;
+            cells = null;
+            weight = 0f;
+            NotifyChanged();
+            SelectedStackChanged?.Invoke();
+            HeldChanged?.Invoke();
+        }
+
+        /// <summary>Copies the contents into a save-friendly form.</summary>
+        public InventoryData Export()
+        {
+            var data = new InventoryData { held = held != null ? held.Id : null };
+            foreach (var stack in stacks)
+            {
+                data.stacks.Add(new StackData
+                {
+                    item = stack.Item.Id, count = stack.Count, x = stack.Origin.x, y = stack.Origin.y, rotated = stack.Rotated
+                });
+            }
+            return data;
+        }
+
+        /// <summary>Replaces the contents with saved ones. Stacks that no longer fit or whose item is gone are skipped.</summary>
+        public void Import(InventoryData data)
+        {
+            stacks.Clear();
+            selection.Clear();
+            held = null;
+            cells = null;
+            weight = 0f;
+
+            if (data != null)
+            {
+                foreach (var saved in data.stacks)
+                {
+                    var item = ItemDatabase.Find(saved.item);
+                    if (item == null || saved.count <= 0) continue;
+
+                    var origin = new Vector2Int(saved.x, saved.y);
+                    var probe = new Stack { Item = item, Count = saved.count, Origin = origin, Rotated = saved.rotated };
+                    if (EvaluateCells(probe, origin, saved.rotated, false) != MoveKind.Move)
+                    {
+                        // The layout is no longer valid (the grid changed): look for another place.
+                        if (!FindSpot(item, out origin, out bool rotated)) continue;
+                        probe.Origin = origin;
+                        probe.Rotated = rotated;
+                    }
+                    stacks.Add(probe);
+                    Place(probe);
+                }
+                Recalculate();
+
+                var heldItem = ItemDatabase.Find(data.held);
+                if (heldItem != null) held = heldItem;
+            }
+
+            NotifyChanged();
+            SelectedStackChanged?.Invoke();
+            HeldChanged?.Invoke();
+        }
+
         /// <summary>Tells what putting the stack at <paramref name="origin"/> would do.</summary>
         public MoveKind Evaluate(Stack stack, Vector2Int origin, bool rotated) => EvaluateCells(stack, origin, rotated, true);
 
@@ -418,7 +604,11 @@ namespace ProjectMayham.Items
             return null;
         }
 
-        private bool FindSpot(ItemDefinition item, out Vector2Int origin, out bool rotated)
+        private bool FindSpot(ItemDefinition item, out Vector2Int origin, out bool rotated) =>
+            FindFreeSpot(item, null, out origin, out rotated);
+
+        // With an occupancy map the search runs on that map instead of the real cells.
+        private bool FindFreeSpot(ItemDefinition item, bool[,] occupied, out Vector2Int origin, out bool rotated)
         {
             var grid = GridSize;
             for (int turn = 0; turn < 2; turn++)
@@ -431,7 +621,7 @@ namespace ProjectMayham.Items
                 {
                     for (int x = 0; x + size.x <= grid.x; x++)
                     {
-                        if (!IsFree(new Vector2Int(x, y), size)) continue;
+                        if (!IsFree(new Vector2Int(x, y), size, occupied)) continue;
                         origin = new Vector2Int(x, y);
                         return true;
                     }
@@ -442,13 +632,13 @@ namespace ProjectMayham.Items
             return false;
         }
 
-        private bool IsFree(Vector2Int origin, Vector2Int size)
+        private bool IsFree(Vector2Int origin, Vector2Int size, bool[,] occupied = null)
         {
             for (int x = origin.x; x < origin.x + size.x; x++)
             {
                 for (int y = origin.y; y < origin.y + size.y; y++)
                 {
-                    if (Cells[x, y] != null) return false;
+                    if (occupied != null ? occupied[x, y] : Cells[x, y] != null) return false;
                 }
             }
             return true;

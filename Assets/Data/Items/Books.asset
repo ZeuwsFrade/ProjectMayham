@@ -18,4 +18,11 @@ MonoBehaviour:
   gridSize: {x: 2, y: 2}
   canRotate: 1
   weight: 2
+  value: 8
+  holdable: 0
+  heldSprite: {fileID: 0}
+  heldOffset: {x: 0.4, y: 0.45}
+  heldAngle: 0
+  heldMatchesWorld: 1
+  heldScale: 1
   worldPrefab: {fileID: 8217352054659401380, guid: 9edb4f8c1f21b3a4f942c8f538cf5f08, type: 3}

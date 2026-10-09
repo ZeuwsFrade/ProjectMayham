@@ -18,6 +18,7 @@ MonoBehaviour:
   gridSize: {x: 1, y: 1}
   canRotate: 1
   weight: 0.3
+  value: 6
   holdable: 1
   heldSprite: {fileID: 0}
   heldOffset: {x: 0.45, y: 0.55}

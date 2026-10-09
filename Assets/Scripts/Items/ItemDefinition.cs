@@ -17,6 +17,9 @@ namespace ProjectMayham.Items
         [Tooltip("Weight of one item, in kg.")]
         [Min(0f)]
         [SerializeField] private float weight = 1f;
+        [Tooltip("Base price in money. The trader buys for a share of it and sells for a markup.")]
+        [Min(0)]
+        [SerializeField] private int value = 1;
         [Header("Hands")]
         [Tooltip("Whether the player can take the item in their hands (it is then shown next to the player).")]
         [SerializeField] private bool holdable;
@@ -35,6 +38,9 @@ namespace ProjectMayham.Items
         [Tooltip("Prefab with an ItemPickup that is spawned when the item is dropped.")]
         [SerializeField] private GameObject worldPrefab;
 
+        /// <summary>Stable key used in save files and barter data: the name of the asset.</summary>
+        public string Id => name;
+        public int Value => Mathf.Max(0, value);
         public string DisplayName => displayName;
         public Sprite Icon => icon;
         public int MaxStack => Mathf.Max(1, maxStack);

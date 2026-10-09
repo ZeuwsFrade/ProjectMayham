@@ -61,7 +61,8 @@ namespace ProjectMayham.Vision
         /// </summary>
         private bool TestVisible(VisionCone cone)
         {
-            if (cone == null || renderers.Length == 0) return false;
+            if (renderers.Length == 0) return false;
+            if (cone == null) return true; // a scene without vision (the shelter): everything is in plain view
 
             Bounds b = renderers[0].bounds;
             Vector2 c = (Vector2)b.center + sightOffset;

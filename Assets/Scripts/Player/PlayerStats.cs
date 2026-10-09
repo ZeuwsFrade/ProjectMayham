@@ -132,6 +132,24 @@ namespace ProjectMayham.Player
             SetHealth(health + amount);
         }
 
+        /// <summary>Sets health without damage effects (loading a save, sleeping). A dead player stays dead.</summary>
+        public void RestoreHealth(float value)
+        {
+            if (dead) return;
+            SetHealth(Mathf.Max(1f, value));
+            SetRecoveringHealth(false);
+        }
+
+        /// <summary>Health and stamina back to the maximum.</summary>
+        public void RestoreAll()
+        {
+            if (dead) return;
+            SetHealth(maxHealth);
+            SetStamina(maxStamina);
+            SetExhausted(false);
+            SetRecoveringHealth(false);
+        }
+
         private float DrainMultiplier()
         {
             if (inventory == null || inventory.ComfortableWeight <= 0f) return 1f;

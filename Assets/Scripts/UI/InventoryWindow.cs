@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using ProjectMayham.Core;
 using ProjectMayham.Interaction;
 using ProjectMayham.Items;
 using TMPro;
@@ -122,6 +123,7 @@ namespace ProjectMayham.UI
             var keyboard = Keyboard.current;
             if (keyboard != null)
             {
+                if (ModalState.IsOpen) { if (IsOpen) SetOpen(false); return; } // another window has the keyboard
                 if (keyboard[toggleKey].wasPressedThisFrame) SetOpen(!IsOpen);
                 else if (IsOpen && keyboard.escapeKey.wasPressedThisFrame)
                 {

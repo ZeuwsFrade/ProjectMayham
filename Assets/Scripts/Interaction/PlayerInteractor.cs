@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ProjectMayham.Core;
 using ProjectMayham.Items;
 using ProjectMayham.Player;
 using ProjectMayham.Vision;
@@ -54,6 +55,14 @@ namespace ProjectMayham.Interaction
 
         private void Update()
         {
+            // Windows that pause the game own the keyboard: nothing in the world can be used meanwhile.
+            if (ModalState.IsOpen)
+            {
+                Current = null;
+                CurrentUsable = false;
+                return;
+            }
+
             FindCurrent();
 
             if (interactAction.WasPressedThisFrame() && Current != null && CurrentUsable) Current.Interact(gameObject);

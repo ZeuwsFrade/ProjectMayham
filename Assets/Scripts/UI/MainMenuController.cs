@@ -1,12 +1,11 @@
+using ProjectMayham.Core;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace ProjectMayham.UI
 {
     public class MainMenuController : MonoBehaviour
     {
-        [SerializeField] private string newGameSceneName = "MainScene";
         [SerializeField] private Button newGameButton;
         [SerializeField] private Button loadGameButton;
         [SerializeField] private Button settingsButton;
@@ -16,20 +15,26 @@ namespace ProjectMayham.UI
         private void Awake()
         {
             if (newGameButton != null) newGameButton.onClick.AddListener(OnNewGameClicked);
-            if (loadGameButton != null) loadGameButton.onClick.AddListener(OnLoadGameClicked);
+            if (loadGameButton != null)
+            {
+                loadGameButton.onClick.AddListener(OnLoadGameClicked);
+                loadGameButton.interactable = GameSession.HasSave;
+            }
             if (settingsButton != null) settingsButton.onClick.AddListener(OnSettingsClicked);
             if (quitButton != null) quitButton.onClick.AddListener(OnQuitClicked);
         }
 
+        // A new game starts in the shelter with a fresh save.
         public void OnNewGameClicked()
         {
-            SceneManager.LoadScene(newGameSceneName);
+            GameSession.NewGame();
+            SceneLoader.Load(SceneLoader.Shelter, "Убежище", save: false);
         }
 
-        // Заглушка: система сохранений ещё не реализована.
         public void OnLoadGameClicked()
         {
-            Debug.Log("Load Game is not implemented yet.");
+            if (!GameSession.Load()) return;
+            SceneLoader.Load(SceneLoader.Shelter, "Убежище", save: false);
         }
 
         public void OnSettingsClicked()
