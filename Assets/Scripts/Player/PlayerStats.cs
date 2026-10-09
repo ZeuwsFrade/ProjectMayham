@@ -150,6 +150,18 @@ namespace ProjectMayham.Player
             SetRecoveringHealth(false);
         }
 
+        /// <summary>
+        /// Pays for a one-off effort (climbing over a barricade). False, with nothing spent, when there is not
+        /// enough stamina or the player is out of breath.
+        /// </summary>
+        public bool TrySpendStamina(float amount)
+        {
+            if (amount <= 0f) return !dead;
+            if (dead || exhausted || stamina < amount) return false;
+            Drain(amount);
+            return true;
+        }
+
         private float DrainMultiplier()
         {
             if (inventory == null || inventory.ComfortableWeight <= 0f) return 1f;

@@ -12,4 +12,19 @@ namespace ProjectMayham.Interaction
         bool CanInteract(GameObject actor);
         void Interact(GameObject actor);
     }
+
+    /// <summary>An interactable that needs the Interact key to be held for a while, like taking a barricade apart.</summary>
+    public interface IHoldInteractable : IInteractable
+    {
+        /// <summary>Seconds the key has to be held before <see cref="IInteractable.Interact"/> is called.</summary>
+        float HoldSeconds { get; }
+        /// <summary>Text shown while the key is held, for example "Разбираю баррикаду".</summary>
+        string HoldLabel { get; }
+    }
+
+    /// <summary>Other ways to deal with the object besides the Interact key; shown after the prompt.</summary>
+    public interface IPromptHints
+    {
+        string Hints { get; }
+    }
 }

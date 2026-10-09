@@ -4,24 +4,32 @@ using UnityEngine.Tilemaps;
 namespace ProjectMayham.Level
 {
     /// <summary>
-    /// Root of a room prefab: one hand-editable mini level. The tilemaps under <see cref="tiles"/> hold the floor and
-    /// the inner walls, with the tile (0, 0) at the bottom-left corner of the room. At the start of a raid they are
-    /// copied into the maze tilemaps, the rest (furniture, decor, loot spots) is used as is.
+    /// Root of a room prefab: one hand-editable mini level. The tilemaps under <see cref="tiles"/> hold the floor, the
+    /// walls and the windows, with the tile (0, 0) at the bottom-left corner of the floor. The room owns the ring of
+    /// outer walls around its floor (tiles -1 and width / height): a gap in the ring is a door, a window tile lets
+    /// the player look in from the corridor. At the start of a raid the tiles are copied into the maze tilemaps, the
+    /// rest (furniture, decor, loot spots) is used as is.
     ///
-    /// Rule for editing: keep the outer ring of floor tiles free of anything that blocks movement. Doors open
-    /// anywhere on the room border, so a free ring guarantees that every door leads to everything inside.
+    /// Rules for editing:
+    /// - the cells of the maze are four tiles (a wall line and three tiles of floor). A door is two tiles wide and
+    ///   lies within one cell: it takes two of the offsets 4k, 4k + 1, 4k + 2 along its side and never 4k + 3, so
+    ///   it faces the floor of a corridor and not a corridor wall;
+    /// - inner walls stand on the same lattice (offsets 4k + 3), which keeps them clear of the doors;
+    /// - every piece of floor has to stay reachable from the doors (Mayham > Level > Validate Rooms checks it).
     /// </summary>
     public class RoomTemplate : MonoBehaviour
     {
         [SerializeField] private RoomKind kind;
         [SerializeField] private RoomSize size;
-        [Tooltip("Parent of the 'Floor' and 'Walls' tilemaps. Destroyed after its tiles have been copied.")]
+        [Tooltip("Parent of the 'Floor', 'Walls' and 'Windows' tilemaps. Destroyed after its tiles have been copied.")]
         [SerializeField] private Transform tiles;
         [SerializeField] private Tilemap floor;
         [SerializeField] private Tilemap walls;
+        [Tooltip("Tiles that stop movement but not sight.")]
+        [SerializeField] private Tilemap windows;
         [Tooltip("Objects that stay in the room: furniture and other props.")]
         [SerializeField] private Transform props;
-        [Tooltip("Objects drawn on the border walls. They are removed when a door opens in their place.")]
+        [Tooltip("Objects drawn on the walls.")]
         [SerializeField] private Transform decor;
         [Tooltip("Empty children that mark the places where loot can appear.")]
         [SerializeField] private Transform lootSpots;
@@ -31,6 +39,7 @@ namespace ProjectMayham.Level
         public Transform Tiles => tiles;
         public Tilemap Floor => floor;
         public Tilemap Walls => walls;
+        public Tilemap Windows => windows;
         public Transform Props => props;
         public Transform Decor => decor;
         public Transform LootSpots => lootSpots;

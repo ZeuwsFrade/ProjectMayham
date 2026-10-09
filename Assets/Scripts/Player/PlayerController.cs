@@ -46,9 +46,14 @@ namespace ProjectMayham.Player
         public Vector2 Velocity => body.linearVelocity;
         /// <summary>Cursor position in world space, refreshed every frame.</summary>
         public Vector2 AimPoint { get; private set; }
-        public bool IsSprinting => sprintHeld && moveInput.sqrMagnitude > 0.01f && CanSprint;
+        public bool IsSprinting => !MovementLocked && sprintHeld && moveInput.sqrMagnitude > 0.01f && CanSprint;
         /// <summary>False while out of breath or carrying more than the comfortable weight.</summary>
         public bool CanSprint => (stats == null || stats.CanSprint) && (inventory == null || !inventory.IsOverloaded);
+        /// <summary>
+        /// While true the movement keys are ignored and the velocity is left to whoever set the lock
+        /// (climbing over a barricade). Aiming keeps working.
+        /// </summary>
+        public bool MovementLocked { get; set; }
 
         private void Awake()
         {
@@ -93,6 +98,8 @@ namespace ProjectMayham.Player
 
         private void ApplyMovement()
         {
+            if (MovementLocked) return;
+
             float speed = IsSprinting ? sprintSpeed : walkSpeed;
             if (inventory != null) speed *= Mathf.Lerp(1f, speedAtMaxWeight, inventory.Encumbrance);
             Vector2 target = moveInput * speed;
