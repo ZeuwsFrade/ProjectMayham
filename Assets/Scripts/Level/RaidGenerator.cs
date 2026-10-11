@@ -1,14 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using ProjectMayham.Items;
+using ProjectMayham.Quests;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace ProjectMayham.Level
 {
     /// <summary>
-    /// Fills the room slots of the corridor template with rooms, blocks some corridors with barricades, scatters
-    /// loot and breaks a few holes through the walls of the maze. Runs when the scene starts, before
+    /// Fills the room slots of the corridor template with rooms (first those the active quests ask for), blocks
+    /// some corridors with barricades, scatters loot and breaks a few holes through the walls of the maze. Runs
+    /// when the scene starts, before
     /// <see cref="World.WrapWorld"/> copies the tilemaps around the seam, so every raid has a different set of rooms
     /// in the same places. The same seed always gives the same raid.
     /// </summary>
@@ -23,6 +25,8 @@ namespace ProjectMayham.Level
             public RoomTemplate Prefab;
             public GameObject Instance;
             public int LootCount;
+            /// <summary>True when the kind was asked for by the demands instead of being picked by chance.</summary>
+            public bool Forced;
         }
 
         private const string RootName = "Raid";
@@ -88,22 +92,36 @@ namespace ProjectMayham.Level
         private readonly List<PlacedRoom> rooms = new List<PlacedRoom>();
         private readonly List<GameObject> barricades = new List<GameObject>();
         private readonly List<GameObject> holes = new List<GameObject>();
+        private readonly List<GameObject> questPickups = new List<GameObject>();
+        private readonly List<RoomKind> missingKinds = new List<RoomKind>();
 
         public int Seed { get; private set; }
         public IReadOnlyList<PlacedRoom> Rooms => rooms;
         public IReadOnlyList<GameObject> Barricades => barricades;
         public IReadOnlyList<GameObject> Holes => holes;
+        /// <summary>Pickups that lie in the raid because the demands asked for them.</summary>
+        public IReadOnlyList<GameObject> QuestPickups => questPickups;
+        /// <summary>Kinds of rooms that were asked for and found no slot in this raid.</summary>
+        public IReadOnlyList<RoomKind> MissingKinds => missingKinds;
 
         private int Tiles => cells * RoomSizes.CellTiles;
 
         private void Awake()
         {
             if (!Application.isPlaying) return;
-            Generate(useFixedSeed ? fixedSeed : Random.Range(1, int.MaxValue));
+
+            // What the quests the player has taken need from this raid; the tracker reports back what was reached.
+            var demands = QuestLog.BuildRaidDemands();
+            Generate(useFixedSeed ? fixedSeed : Random.Range(1, int.MaxValue), demands);
+            gameObject.AddComponent<RaidQuestTracker>().Begin(this, demands);
         }
 
-        /// <summary>Builds a raid. Anything left from an earlier one (also from an editor preview) is removed first.</summary>
-        public void Generate(int seed)
+        /// <summary>
+        /// Builds a raid. Anything left from an earlier one (also from an editor preview) is removed first.
+        /// <paramref name="demands"/> say what has to be in the raid whatever the dice say (rooms and items that
+        /// quests need); without them the raid is decided by the seed alone.
+        /// </summary>
+        public void Generate(int seed, RaidDemands demands = null)
         {
             Clear();
             Seed = seed;
@@ -113,9 +131,12 @@ namespace ProjectMayham.Level
             root.transform.SetParent(transform, false);
 
             var slots = GetComponentsInChildren<RoomSlot>().OrderBy(s => s.name, System.StringComparer.Ordinal).ToList();
+            var forced = AssignRequiredKinds(slots, demands, rng);
             foreach (var slot in slots)
             {
-                var placed = PlaceRoom(slot, root.transform, rng);
+                var placed = forced.TryGetValue(slot, out var kind)
+                    ? PlaceRoom(slot, root.transform, rng, kind, demands)
+                    : PlaceRoom(slot, root.transform, rng);
                 if (placed != null) rooms.Add(placed);
             }
             // After the rooms: their doors decide which corridor cells are passages.
@@ -146,6 +167,8 @@ namespace ProjectMayham.Level
             rooms.Clear();
             barricades.Clear();
             holes.Clear();
+            questPickups.Clear();
+            missingKinds.Clear();
 
             for (int i = transform.childCount - 1; i >= 0; i--)
             {
@@ -157,9 +180,37 @@ namespace ProjectMayham.Level
 
         // ---- rooms ----
 
-        private PlacedRoom PlaceRoom(RoomSlot slot, Transform root, System.Random rng)
+        /// <summary>
+        /// Gives every kind of room the demands ask for a slot of its own, before the rest is filled by chance.
+        /// The kind that fits the fewest slots goes first. Draws no random numbers when nothing is asked for,
+        /// so a raid without demands is the same as it always was for the same seed.
+        /// </summary>
+        private Dictionary<RoomSlot, RoomKind> AssignRequiredKinds(List<RoomSlot> slots, RaidDemands demands, System.Random rng)
         {
-            var info = library.PickKind(slot.Size, rng);
+            var assigned = new Dictionary<RoomSlot, RoomKind>();
+            if (demands == null || demands.IsEmpty) return assigned;
+
+            // Kinds that fit the same number of slots keep the order of the demands: what was asked first is served first.
+            var kinds = demands.Rooms()
+                .Select((kind, index) => (kind, index, fits: slots.Count(s => library.CanPlace(kind, s.Size))))
+                .OrderBy(k => k.fits).ThenBy(k => k.index).ToList();
+            foreach (var entry in kinds)
+            {
+                var free = slots.Where(s => !assigned.ContainsKey(s) && library.CanPlace(entry.kind, s.Size)).ToList();
+                if (free.Count == 0)
+                {
+                    missingKinds.Add(entry.kind);
+                    Debug.LogWarning($"RaidGenerator: no free slot for a room of kind {entry.kind}; what needs it has to wait for another raid.", this);
+                    continue;
+                }
+                assigned[free[rng.Next(free.Count)]] = entry.kind;
+            }
+            return assigned;
+        }
+
+        private PlacedRoom PlaceRoom(RoomSlot slot, Transform root, System.Random rng, RoomKind? forcedKind = null, RaidDemands demands = null)
+        {
+            var info = forcedKind.HasValue ? library.Info(forcedKind.Value) : library.PickKind(slot.Size, rng);
             if (info == null)
             {
                 Debug.LogWarning($"RaidGenerator: no room fits {slot.name} ({slot.Size}).", slot);
@@ -177,8 +228,15 @@ namespace ProjectMayham.Level
             CopyTiles(instance.Windows, windowMap, origin, paintedWindows);
             Remove(instance.Tiles.gameObject);
 
-            var placed = new PlacedRoom { Slot = slot, Kind = info.kind, Prefab = prefab, Instance = instance.gameObject };
-            placed.LootCount = SpawnRoomLoot(instance, info, rng);
+            var placed = new PlacedRoom
+            {
+                Slot = slot, Kind = info.kind, Prefab = prefab, Instance = instance.gameObject, Forced = forcedKind.HasValue
+            };
+            // What the demands want to lie in a room of this kind goes into the room that was put up for them.
+            var wanted = forcedKind.HasValue && demands != null
+                ? demands.Items.Where(i => i.Room == info.kind).ToList()
+                : null;
+            placed.LootCount = SpawnRoomLoot(instance, info, rng, wanted);
             return placed;
         }
 
@@ -196,19 +254,58 @@ namespace ProjectMayham.Level
             }
         }
 
-        private int SpawnRoomLoot(RoomTemplate room, RoomLibrary.KindInfo info, System.Random rng)
+        private int SpawnRoomLoot(RoomTemplate room, RoomLibrary.KindInfo info, System.Random rng, List<RaidDemands.ItemDemand> wanted = null)
         {
             int spawned = 0;
-            if (room.LootSpots == null) return 0;
+            bool anyWanted = wanted != null && wanted.Count > 0;
+            if (room.LootSpots == null)
+            {
+                if (anyWanted) Debug.LogWarning($"RaidGenerator: {room.name} has no loot spots, the items asked for it are not placed.", room);
+                return 0;
+            }
 
             // Collected first: the markers are removed while the loop runs.
             var spots = room.LootSpots.Cast<Transform>().ToList();
+
+            // What was asked for goes first and takes a spot of its own; ordinary loot does not land there.
+            if (anyWanted)
+            {
+                foreach (var demand in wanted)
+                {
+                    if (spots.Count == 0)
+                    {
+                        Debug.LogWarning($"RaidGenerator: {room.name} has too few loot spots for what was asked of it.", room);
+                        break;
+                    }
+                    int index = rng.Next(spots.Count);
+                    var spot = spots[index];
+                    spots.RemoveAt(index);
+                    var pickup = SpawnItem(demand.Item, demand.Count, spot.position, room.transform);
+                    if (pickup != null) questPickups.Add(pickup);
+                    Remove(spot.gameObject);
+                }
+            }
+
             foreach (var spot in spots)
             {
                 if (info.loot != null && rng.NextDouble() <= info.lootChance && SpawnLoot(info.loot, spot.position, room.transform, rng)) spawned++;
                 Remove(spot.gameObject);
             }
             return spawned;
+        }
+
+        // A given item as its pickup, as opposed to SpawnLoot, which rolls one from a table.
+        private static GameObject SpawnItem(ItemDefinition item, int count, Vector3 position, Transform parent)
+        {
+            if (item == null || item.WorldPrefab == null)
+            {
+                Debug.LogWarning($"RaidGenerator: the item {(item != null ? item.Id : "(none)")} has no world prefab and cannot be placed.");
+                return null;
+            }
+
+            var instance = Instantiate(item.WorldPrefab, position, Quaternion.identity, parent);
+            if (instance.TryGetComponent<ItemPickup>(out var pickup)) pickup.Set(item, count);
+            return instance;
         }
 
         // ---- barricades ----
