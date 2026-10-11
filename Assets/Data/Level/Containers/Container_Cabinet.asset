@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdebbe3b8ce86d540925a0f428558104, type: 3}
+  m_Name: Container_Cabinet
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.LootContainerProfile
+  title: "\u0428\u043A\u0430\u0444"
+  gridSize: {x: 4, y: 5}
+  secondsPerItem: 1
+  loot: {fileID: 11400000, guid: 9d729097c6b298140a3a239d56277cdf, type: 2}
+  emptyChance: 0.65
+  minStacks: 1
+  maxStacks: 3
+  roomLootChance: 0.3

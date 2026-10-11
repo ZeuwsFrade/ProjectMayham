@@ -118,6 +118,28 @@ namespace ProjectMayham.EditorTools
                 t.Eq(QuestLog.TryTurnIn(visit, backpack), TurnInResult.Done, "a visit quest is turned in without items");
             }
 
+            // A special item that its quest hides in a container.
+            using (var world = new World())
+            {
+                var onFloor = world.Make<ItemDefinition>("OnFloor");
+                var inContainer = world.Make<ItemDefinition>("InContainer");
+                var first = world.Quest("First", 1);
+                world.Objective(first, QuestObjectiveKind.FindSpecial, onFloor, 1, RoomKind.BossOffice);
+                var second = world.Quest("Second", 2);
+                world.Objective(second, QuestObjectiveKind.FindSpecial, inContainer, 1, RoomKind.Storage, hidden: true);
+                var third = world.Quest("Third", 3);
+                world.Objective(third, QuestObjectiveKind.Deliver, papers, 1, hidden: true);
+                t.Ok(second.Objectives[0].Hidden, "a special item can be marked as hidden");
+                t.Ok(!third.Objectives[0].Hidden, "an ordinary item cannot: the mark means nothing for it");
+
+                QuestLog.Accept(first);
+                QuestLog.Accept(second);
+                var asked = QuestLog.BuildRaidDemands();
+                t.Eq(asked.Items.Count, 2, "both special items are asked of the raid");
+                t.Ok(asked.Items.Count == 2 && !asked.Items[0].Hidden, "one to lie on the floor");
+                t.Ok(asked.Items.Count == 2 && asked.Items[1].Hidden, "the other to be hidden in a container");
+            }
+
             // What the raid has to contain.
             using (var world = new World())
             {

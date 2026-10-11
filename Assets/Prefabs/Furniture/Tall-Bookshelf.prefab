@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7473169234152907091}
   - component: {fileID: 5061322031987742628}
   - component: {fileID: 8028269665380494950}
+  - component: {fileID: 4723235269387177170}
   m_Layer: 9
   m_Name: Tall-Bookshelf
   m_TagString: Untagged
@@ -151,3 +152,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f14bffb571259fe40958201e3038305c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.World.WrapEntity
+--- !u!114 &4723235269387177170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5164213278447218751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18c3ccaca49c91542b0e04ba3ea31511, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.LootContainer
+  profile: {fileID: 11400000, guid: a15302e6aa8644e47818c068e47e92ac, type: 2}

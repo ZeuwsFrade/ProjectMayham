@@ -1,4 +1,5 @@
 using System.Collections;
+using ProjectMayham.Core;
 using ProjectMayham.Level;
 using ProjectMayham.Player;
 using ProjectMayham.World;
@@ -74,7 +75,8 @@ namespace ProjectMayham.Interaction
                 if (messageTimer <= 0f) Message = string.Empty;
             }
 
-            if (!IsClimbing && climbAction.WasPressedThisFrame()) TryClimb();
+            // Not from behind a window: the one of a container does not stop the game, and the keys with it.
+            if (!IsClimbing && !ModalState.IsOpen && climbAction.WasPressedThisFrame()) TryClimb();
         }
 
         // ---- barricades ----

@@ -236,7 +236,7 @@ namespace ProjectMayham.Quests
                     else if (objective.Kind == QuestObjectiveKind.FindSpecial)
                     {
                         int missing = objective.Count - Owned(data, objective.Item);
-                        if (missing > 0) demands.AddItem(objective.Item, missing, objective.Room);
+                        if (missing > 0) demands.AddItem(objective.Item, missing, objective.Room, objective.Hidden);
                     }
                 }
             }

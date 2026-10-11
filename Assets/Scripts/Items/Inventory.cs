@@ -144,6 +144,13 @@ namespace ProjectMayham.Items
             return Mathf.Max(0, Mathf.FloorToInt((free + WeightEpsilon) / item.Weight));
         }
 
+        /// <summary>For subclasses that are set up from code: replaces the weight limits of the Inspector.</summary>
+        protected void SetWeightLimits(float comfortable, float max)
+        {
+            comfortableWeight = Mathf.Max(0f, comfortable);
+            maxWeight = Mathf.Max(comfortableWeight, max);
+        }
+
         /// <summary>For subclasses that store items differently: raises <see cref="Changed"/>.</summary>
         protected void NotifyChanged() => Changed?.Invoke();
 

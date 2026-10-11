@@ -54,6 +54,13 @@ namespace ProjectMayham.Player
         /// (climbing over a barricade). Aiming keeps working.
         /// </summary>
         public bool MovementLocked { get; set; }
+        /// <summary>What the move keys ask for right now, whether or not the character can move.</summary>
+        public Vector2 MoveInput => moveInput;
+        /// <summary>
+        /// While set the character looks at this point instead of the mouse cursor: for a window that needs the
+        /// mouse while the game goes on.
+        /// </summary>
+        public Vector2? LookAt { get; set; }
 
         private void Awake()
         {
@@ -82,6 +89,12 @@ namespace ProjectMayham.Player
 
         private void UpdateAimPoint()
         {
+            if (LookAt.HasValue)
+            {
+                AimPoint = LookAt.Value;
+                return;
+            }
+
             if (cam == null) cam = Camera.main;
             if (cam == null) return;
 

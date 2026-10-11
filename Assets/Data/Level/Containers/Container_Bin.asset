@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdebbe3b8ce86d540925a0f428558104, type: 3}
+  m_Name: Container_Bin
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.LootContainerProfile
+  title: "\u0423\u0440\u043D\u0430"
+  gridSize: {x: 2, y: 2}
+  secondsPerItem: 0.6
+  loot: {fileID: 11400000, guid: 2a1e93c36e3d86a46a192961753bbef3, type: 2}
+  emptyChance: 0.75
+  minStacks: 1
+  maxStacks: 1
+  roomLootChance: 0.3

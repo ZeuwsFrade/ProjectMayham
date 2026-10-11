@@ -66,7 +66,7 @@ namespace ProjectMayham.EditorTools
             }
 
             public void Objective(QuestDefinition quest, QuestObjectiveKind kind, ItemDefinition item, int count,
-                RoomKind room = RoomKind.Office, string text = "")
+                RoomKind room = RoomKind.Office, string text = "", bool hidden = false)
             {
                 var so = new SerializedObject(quest);
                 var list = so.FindProperty("objectives");
@@ -77,6 +77,7 @@ namespace ProjectMayham.EditorTools
                 entry.FindPropertyRelative("count").intValue = count;
                 entry.FindPropertyRelative("room").intValue = (int)room;
                 entry.FindPropertyRelative("text").stringValue = text;
+                entry.FindPropertyRelative("hidden").boolValue = hidden;
                 so.ApplyModifiedPropertiesWithoutUndo();
                 Publish();
             }

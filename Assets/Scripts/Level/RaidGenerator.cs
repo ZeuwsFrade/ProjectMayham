@@ -8,8 +8,9 @@ using UnityEngine.Tilemaps;
 namespace ProjectMayham.Level
 {
     /// <summary>
-    /// Fills the room slots of the corridor template with rooms (first those the active quests ask for), blocks
-    /// some corridors with barricades, scatters loot and breaks a few holes through the walls of the maze. Runs
+    /// Fills the room slots of the corridor template with rooms (first those the active quests ask for), fills
+    /// the loot containers among their furniture, blocks some corridors with barricades, scatters loot and breaks
+    /// a few holes through the walls of the maze. Runs
     /// when the scene starts, before
     /// <see cref="World.WrapWorld"/> copies the tilemaps around the seam, so every raid has a different set of rooms
     /// in the same places. The same seed always gives the same raid.
@@ -27,9 +28,13 @@ namespace ProjectMayham.Level
             public int LootCount;
             /// <summary>True when the kind was asked for by the demands instead of being picked by chance.</summary>
             public bool Forced;
+            /// <summary>Loot containers among the furniture of the room.</summary>
+            public int ContainerCount;
         }
 
         private const string RootName = "Raid";
+        // Mixed into the seed for the dice of the containers.
+        private const int ContainerSalt = 0x2C0FFEE;
 
         private static readonly Vector2Int[] Directions = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down };
 
@@ -94,6 +99,11 @@ namespace ProjectMayham.Level
         private readonly List<GameObject> holes = new List<GameObject>();
         private readonly List<GameObject> questPickups = new List<GameObject>();
         private readonly List<RoomKind> missingKinds = new List<RoomKind>();
+        private readonly List<LootContainer> containers = new List<LootContainer>();
+        private readonly List<LootContainer> questContainers = new List<LootContainer>();
+        // The containers have dice of their own: what lies in them changes nothing about the rooms, the loot on
+        // the floor, the barricades and the holes of a seed.
+        private System.Random containerRng;
 
         public int Seed { get; private set; }
         public IReadOnlyList<PlacedRoom> Rooms => rooms;
@@ -101,6 +111,10 @@ namespace ProjectMayham.Level
         public IReadOnlyList<GameObject> Holes => holes;
         /// <summary>Pickups that lie in the raid because the demands asked for them.</summary>
         public IReadOnlyList<GameObject> QuestPickups => questPickups;
+        /// <summary>Every loot container of the raid, room by room.</summary>
+        public IReadOnlyList<LootContainer> Containers => containers;
+        /// <summary>Containers that hold a thing the demands asked to be hidden.</summary>
+        public IReadOnlyList<LootContainer> QuestContainers => questContainers;
         /// <summary>Kinds of rooms that were asked for and found no slot in this raid.</summary>
         public IReadOnlyList<RoomKind> MissingKinds => missingKinds;
 
@@ -126,6 +140,7 @@ namespace ProjectMayham.Level
             Clear();
             Seed = seed;
             var rng = new System.Random(seed);
+            containerRng = new System.Random(seed ^ ContainerSalt);
 
             var root = new GameObject(RootName);
             root.transform.SetParent(transform, false);
@@ -146,7 +161,8 @@ namespace ProjectMayham.Level
             PlaceHoles(root.transform, slots, rng);
 
             string summary = string.Join(", ", rooms.Select(r => $"{r.Slot.name}={RoomSizes.Title(r.Kind)}"));
-            Debug.Log($"Raid seed {seed}: {summary}; barricades: {barricades.Count}; holes: {holes.Count}");
+            Debug.Log($"Raid seed {seed}: {summary}; barricades: {barricades.Count}; holes: {holes.Count}; "
+                + $"containers: {containers.Count}, {containers.Count(c => c.HiddenCount > 0)} with loot");
         }
 
         /// <summary>Removes the rooms, barricades, holes, props and loot of the current raid and restores the empty template.</summary>
@@ -169,6 +185,8 @@ namespace ProjectMayham.Level
             holes.Clear();
             questPickups.Clear();
             missingKinds.Clear();
+            containers.Clear();
+            questContainers.Clear();
 
             for (int i = transform.childCount - 1; i >= 0; i--)
             {
@@ -236,6 +254,8 @@ namespace ProjectMayham.Level
             var wanted = forcedKind.HasValue && demands != null
                 ? demands.Items.Where(i => i.Room == info.kind).ToList()
                 : null;
+            // The containers come first: what was to be hidden and found no container is laid on the floor with the rest.
+            placed.ContainerCount = FillContainers(instance, info, wanted);
             placed.LootCount = SpawnRoomLoot(instance, info, rng, wanted);
             return placed;
         }
@@ -252,6 +272,33 @@ namespace ProjectMayham.Level
                 target.SetTile(destination, tile);
                 painted.Add(destination);
             }
+        }
+
+        /// <summary>
+        /// Puts this raid's contents into the containers of a room and hides what the demands want hidden; the
+        /// demands that were served are taken off <paramref name="wanted"/>. Returns the number of containers.
+        /// </summary>
+        private int FillContainers(RoomTemplate room, RoomLibrary.KindInfo info, List<RaidDemands.ItemDemand> wanted)
+        {
+            var found = room.GetComponentsInChildren<LootContainer>();
+            foreach (var container in found) container.Fill(containerRng, info.loot);
+            containers.AddRange(found);
+            if (wanted == null) return found.Length;
+
+            foreach (var demand in wanted.Where(d => d.Hidden).ToList())
+            {
+                var fitting = found.Where(c => c.CanHide(demand.Item, demand.Count)).ToList();
+                if (fitting.Count == 0)
+                {
+                    Debug.LogWarning($"RaidGenerator: no container of {room.name} takes {demand.Item.Id}, it is put on the floor.", room);
+                    continue;
+                }
+                var container = fitting[containerRng.Next(fitting.Count)];
+                container.Hide(demand.Item, demand.Count);
+                questContainers.Add(container);
+                wanted.Remove(demand);
+            }
+            return found.Length;
         }
 
         private int SpawnRoomLoot(RoomTemplate room, RoomLibrary.KindInfo info, System.Random rng, List<RaidDemands.ItemDemand> wanted = null)

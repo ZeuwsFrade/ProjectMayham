@@ -191,7 +191,7 @@ namespace ProjectMayham.EditorTools
                         warning(quest, $"предмет «{item.DisplayName}» не встречается ни в луте, ни у торговца — его негде взять");
                 }
 
-                if (objective.Kind != QuestObjectiveKind.Deliver) CheckRoom(quest, objective, facts, error);
+                if (objective.Kind != QuestObjectiveKind.Deliver) CheckRoom(quest, objective, facts, error, warning);
             }
         }
 
@@ -213,7 +213,8 @@ namespace ProjectMayham.EditorTools
                 error(quest, $"на префабе предмета «{name}» нет ItemPickup или WrapEntity");
         }
 
-        private static void CheckRoom(QuestDefinition quest, QuestObjective objective, Facts facts, Action<QuestDefinition, string> error)
+        private static void CheckRoom(QuestDefinition quest, QuestObjective objective, Facts facts,
+            Action<QuestDefinition, string> error, Action<QuestDefinition, string> warning)
         {
             if (facts.Library == null) return;
 
@@ -229,6 +230,14 @@ namespace ProjectMayham.EditorTools
             bool noSpots = facts.Library.Rooms.Any(room =>
                 room != null && room.Kind == kind && (room.LootSpots == null || room.LootSpots.childCount == 0));
             if (noSpots) error(quest, $"у префаба комнаты «{RoomSizes.Title(kind)}» нет точек лута — особый предмет некуда положить");
+
+            // A hidden item that finds no container is put on the floor, so this is worth a warning, not an error.
+            var item = objective.Item;
+            if (!objective.Hidden || item == null) return;
+            bool noContainer = facts.Library.Rooms.Any(room =>
+                room != null && room.Kind == kind && !room.GetComponentsInChildren<LootContainer>(true).Any(c => c.Fits(item)));
+            if (noContainer)
+                warning(quest, $"у префаба комнаты «{RoomSizes.Title(kind)}» нет контейнера, куда поместится «{item.DisplayName}» — в таком рейде предмет ляжет на пол");
         }
 
         private static void CheckReward(QuestDefinition quest, Facts facts,

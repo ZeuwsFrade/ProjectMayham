@@ -8,15 +8,21 @@ using UnityEngine.UI;
 namespace ProjectMayham.UI
 {
     /// <summary>
-    /// Two grid inventories side by side (the player's and the stash) with items moved between them: drag a stack
+    /// Two grid inventories side by side (the player's and a storage) with items moved between them: drag a stack
     /// with the left mouse button (R turns it), or right click / Shift+click to send it to the other side at once.
-    /// Dropping on a stack of the same item merges them. The pointer is read straight from the devices.
+    /// Dropping on a stack of the same item merges them. A sealed stack (a thing in a container that is not found
+    /// yet) is drawn as "?" and cannot be touched. The pointer is read straight from the devices.
     /// </summary>
     public class TransferWindow : ModalWindow
     {
         private const float Cell = 56f;
+        // A storage that can hold more than this has no weight limit worth showing.
+        private const float UnlimitedWeight = 10000f;
+        // A grid narrower than this has room for the name of its storage only, not for the weight next to it.
+        private const float WeightLabelMinWidth = 400f;
 
         private static readonly Color ItemColor = new Color(0.17f, 0.21f, 0.25f, 0.96f);
+        private static readonly Color SealedColor = new Color(0.11f, 0.12f, 0.15f, 0.96f);
         private static readonly Color ValidColor = new Color(0.3f, 0.9f, 0.4f, 0.4f);
         private static readonly Color MergeColor = new Color(0.35f, 0.7f, 1f, 0.45f);
         private static readonly Color InvalidColor = new Color(0.95f, 0.3f, 0.3f, 0.4f);
@@ -52,37 +58,56 @@ namespace ProjectMayham.UI
             window.Prepare(player, storage, storageName);
         }
 
-        private void Prepare(GridInventory player, GridInventory storage, string storageName)
+        protected void Prepare(GridInventory player, GridInventory storage, string storageName)
         {
-            // The window is built once, for the first pair of inventories it is opened with.
-            if (views[0] == null)
+            // The layout depends on the sizes of the two grids, so another pair of inventories gets a new one.
+            if (views[0] == null || views[0].Inventory != player || views[1].Inventory != storage)
             {
+                DiscardUI();
                 views[0] = new View { Inventory = player, Name = "Рюкзак" };
                 views[1] = new View { Inventory = storage, Name = storageName };
             }
             Show();
         }
 
+        /// <summary>How dark the game behind the window gets.</summary>
+        protected virtual Color DimColor => UIKit.Dim;
+
+        /// <summary>Where the middle of the panel is, counted from the middle of the screen.</summary>
+        protected virtual Vector2 PanelOffset => Vector2.zero;
+
+        /// <summary>The line under the grids while the pointer is over nothing.</summary>
+        protected virtual string Hint => DefaultHint;
+
+        /// <summary>Font size of that line.</summary>
+        protected virtual float HintSize => 24f;
+
+        /// <summary>The least width the storage gets in the panel, so that small storages do not make a tiny window.</summary>
+        protected virtual float MinStorageWidth => 0f;
+
+        /// <summary>Called for every stack that was just drawn, for a window that wants to add something to it.</summary>
+        protected virtual void OnWidgetBuilt(GridInventory inventory, GridInventory.Stack stack, RectTransform widget) { }
+
         protected override void Build(Canvas canvas)
         {
-            var dim = UIKit.Panel(canvas.transform, "Dim", UIKit.Dim);
+            var dim = UIKit.Panel(canvas.transform, "Dim", DimColor);
             UIKit.Stretch(dim.rectTransform);
 
             var left = views[0].Inventory.GridSize;
             var right = views[1].Inventory.GridSize;
-            float leftWidth = left.x * Cell, rightWidth = right.x * Cell;
+            float leftWidth = left.x * Cell, rightWidth = Mathf.Max(right.x * Cell, MinStorageWidth);
             float gridsHeight = Mathf.Max(left.y, right.y) * Cell;
             const float margin = 36f, gap = 70f, top = 110f, bottom = 120f;
 
             float width = margin * 2f + leftWidth + gap + rightWidth;
             float height = top + gridsHeight + bottom;
             panel = UIKit.Panel(dim.transform, "Panel", UIKit.PanelColor).rectTransform;
-            UIKit.Place(panel, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(width, height));
+            UIKit.Place(panel, new Vector2(0.5f, 0.5f), PanelOffset, new Vector2(width, height));
 
             BuildView(views[0], new Vector2(margin, -top), left);
             BuildView(views[1], new Vector2(margin + leftWidth + gap, -top), right);
 
-            infoLabel = UIKit.Label(panel, string.Empty, 24f, TextAlignmentOptions.Left, UIKit.Muted);
+            infoLabel = UIKit.Label(panel, string.Empty, HintSize, TextAlignmentOptions.Left, UIKit.Muted);
             UIKit.Place(infoLabel.rectTransform, new Vector2(0f, 0f), new Vector2(margin, 20f), new Vector2(width - margin * 2f - 280f, 80f));
             infoLabel.rectTransform.pivot = new Vector2(0f, 0f);
 
@@ -102,13 +127,24 @@ namespace ProjectMayham.UI
 
         private void BuildView(View view, Vector2 topLeft, Vector2Int size)
         {
-            var title = UIKit.Label(panel, view.Name, 34f, TextAlignmentOptions.Left, UIKit.Accent);
-            UIKit.Place(title.rectTransform, new Vector2(0f, 1f), topLeft + new Vector2(0f, 60f), new Vector2(size.x * Cell - 200f, 44f));
+            float gridWidth = size.x * Cell;
+            bool showWeight = view.Inventory.MaxWeight < UnlimitedWeight || gridWidth >= WeightLabelMinWidth;
+            var title = UIKit.Label(panel, view.Name, showWeight ? 34f : 30f, TextAlignmentOptions.Left, UIKit.Accent);
+            UIKit.Place(title.rectTransform, new Vector2(0f, 1f), topLeft + new Vector2(0f, 60f),
+                new Vector2(showWeight ? gridWidth - 200f : Mathf.Max(gridWidth, 260f), 44f));
             title.rectTransform.pivot = new Vector2(0f, 1f);
             title.text = view.Name;
-            view.WeightLabel = UIKit.Label(panel, string.Empty, 24f, TextAlignmentOptions.Right, UIKit.Muted);
-            UIKit.Place(view.WeightLabel.rectTransform, new Vector2(0f, 1f), topLeft + new Vector2(size.x * Cell, 60f), new Vector2(260f, 44f));
-            view.WeightLabel.rectTransform.pivot = new Vector2(1f, 1f);
+            if (showWeight)
+            {
+                view.WeightLabel = UIKit.Label(panel, string.Empty, 24f, TextAlignmentOptions.Right, UIKit.Muted);
+                UIKit.Place(view.WeightLabel.rectTransform, new Vector2(0f, 1f), topLeft + new Vector2(gridWidth, 60f), new Vector2(260f, 44f));
+                view.WeightLabel.rectTransform.pivot = new Vector2(1f, 1f);
+            }
+            else
+            {
+                title.textWrappingMode = TextWrappingModes.NoWrap;
+                title.overflowMode = TextOverflowModes.Overflow;
+            }
 
             var grid = UIKit.Panel(panel, "Grid", new Color(0f, 0f, 0f, 0.35f)).rectTransform;
             UIKit.Place(grid, new Vector2(0f, 1f), topLeft, new Vector2(size.x * Cell, size.y * Cell));
@@ -151,7 +187,7 @@ namespace ProjectMayham.UI
             foreach (var view in views) view.Inventory.Changed -= Rebuild;
         }
 
-        private const string Hint = "Перетаскивайте предметы мышью, R — повернуть. Правый клик или Shift+клик — перенести на другую сторону.";
+        private const string DefaultHint = "Перетаскивайте предметы мышью, R — повернуть. Правый клик или Shift+клик — перенести на другую сторону.";
 
         // ---- input ----
 
@@ -175,7 +211,8 @@ namespace ProjectMayham.UI
 
             var view = ViewUnder(screen, out var stack);
             infoLabel.text = stack != null ? Describe(stack) : Hint;
-            if (stack == null) return;
+            // What is not found yet cannot be taken.
+            if (stack == null || stack.Sealed) return;
 
             bool shift = keyboard != null && keyboard.shiftKey.isPressed;
             if (mouse.rightButton.wasPressedThisFrame || (shift && mouse.leftButton.wasPressedThisFrame)) QuickTransfer(view, stack);
@@ -326,11 +363,16 @@ namespace ProjectMayham.UI
                 foreach (var stack in view.Inventory.Stacks)
                 {
                     if (stack == dragged) continue;
-                    view.Widgets.Add(CreateWidget(view.Items, stack.Item, stack.Count, stack.Rotated, TopLeftOf(stack.Origin)).gameObject);
+                    var widget = stack.Sealed
+                        ? CreateSealedWidget(view.Items, stack)
+                        : CreateWidget(view.Items, stack.Item, stack.Count, stack.Rotated, TopLeftOf(stack.Origin));
+                    view.Widgets.Add(widget.gameObject);
+                    OnWidgetBuilt(view.Inventory, stack, widget);
                 }
                 view.Highlight.transform.SetAsLastSibling();
+                if (view.WeightLabel == null) continue;
                 // A storage without a practical weight limit shows only what it holds.
-                bool limited = view.Inventory.MaxWeight < 10000f;
+                bool limited = view.Inventory.MaxWeight < UnlimitedWeight;
                 view.WeightLabel.text = limited
                     ? $"{view.Inventory.TotalWeight:0.#} / {view.Inventory.MaxWeight:0.#} кг"
                     : $"{view.Inventory.TotalWeight:0.#} кг";
@@ -370,8 +412,31 @@ namespace ProjectMayham.UI
             return root;
         }
 
+        // A thing that is not found yet: its place and its size show, what it is does not.
+        private static RectTransform CreateSealedWidget(Transform parent, GridInventory.Stack stack)
+        {
+            var root = UIKit.Rect("Hidden", parent);
+            root.anchorMin = root.anchorMax = root.pivot = new Vector2(0f, 1f);
+            root.anchoredPosition = TopLeftOf(stack.Origin);
+            root.sizeDelta = Footprint(stack.Item, stack.Rotated);
+
+            var frame = UIKit.Panel(root, "Frame", new Color(0f, 0f, 0f, 0.6f));
+            UIKit.Stretch(frame.rectTransform);
+            frame.raycastTarget = false;
+
+            var back = UIKit.Panel(root, "Background", SealedColor);
+            UIKit.Stretch(back.rectTransform, 2f);
+            back.raycastTarget = false;
+
+            var mark = UIKit.Label(root, "?", 34f, TextAlignmentOptions.Center, UIKit.Muted);
+            UIKit.Stretch(mark.rectTransform);
+            return root;
+        }
+
         private static string Describe(GridInventory.Stack stack)
         {
+            if (stack.Sealed) return "Ещё не найдено";
+
             var item = stack.Item;
             string count = stack.Count > 1 ? $" ×{stack.Count}" : string.Empty;
             return $"{item.DisplayName}{count} — {item.Weight * stack.Count:0.##} кг ({item.Weight:0.##} кг/шт), {item.GridSize.x}×{item.GridSize.y}";

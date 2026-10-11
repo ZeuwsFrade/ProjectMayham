@@ -29,7 +29,7 @@ namespace ProjectMayham.EditorTools
             switch (kind)
             {
                 case QuestObjectiveKind.Deliver: return 4;       // kind, item, count, own wording
-                case QuestObjectiveKind.FindSpecial: return 5;   // kind, item, count, room, own wording
+                case QuestObjectiveKind.FindSpecial: return 6;   // kind, item, count, room, hidden, own wording
                 default: return 3;                               // kind, room, own wording
             }
         }
@@ -62,6 +62,13 @@ namespace ProjectMayham.EditorTools
                 int index = Mathf.Max(0, Array.IndexOf(RoomKinds, (RoomKind)roomProperty.intValue));
                 int chosen = EditorGUI.Popup(row, kind == QuestObjectiveKind.VisitRoom ? "Куда прийти" : "Где лежит", index, RoomNames);
                 if (chosen != index || (int)RoomKinds[chosen] != roomProperty.intValue) roomProperty.intValue = (int)RoomKinds[chosen];
+                row.y += Row;
+            }
+
+            if (kind == QuestObjectiveKind.FindSpecial)
+            {
+                EditorGUI.PropertyField(row, property.FindPropertyRelative("hidden"),
+                    new GUIContent("Спрятан в контейнере", "Выключено — предмет лежит на полу комнаты. Включено — в одном из её контейнеров, его надо найти обыском."));
                 row.y += Row;
             }
 

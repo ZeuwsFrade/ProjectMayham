@@ -84,6 +84,35 @@ namespace ProjectMayham.EditorTools
                 t.Ok(Errors(world, facts).Length == 0 && Warnings(world, facts).Contains("негде взять"), "an item found nowhere is a warning");
             }
 
+            // A special item that is hidden needs a container it fits into.
+            using (var world = new World())
+            {
+                var special = world.Make<ItemDefinition>("Special");
+                SetItem(special, 0, papers.WorldPrefab);
+                var facts = TestFacts(special);
+                var hide = world.Quest("Hide");
+                world.Objective(hide, QuestObjectiveKind.FindSpecial, special, 1, RoomKind.BossOffice, hidden: true);
+                world.Reward(hide, 10);
+                t.Ok(!Warnings(world, facts).Contains("контейнер"), "a small hidden item finds a container in every boss office");
+
+                var size = new SerializedObject(special);
+                size.FindProperty("gridSize").vector2IntValue = new Vector2Int(9, 9);
+                size.ApplyModifiedPropertiesWithoutUndo();
+                t.Ok(Warnings(world, facts).Contains("нет контейнера"), "a hidden item too large for every container is a warning");
+                t.Eq(Errors(world, facts), string.Empty, "and not an error: it will lie on the floor");
+
+                var open = world.Quest("Open");
+                var plain = world.Make<ItemDefinition>("Plain");
+                SetItem(plain, 0, papers.WorldPrefab);
+                size = new SerializedObject(plain);
+                size.FindProperty("gridSize").vector2IntValue = new Vector2Int(9, 9);
+                size.ApplyModifiedPropertiesWithoutUndo();
+                facts.DatabaseItems.Add(plain);
+                world.Objective(open, QuestObjectiveKind.FindSpecial, plain, 1, RoomKind.Storage);
+                world.Reward(open, 10);
+                t.Ok(!Warnings(world, facts).Contains("«Plain»"), "an item that is not hidden needs no container");
+            }
+
             // The quest itself.
             using (var world = new World())
             {

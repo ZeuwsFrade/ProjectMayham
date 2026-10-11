@@ -17,6 +17,8 @@ namespace ProjectMayham.Level
             public ItemDefinition Item;
             public int Count;
             public RoomKind Room;
+            /// <summary>True when the item has to be hidden in a container of the room instead of lying on the floor.</summary>
+            public bool Hidden;
         }
 
         private readonly List<ItemDemand> items = new List<ItemDemand>();
@@ -31,8 +33,11 @@ namespace ProjectMayham.Level
         /// <summary>Every kind of room that has to exist, each once, the one asked for first coming first.</summary>
         public List<RoomKind> Rooms() => new List<RoomKind>(rooms);
 
-        /// <summary>Asks for an item in a room of a kind. An item that is already asked for keeps its room and gets the larger amount.</summary>
-        public void AddItem(ItemDefinition item, int count, RoomKind room)
+        /// <summary>
+        /// Asks for an item in a room of a kind: on the floor, or hidden in one of the containers of the room.
+        /// An item that is already asked for keeps its room and its place and gets the larger amount.
+        /// </summary>
+        public void AddItem(ItemDefinition item, int count, RoomKind room, bool hidden = false)
         {
             if (item == null || count <= 0) return;
 
@@ -42,7 +47,7 @@ namespace ProjectMayham.Level
                 existing.Count = Mathf.Max(existing.Count, count);
                 return;
             }
-            items.Add(new ItemDemand { Item = item, Count = count, Room = room });
+            items.Add(new ItemDemand { Item = item, Count = count, Room = room, Hidden = hidden });
             Require(room);
         }
 

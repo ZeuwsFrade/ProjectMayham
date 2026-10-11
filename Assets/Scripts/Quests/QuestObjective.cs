@@ -25,6 +25,8 @@ namespace ProjectMayham.Quests
         [SerializeField] private ItemDefinition item;
         [SerializeField, Min(1)] private int count = 1;
         [SerializeField] private RoomKind room;
+        [Tooltip("For a special item: it is hidden in a container of the room instead of lying on the floor.")]
+        [SerializeField] private bool hidden;
         [Tooltip("Own wording of the objective. Empty: it is put together from the item and the room.")]
         [SerializeField] private string text;
 
@@ -33,6 +35,8 @@ namespace ProjectMayham.Quests
         public int Count => Mathf.Max(1, count);
         /// <summary>Where the special item lies, or the place to visit.</summary>
         public RoomKind Room => room;
+        /// <summary>True for a special item that has to be searched for in the containers of its room.</summary>
+        public bool Hidden => kind == QuestObjectiveKind.FindSpecial && hidden;
 
         public bool NeedsItem => kind == QuestObjectiveKind.Deliver || kind == QuestObjectiveKind.FindSpecial;
         /// <summary>False when the objective cannot be checked: it needs an item and has none.</summary>
