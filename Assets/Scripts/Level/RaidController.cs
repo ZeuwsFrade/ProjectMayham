@@ -16,6 +16,8 @@ namespace ProjectMayham.Level
         [SerializeField] private PlayerPersistence persistence;
         [Tooltip("Esc closes this window first; it only asks about leaving when the window was not open.")]
         [SerializeField] private InventoryWindow inventoryWindow;
+        [Tooltip("Scene the raid ends in: the shelter (a test raid names its test shelter here).")]
+        [SerializeField] private string shelterScene = SceneLoader.Shelter;
 
         private bool inventoryWasOpen;
         private bool dying;
@@ -43,12 +45,12 @@ namespace ProjectMayham.Level
             inventoryWasOpen = inventoryOpen;
         }
 
-        private static void AskToLeave()
+        private void AskToLeave()
         {
             ConfirmDialog.Ask(
                 "Вернуться в убежище?",
                 "Вы покинете рейд. Всё, что в рюкзаке, останется при вас.",
-                () => SceneLoader.Load(SceneLoader.Shelter, "Убежище"),
+                () => SceneLoader.Load(shelterScene, "Убежище"),
                 yesText: "Вернуться", noText: "Остаться");
         }
 
@@ -60,7 +62,7 @@ namespace ProjectMayham.Level
                 "Вы погибли",
                 "Всё, что было при вас, потеряно. Вы очнулись в убежище.",
                 "В убежище",
-                () => SceneLoader.Load(SceneLoader.Shelter, "Убежище"));
+                () => SceneLoader.Load(shelterScene, "Убежище"));
         }
     }
 }

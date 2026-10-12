@@ -23,25 +23,26 @@ namespace ProjectMayham.Level
     }
 
     /// <summary>
-    /// The maze is a grid of 3x3-tile cells: a one-tile wall line and two tiles of floor. A room covers a block of
-    /// cells and removes the wall lines inside it, so its inside is 3 * cells - 1 tiles wide and tall.
+    /// The maze is a grid of 4x4-tile cells: a one-tile wall line and three tiles of floor, so a corridor is three
+    /// tiles wide. A room covers a block of cells and removes the wall lines inside it, so its inside is
+    /// 4 * cells - 1 tiles wide and tall.
     /// </summary>
     public static class RoomSizes
     {
-        public const int CellTiles = 3;
+        public const int CellTiles = 4;
 
-        /// <summary>Cells covered by a slot: small 2x2, medium 3x2, large 3x3.</summary>
+        /// <summary>Cells covered by a slot: small 7x7, medium 8x7, large 9x9.</summary>
         public static Vector2Int Cells(RoomSize size)
         {
             switch (size)
             {
-                case RoomSize.Small: return new Vector2Int(2, 2);
-                case RoomSize.Medium: return new Vector2Int(3, 2);
-                default: return new Vector2Int(3, 3);
+                case RoomSize.Small: return new Vector2Int(7, 7);
+                case RoomSize.Medium: return new Vector2Int(8, 7);
+                default: return new Vector2Int(9, 9);
             }
         }
 
-        /// <summary>Floor tiles inside the room walls: small 5x5, medium 8x5, large 8x8.</summary>
+        /// <summary>Floor tiles inside the room walls: small 27x27, medium 31x27, large 35x35.</summary>
         public static Vector2Int Interior(RoomSize size)
         {
             var cells = Cells(size);

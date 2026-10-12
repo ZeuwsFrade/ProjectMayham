@@ -10,7 +10,8 @@ using UnityEngine.InputSystem;
 namespace ProjectMayham.Interaction
 {
     /// <summary>
-    /// Finds the nearest interactable the player can see, uses it on E and drops the selected item on G.
+    /// Finds the nearest interactable the player can see and reach, uses it on E (some need the key to be held)
+    /// and drops the selected item on G.
     /// </summary>
     [RequireComponent(typeof(Inventory))]
     public class PlayerInteractor : MonoBehaviour
@@ -22,15 +23,23 @@ namespace ProjectMayham.Interaction
         [SerializeField] private float dropDistance = 0.9f;
         [Tooltip("Layers that stop a dropped item from being placed inside a wall.")]
         [SerializeField] private LayerMask blockMask;
+        [Tooltip("Layers nothing can be used through: walls and the glass of windows.")]
+        [SerializeField] private LayerMask reachBlockMask;
 
         private Inventory inventory;
         private PlayerController player;
         private InputAction interactAction;
         private InputAction dropAction;
+        private IHoldInteractable holdTarget;
+        private float holdTimer;
 
         /// <summary>The object the prompt is about, or null.</summary>
         public IInteractable Current { get; private set; }
         public bool CurrentUsable { get; private set; }
+        /// <summary>The object the Interact key is being held on, or null.</summary>
+        public IHoldInteractable HoldTarget => holdTarget;
+        /// <summary>0..1 while the Interact key is held on <see cref="HoldTarget"/>.</summary>
+        public float HoldProgress => holdTarget != null ? Mathf.Clamp01(holdTimer / holdTarget.HoldSeconds) : 0f;
 
         private void Awake()
         {
@@ -51,6 +60,7 @@ namespace ProjectMayham.Interaction
             interactAction.Disable();
             dropAction.Disable();
             Current = null;
+            CancelHold();
         }
 
         private void Update()
@@ -60,13 +70,50 @@ namespace ProjectMayham.Interaction
             {
                 Current = null;
                 CurrentUsable = false;
+                CancelHold();
                 return;
             }
 
             FindCurrent();
-
-            if (interactAction.WasPressedThisFrame() && Current != null && CurrentUsable) Current.Interact(gameObject);
+            UpdateInteract();
             if (dropAction.WasPressedThisFrame()) DropSelected();
+        }
+
+        private void UpdateInteract()
+        {
+            bool usable = Current != null && CurrentUsable;
+            if (usable && interactAction.WasPressedThisFrame())
+            {
+                var hold = Current as IHoldInteractable;
+                if (hold == null || hold.HoldSeconds <= 0f)
+                {
+                    Current.Interact(gameObject);
+                    return;
+                }
+                holdTarget = hold;
+                holdTimer = 0f;
+            }
+
+            if (holdTarget == null) return;
+            // Letting go of the key, walking away or losing sight of the object starts over.
+            if (!usable || !interactAction.IsPressed() || !ReferenceEquals(Current, holdTarget))
+            {
+                CancelHold();
+                return;
+            }
+
+            holdTimer += Time.deltaTime;
+            if (holdTimer < holdTarget.HoldSeconds) return;
+
+            var finished = holdTarget;
+            CancelHold();
+            finished.Interact(gameObject);
+        }
+
+        private void CancelHold()
+        {
+            holdTarget = null;
+            holdTimer = 0f;
         }
 
         private void FindCurrent()
@@ -84,6 +131,8 @@ namespace ProjectMayham.Interaction
                 if (distance >= bestDistance) continue;
                 // Things the player cannot see (in the dark or behind a wall) cannot be used.
                 if (cone != null && !cone.IsPointVisible(origin + delta)) continue;
+                // Seeing is not enough: a window shows what is behind it but nothing can be taken through the glass.
+                if (reachBlockMask != 0 && Physics2D.Linecast(origin, origin + delta, reachBlockMask)) continue;
 
                 best = candidate;
                 bestDistance = distance;

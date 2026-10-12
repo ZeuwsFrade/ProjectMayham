@@ -71,6 +71,16 @@ namespace ProjectMayham.Level
             return matching.Count == 0 ? null : matching[rng.Next(matching.Count)];
         }
 
+        /// <summary>
+        /// True when a room of this kind can stand in a slot of this size: the size is allowed for the kind and a
+        /// prefab exists. The weight plays no part, so a kind that is rare can still be asked for.
+        /// </summary>
+        public bool CanPlace(RoomKind kind, RoomSize size)
+        {
+            var info = Info(kind);
+            return info != null && Array.IndexOf(info.sizes, size) >= 0 && Matching(kind, size).Count > 0;
+        }
+
         private bool Allows(KindInfo info, RoomSize size)
         {
             if (info.weight <= 0f || Array.IndexOf(info.sizes, size) < 0) return false;

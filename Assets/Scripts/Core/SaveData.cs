@@ -48,6 +48,8 @@ namespace ProjectMayham.Core
         public List<TraderStockData> traders = new List<TraderStockData>();
         /// <summary>Ids of the shelter modules that have been built.</summary>
         public List<string> builtModules = new List<string>();
+        /// <summary>Quests the player has taken or turned in, in the order they were taken. See <see cref="Quests.QuestLog"/>.</summary>
+        public List<QuestProgressData> quests = new List<QuestProgressData>();
     }
 
     [Serializable]
@@ -55,5 +57,17 @@ namespace ProjectMayham.Core
     {
         public string trader;
         public List<StockData> stock = new List<StockData>();
+    }
+
+    /// <summary>How far one quest is. Items asked for are not stored: they are what lies in the backpack.</summary>
+    [Serializable]
+    public class QuestProgressData
+    {
+        /// <summary>Id of the quest: the name of its asset.</summary>
+        public string quest;
+        /// <summary>1 = taken, 2 = turned in. Anything else means "no entry".</summary>
+        public int state;
+        /// <summary>Things done and brought home, for example "visit:Parking".</summary>
+        public List<string> marks = new List<string>();
     }
 }

@@ -25,6 +25,11 @@ namespace ProjectMayham.Items
             /// <summary>Top-left cell, with (0, 0) at the top-left corner of the grid.</summary>
             public Vector2Int Origin { get; internal set; }
             public bool Rotated { get; internal set; }
+            /// <summary>
+            /// True for a thing that lies in a container and has not been found yet: it takes up its cells, but it
+            /// cannot be moved, split or added to until <see cref="Unseal"/> is called.
+            /// </summary>
+            public bool Sealed { get; internal set; }
             /// <summary>Cells covered, taking the rotation into account.</summary>
             public Vector2Int Size => Oriented(Item, Rotated);
         }
@@ -126,7 +131,7 @@ namespace ProjectMayham.Items
             if (item == null) return false;
             foreach (var stack in stacks)
             {
-                if (stack.Item == item && stack.Count < item.MaxStack) return true;
+                if (!stack.Sealed && stack.Item == item && stack.Count < item.MaxStack) return true;
             }
             return FindSpot(item, out _, out _);
         }
@@ -143,7 +148,7 @@ namespace ProjectMayham.Items
             foreach (var stack in stacks)
             {
                 if (left <= 0) break;
-                if (stack.Item != item || stack.Count >= item.MaxStack) continue;
+                if (stack.Sealed || stack.Item != item || stack.Count >= item.MaxStack) continue;
                 int moved = Mathf.Min(left, item.MaxStack - stack.Count);
                 stack.Count += moved;
                 left -= moved;
@@ -169,6 +174,47 @@ namespace ProjectMayham.Items
             return count - added;
         }
 
+        /// <summary>
+        /// Sets the size of the grid and the weight limit from code, for storages that are made at run time.
+        /// Only an inventory that holds nothing can be set up; returns false otherwise.
+        /// </summary>
+        public bool Configure(Vector2Int size, float maxWeight)
+        {
+            if (stacks.Count > 0 || held != null) return false;
+
+            gridSize = new Vector2Int(Mathf.Max(1, size.x), Mathf.Max(1, size.y));
+            cells = null;
+            SetWeightLimits(maxWeight, maxWeight);
+            return true;
+        }
+
+        /// <summary>
+        /// Puts one new stack (up to the max stack of the item) on free cells as a thing that is not found yet.
+        /// It never joins a stack that is already there. Returns the stack, or null when there is no room.
+        /// </summary>
+        public Stack AddSealed(ItemDefinition item, int count)
+        {
+            if (item == null || count <= 0) return null;
+
+            int amount = Mathf.Min(count, item.MaxStack, CountByWeight(item));
+            if (amount <= 0 || !FindSpot(item, out var origin, out bool rotated)) return null;
+
+            var stack = new Stack { Item = item, Count = amount, Origin = origin, Rotated = rotated, Sealed = true };
+            stacks.Add(stack);
+            Place(stack);
+            Recalculate();
+            NotifyChanged();
+            return stack;
+        }
+
+        /// <summary>Turns a sealed stack into an ordinary one.</summary>
+        public void Unseal(Stack stack)
+        {
+            if (stack == null || !stack.Sealed || !stacks.Contains(stack)) return;
+            stack.Sealed = false;
+            NotifyChanged();
+        }
+
         /// <summary>Takes one selected stack out of the inventory; call again to take the next one.</summary>
         public override bool TakeSelected(out ItemDefinition item, out int count)
         {
@@ -189,7 +235,7 @@ namespace ProjectMayham.Items
         /// </summary>
         public bool Hold(Stack stack)
         {
-            if (stack == null || !stacks.Contains(stack) || !stack.Item.Holdable) return false;
+            if (stack == null || stack.Sealed || !stacks.Contains(stack) || !stack.Item.Holdable) return false;
 
             var item = stack.Item;
             if (held != null && !Unhold()) return false;
@@ -270,7 +316,7 @@ namespace ProjectMayham.Items
         /// <summary>Splits <paramref name="amount"/> items off a stack into a new stack in the first free spot.</summary>
         public Stack Split(Stack stack, int amount)
         {
-            if (stack == null || !stacks.Contains(stack)) return null;
+            if (stack == null || stack.Sealed || !stacks.Contains(stack)) return null;
             if (amount < 1 || amount >= stack.Count) return null;
             if (!FindSpot(stack.Item, out var origin, out bool rotated)) return null;
 
@@ -302,13 +348,13 @@ namespace ProjectMayham.Items
 
         // ---- counting, trading and moving items between inventories ----
 
-        /// <summary>How many items of this kind lie in the grid (the hands are not counted).</summary>
+        /// <summary>How many items of this kind lie in the grid (the hands and what is not found yet are not counted).</summary>
         public int CountOf(ItemDefinition item)
         {
             int total = 0;
             foreach (var stack in stacks)
             {
-                if (stack.Item == item) total += stack.Count;
+                if (stack.Item == item && !stack.Sealed) total += stack.Count;
             }
             return total;
         }
@@ -318,7 +364,7 @@ namespace ProjectMayham.Items
         {
             if (item == null || count <= 0) return 0;
 
-            var matching = stacks.Where(s => s.Item == item).OrderBy(s => s.Count).ToList();
+            var matching = stacks.Where(s => s.Item == item && !s.Sealed).OrderBy(s => s.Count).ToList();
             int left = count;
             foreach (var stack in matching)
             {
@@ -345,7 +391,12 @@ namespace ProjectMayham.Items
         }
 
         /// <summary>True when the grid could take this many items as a whole (room and weight), without placing them.</summary>
-        public bool CanFit(ItemDefinition item, int count)
+        public bool CanFit(ItemDefinition item, int count) => CanFit(item, count, true);
+
+        /// <summary>The same for items that would lie in stacks of their own, as <see cref="AddSealed"/> puts them.</summary>
+        public bool CanFitApart(ItemDefinition item, int count) => CanFit(item, count, false);
+
+        private bool CanFit(ItemDefinition item, int count, bool joinStacks)
         {
             if (item == null || count <= 0) return false;
             if (CountByWeight(item) < count) return false;
@@ -361,7 +412,7 @@ namespace ProjectMayham.Items
             int left = count;
             foreach (var stack in stacks)
             {
-                if (stack.Item != item) continue;
+                if (!joinStacks || stack.Sealed || stack.Item != item) continue;
                 left -= item.MaxStack - stack.Count;
                 if (left <= 0) return true;
             }
@@ -490,7 +541,7 @@ namespace ProjectMayham.Items
 
         private MoveKind EvaluateCells(Stack stack, Vector2Int origin, bool rotated, bool mustBeInGrid)
         {
-            if (stack == null || (mustBeInGrid && !stacks.Contains(stack))) return MoveKind.Invalid;
+            if (stack == null || stack.Sealed || (mustBeInGrid && !stacks.Contains(stack))) return MoveKind.Invalid;
             if (rotated != stack.Rotated && !stack.Item.CanRotate) return MoveKind.Invalid;
 
             var size = Oriented(stack.Item, rotated);
@@ -511,6 +562,7 @@ namespace ProjectMayham.Items
 
             if (other == null) return MoveKind.Move;
             // Dropping on top of a stack of the same item with room left merges into it.
+            if (other.Sealed) return MoveKind.Invalid;
             return other.Item == stack.Item && other.Count < stack.Item.MaxStack ? MoveKind.Merge : MoveKind.Invalid;
         }
 
@@ -552,7 +604,7 @@ namespace ProjectMayham.Items
             var grid = GridSize;
             foreach (var stack in group)
             {
-                if (!stacks.Contains(stack)) return false;
+                if (stack.Sealed || !stacks.Contains(stack)) return false;
                 var size = stack.Size;
                 var origin = stack.Origin + delta;
                 if (origin.x < 0 || origin.y < 0 || origin.x + size.x > grid.x || origin.y + size.y > grid.y) return false;

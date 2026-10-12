@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5523830173967244778}
   - component: {fileID: 3410003004836330685}
   - component: {fileID: 8239915049262744888}
+  - component: {fileID: 9188940710679733818}
   m_Layer: 9
   m_Name: Box
   m_TagString: Untagged
@@ -151,3 +152,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f14bffb571259fe40958201e3038305c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.World.WrapEntity
+--- !u!114 &9188940710679733818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4000528946564296367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18c3ccaca49c91542b0e04ba3ea31511, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.LootContainer
+  profile: {fileID: 11400000, guid: 51fd28c2309223a4396735471ba47b91, type: 2}

@@ -24,9 +24,9 @@ MonoBehaviour:
   ambientRadius: 2
   ambientIntensity: 0.8
   ambientRayCount: 48
-  darknessColor: {r: 0.041918844, g: 0.041918844, b: 0.05660379, a: 1}
+  darknessColor: {r: 0.012, g: 0.012, b: 0.016, a: 1}
   memoryEnabled: 1
-  memoryBrightness: 0.05
+  memoryBrightness: 0.025
   memoryForgetSeconds: 40
   memoryWorldCenter: {x: 0, y: 0}
   memoryWorldSize: 64

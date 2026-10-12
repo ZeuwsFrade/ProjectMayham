@@ -8,7 +8,7 @@ namespace ProjectMayham.Shelter
 {
     /// <summary>
     /// The trader / quest giver of the shelter (Tyler). E starts a dialogue; from it the player can trade
-    /// (buy, sell, barter) or ask for work. The quest part is a stub, see <see cref="QuestService"/>.
+    /// (buy, sell, barter) or ask for work; the talk about work is built by <see cref="QuestDialogue"/>.
     /// </summary>
     public class NpcTrader : ShelterInteractable
     {
@@ -27,15 +27,9 @@ namespace ProjectMayham.Shelter
             if (!actor.TryGetComponent<GridInventory>(out var inventory)) return;
 
             var root = new DialogueNode { Text = trader.Greeting };
-            var work = new DialogueNode();
-            var quests = QuestService.GetAvailable(trader.Id);
-            work.Text = quests.Count == 0
-                ? "Работы пока нет, [ИГРОК]. Загляни позже. (Квестовая система — заглушка)"
-                : "Есть пара дел.";
-            work.Choices.Add(new DialogueChoice { Text = "Понятно", Next = root });
 
             root.Choices.Add(new DialogueChoice { Text = "Давай посмотрим товары", Action = () => TradeWindow.Open(book, inventory) });
-            root.Choices.Add(new DialogueChoice { Text = "Есть для меня работа?", Next = work });
+            root.Choices.Add(QuestDialogue.WorkChoice(trader.Id, inventory, root));
             root.Choices.Add(new DialogueChoice { Text = "Я пойду", Closes = true });
 
             var portrait = trader.Portrait;

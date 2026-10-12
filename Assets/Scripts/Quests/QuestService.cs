@@ -1,15 +1,16 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ProjectMayham.Quests
 {
     /// <summary>
-    /// STUB of the quest system. The design document describes quests from Tyler and from NPCs met in raids; none
-    /// of that exists yet. The dialogue already asks this service, so a real implementation only has to replace
-    /// the body of <see cref="GetAvailable"/> and add a quest log.
+    /// The first, small door into the quest system, kept for code that only wants to know whether an NPC has work.
+    /// The rules live in <see cref="QuestLog"/>, the conversation in <see cref="QuestDialogue"/>.
     /// </summary>
     public static class QuestService
     {
-        /// <summary>Titles of the quests this NPC can give right now. Always empty until quests are implemented.</summary>
-        public static IReadOnlyList<string> GetAvailable(string npcId) => System.Array.Empty<string>();
+        /// <summary>Titles of the quests this NPC can give right now.</summary>
+        public static IReadOnlyList<string> GetAvailable(string npcId) =>
+            QuestLog.Offers(npcId).Select(quest => quest.Title).ToList();
     }
 }
