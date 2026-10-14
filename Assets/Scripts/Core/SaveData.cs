@@ -50,6 +50,16 @@ namespace ProjectMayham.Core
         public List<string> builtModules = new List<string>();
         /// <summary>Quests the player has taken or turned in, in the order they were taken. See <see cref="Quests.QuestLog"/>.</summary>
         public List<QuestProgressData> quests = new List<QuestProgressData>();
+        /// <summary>How worn the weapons are. See <see cref="Combat.WeaponWear"/>.</summary>
+        public List<WeaponWearData> weaponWear = new List<WeaponWearData>();
+    }
+
+    /// <summary>Durability left in a weapon. A weapon that is not listed is as good as new.</summary>
+    [Serializable]
+    public class WeaponWearData
+    {
+        public string item;
+        public float durability;
     }
 
     [Serializable]

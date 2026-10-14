@@ -16,6 +16,31 @@ namespace ProjectMayham.Items
 
         private GridInventory inventory;
         private SpriteRenderer view;
+        private bool posed;
+
+        /// <summary>
+        /// Puts the item at a place in the world instead of in the hands: a weapon being swung. Stays there until
+        /// <see cref="ClearPose"/>.
+        /// </summary>
+        /// <param name="position">World position of the middle of the sprite.</param>
+        /// <param name="angle">World rotation of the sprite around Z, in degrees, as the item's own hand angle would be.</param>
+        public void SetPose(Vector2 position, float angle)
+        {
+            if (view == null || !view.enabled) return;
+
+            posed = true;
+            view.transform.SetPositionAndRotation(new Vector3(position.x, position.y, view.transform.position.z),
+                Quaternion.Euler(0f, 0f, angle));
+        }
+
+        /// <summary>The item goes back to the hands.</summary>
+        public void ClearPose()
+        {
+            if (!posed) return;
+
+            posed = false;
+            Refresh();
+        }
 
         private void Awake()
         {
@@ -55,6 +80,7 @@ namespace ProjectMayham.Items
 
         private void Refresh()
         {
+            posed = false;
             var item = inventory.HeldItem;
             view.enabled = item != null && item.HeldSprite != null;
             if (!view.enabled) return;

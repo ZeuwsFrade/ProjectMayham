@@ -46,7 +46,13 @@ namespace ProjectMayham.Player
         public Vector2 Velocity => body.linearVelocity;
         /// <summary>Cursor position in world space, refreshed every frame.</summary>
         public Vector2 AimPoint { get; private set; }
-        public bool IsSprinting => !MovementLocked && sprintHeld && moveInput.sqrMagnitude > 0.01f && CanSprint;
+        public bool IsSprinting => !MovementLocked && !SprintBlocked && sprintHeld && moveInput.sqrMagnitude > 0.01f && CanSprint;
+        /// <summary>Walking speed is multiplied by this (a raised weapon slows the player down). 1 = no change.</summary>
+        public float SpeedMultiplier { get; set; } = 1f;
+        /// <summary>Turning speed is multiplied by this (a swing commits the player to a direction). 1 = no change.</summary>
+        public float TurnMultiplier { get; set; } = 1f;
+        /// <summary>True while sprinting is not allowed whatever the stamina is (weapon raised).</summary>
+        public bool SprintBlocked { get; set; }
         /// <summary>False while out of breath or carrying more than the comfortable weight.</summary>
         public bool CanSprint => (stats == null || stats.CanSprint) && (inventory == null || !inventory.IsOverloaded);
         /// <summary>
@@ -115,6 +121,7 @@ namespace ProjectMayham.Player
 
             float speed = IsSprinting ? sprintSpeed : walkSpeed;
             if (inventory != null) speed *= Mathf.Lerp(1f, speedAtMaxWeight, inventory.Encumbrance);
+            speed *= SpeedMultiplier;
             Vector2 target = moveInput * speed;
             float rate = moveInput.sqrMagnitude > 0.01f ? acceleration : deceleration;
             body.linearVelocity = Vector2.MoveTowards(body.linearVelocity, target, rate * Time.fixedDeltaTime);
@@ -126,8 +133,15 @@ namespace ProjectMayham.Player
             if (dir.sqrMagnitude < 0.0001f) return;
 
             float targetAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + rotationOffset;
-            float angle = Mathf.MoveTowardsAngle(body.rotation, targetAngle, turnSpeed * Time.fixedDeltaTime);
+            float angle = Mathf.MoveTowardsAngle(body.rotation, targetAngle, turnSpeed * TurnMultiplier * Time.fixedDeltaTime);
             body.MoveRotation(angle);
+        }
+
+        /// <summary>Throws the player away from a blow. The movement keys pull the velocity back to normal within a moment.</summary>
+        public void Knock(Vector2 velocity)
+        {
+            if (MovementLocked) return;
+            body.linearVelocity += velocity;
         }
     }
 }
