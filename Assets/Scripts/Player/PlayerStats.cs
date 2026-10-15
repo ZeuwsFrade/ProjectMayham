@@ -1,4 +1,5 @@
 using System;
+using ProjectMayham.Combat;
 using ProjectMayham.Items;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ namespace ProjectMayham.Player
     /// health regeneration instead, until health is back at the threshold.
     /// </summary>
     [RequireComponent(typeof(PlayerController))]
-    public class PlayerStats : MonoBehaviour
+    public class PlayerStats : MonoBehaviour, IDamageable
     {
         // Changes smaller than this do not raise events.
         private const float Epsilon = 0.0001f;
@@ -109,6 +110,9 @@ namespace ProjectMayham.Player
             Regenerate(regenRate * dt);
         }
 
+        Team IDamageable.Team => Team.Player;
+        bool IDamageable.IsAlive => !dead;
+
         public void TakeDamage(float amount)
         {
             if (dead || amount <= 0f) return;
@@ -123,7 +127,19 @@ namespace ProjectMayham.Player
                 dead = true;
                 SetRecoveringHealth(false);
                 Died?.Invoke();
+                CombatEvents.RaiseActorDied(gameObject);
             }
+        }
+
+        /// <summary>A blow from an enemy: the damage, a shove away from it and a shake of the screen.</summary>
+        void IDamageable.TakeDamage(in DamageInfo info)
+        {
+            if (dead) return;
+
+            TakeDamage(info.Amount);
+            if (info.Knockback > 0f) controller.Knock(info.Direction * info.Knockback);
+            CameraShake.Add(Mathf.Clamp01(info.Amount / maxHealth * 2.5f));
+            HitStop.Request(dead ? 0.12f : 0.04f);
         }
 
         public void Heal(float amount)

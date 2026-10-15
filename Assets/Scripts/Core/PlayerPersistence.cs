@@ -1,3 +1,4 @@
+using System.Linq;
 using ProjectMayham.Items;
 using ProjectMayham.Player;
 using UnityEngine;
@@ -52,6 +53,11 @@ namespace ProjectMayham.Core
         {
             inventory.Clear();
             equipment.Clear();
+
+            // What was lost took its wear with it. Weapons lying in the stash keep theirs.
+            var stash = GameSession.Data.stash;
+            var owned = stash.stacks.Select(s => s.item).Append(stash.held).Where(id => !string.IsNullOrEmpty(id));
+            Combat.WeaponWear.ForgetExcept(owned);
         }
     }
 }

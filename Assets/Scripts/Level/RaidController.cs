@@ -1,3 +1,4 @@
+using ProjectMayham.Combat;
 using ProjectMayham.Core;
 using ProjectMayham.Player;
 using ProjectMayham.UI;
@@ -21,15 +22,25 @@ namespace ProjectMayham.Level
 
         private bool inventoryWasOpen;
         private bool dying;
+        // The raid ends when the death animation has played; a player without one ends it at the moment of death.
+        private PlayerDeath death;
 
         private void OnEnable()
         {
-            if (stats != null) stats.Died += OnDied;
+            if (stats == null) return;
+
+            death = stats.GetComponent<PlayerDeath>();
+            if (death != null) death.OnDied += OnDied;
+            else stats.Died += OnDied;
         }
 
         private void OnDisable()
         {
-            if (stats != null) stats.Died -= OnDied;
+            if (stats == null) return;
+
+            if (death != null) death.OnDied -= OnDied;
+            stats.Died -= OnDied;
+            death = null;
         }
 
         private void Update()
@@ -39,7 +50,7 @@ namespace ProjectMayham.Level
 
             // The inventory may have used this Esc press already, then it was open a frame ago.
             bool free = !inventoryOpen && !inventoryWasOpen && !ModalState.IsOpen && !ModalWindow.EscapeConsumed
-                        && !SceneLoader.IsLoading && !dying;
+                        && !SceneLoader.IsLoading && !dying && (death == null || !death.IsDying);
             if (free && keyboard != null && keyboard.escapeKey.wasPressedThisFrame) AskToLeave();
 
             inventoryWasOpen = inventoryOpen;
