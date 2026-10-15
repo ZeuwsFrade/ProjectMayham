@@ -34,6 +34,12 @@ namespace ProjectMayham.Items
         [Tooltip("Size in the hands when it does not follow the world prefab (1 = the sprite's natural size).")]
         [SerializeField, Min(0.01f)] private float heldScale = 1f;
 
+        [Header("Equipment")]
+        [Tooltip("Where the item is worn. None: it is not worn.")]
+        [SerializeField] private EquipSlot equipSlot = EquipSlot.None;
+        [Tooltip("For a backpack: columns and rows of the inventory while it is worn.")]
+        [SerializeField] private Vector2Int backpackGrid = new Vector2Int(8, 5);
+
         [Header("World")]
         [Tooltip("Prefab with an ItemPickup that is spawned when the item is dropped.")]
         [SerializeField] private GameObject worldPrefab;
@@ -57,5 +63,10 @@ namespace ProjectMayham.Items
             ? Mathf.Max(0.01f, worldPrefab.transform.lossyScale.x)
             : Mathf.Max(0.01f, heldScale);
         public GameObject WorldPrefab => worldPrefab;
+        public EquipSlot EquipSlot => equipSlot;
+        /// <summary>True for a thing that is put on: a headwear, a backpack, footwear.</summary>
+        public bool Wearable => equipSlot != EquipSlot.None;
+        /// <summary>For a backpack: the size of the inventory grid while it is worn.</summary>
+        public Vector2Int BackpackGrid => new Vector2Int(Mathf.Max(1, backpackGrid.x), Mathf.Max(1, backpackGrid.y));
     }
 }

@@ -87,6 +87,19 @@ namespace ProjectMayham.UI
             canvas = null;
         }
 
+        /// <summary>Builds the UI again while the window stays open: for a window whose layout depends on what it shows.</summary>
+        protected void RebuildUI()
+        {
+            if (canvas == null) return;
+            for (int i = canvas.transform.childCount - 1; i >= 0; i--)
+            {
+                var child = canvas.transform.GetChild(i).gameObject;
+                child.SetActive(false);
+                Destroy(child);
+            }
+            Build(canvas);
+        }
+
         /// <summary>Esc was pressed while the window is open; closes by default.</summary>
         protected virtual void OnCancel() => Close();
 

@@ -58,6 +58,7 @@ namespace ProjectMayham.Core
                 if (!HasSave) return false;
                 var loaded = JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath));
                 if (loaded == null) return false;
+                loaded.Upgrade();
                 data = loaded;
                 return true;
             }

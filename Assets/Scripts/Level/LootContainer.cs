@@ -9,8 +9,9 @@ namespace ProjectMayham.Level
 {
     /// <summary>
     /// A piece of furniture that can be searched: a bin, a cabinet, a crate. A raid puts things into it that the
-    /// player has not found yet (sealed stacks: they take up their cells but cannot be taken). While its window is
-    /// open the things are found one by one; what was found stays found, and the player may leave things here.
+    /// player has not found yet (sealed stacks: they take up their cells but cannot be taken). The first time its
+    /// window is open the player looks it over for a moment; only then does it show what is inside, or that it is
+    /// empty. Then the things are found one by one; what was found stays found, and the player may leave things here.
     /// </summary>
     public class LootContainer : MonoBehaviour, IInteractable
     {
@@ -18,12 +19,15 @@ namespace ProjectMayham.Level
         private const float NoWeightLimit = 100000f;
         // For a container that was given no profile.
         private const float DefaultSeconds = 1f;
+        private const float DefaultLook = 0.8f;
         private static readonly Vector2Int DefaultGrid = new Vector2Int(3, 3);
 
         [SerializeField] private LootContainerProfile profile;
 
         private GridInventory inventory;
         private bool opened;
+        private bool lookedIn;
+        private float lookTimer;
         private float searchTimer;
 
         public LootContainerProfile Profile => profile;
@@ -43,6 +47,7 @@ namespace ProjectMayham.Level
         }
 
         private float SecondsPerItem => profile != null ? profile.SecondsPerItem : DefaultSeconds;
+        private float LookSeconds => profile != null ? profile.LookSeconds : DefaultLook;
 
         /// <summary>True when one piece of the item fits into the grid of the container. Safe to ask of a prefab.</summary>
         public bool Fits(ItemDefinition item)
@@ -58,7 +63,13 @@ namespace ProjectMayham.Level
         public int HiddenCount => inventory != null ? inventory.Stacks.Count(s => s.Sealed) : 0;
 
         /// <summary>True once the player has looked into the container and found everything there was.</summary>
-        public bool IsSearched => opened && HiddenCount == 0;
+        public bool IsSearched => lookedIn && HiddenCount == 0;
+
+        /// <summary>True during the first look into the container: what is inside does not show yet.</summary>
+        public bool IsLookingIn => opened && !lookedIn;
+
+        /// <summary>0..1: how far the first look has got.</summary>
+        public float LookProgress => lookedIn || LookSeconds <= 0f ? 1f : Mathf.Clamp01(lookTimer / LookSeconds);
 
         /// <summary>0..1: how far the search for the next thing has got.</summary>
         public float SearchProgress => HiddenCount > 0 ? Mathf.Clamp01(searchTimer / SecondsPerItem) : 0f;
@@ -95,6 +106,8 @@ namespace ProjectMayham.Level
             var grid = Inventory;
             grid.Clear();
             opened = false;
+            lookedIn = false;
+            lookTimer = 0f;
             searchTimer = 0f;
             if (profile == null) return 0;
 
@@ -125,12 +138,29 @@ namespace ProjectMayham.Level
             return left <= 0;
         }
 
-        /// <summary>Marks the container as looked into: from now on the prompt tells whether anything is left.</summary>
-        public void Open() => opened = true;
+        /// <summary>
+        /// The player opens the container: the first time this starts the look into it (<see cref="Search"/> runs
+        /// it); afterwards the prompt tells whether anything is left.
+        /// </summary>
+        public void Open()
+        {
+            opened = true;
+            if (LookSeconds <= 0f) lookedIn = true;
+        }
 
         /// <summary>Goes on searching for <paramref name="deltaTime"/> seconds. Returns how many things were found.</summary>
         public int Search(float deltaTime)
         {
+            // The first look: what is inside, and whether anything is, shows only after it.
+            if (!lookedIn)
+            {
+                if (!opened) return 0;
+                lookTimer += Mathf.Max(0f, deltaTime);
+                if (lookTimer < LookSeconds) return 0;
+                lookedIn = true;
+                deltaTime = lookTimer - LookSeconds;
+            }
+
             if (HiddenCount == 0)
             {
                 searchTimer = 0f;

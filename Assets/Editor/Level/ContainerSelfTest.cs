@@ -108,7 +108,7 @@ namespace ProjectMayham.EditorTools
         }
 
         private static LootContainerProfile Profile(string title, int columns, int rows, LootTable loot,
-            float emptyChance, int minStacks, int maxStacks, float roomLootChance = 0f, float seconds = 1f)
+            float emptyChance, int minStacks, int maxStacks, float roomLootChance = 0f, float seconds = 1f, float look = 0f)
         {
             var profile = Make<LootContainerProfile>("self-test profile");
             var so = new SerializedObject(profile);
@@ -120,6 +120,7 @@ namespace ProjectMayham.EditorTools
             so.FindProperty("minStacks").intValue = minStacks;
             so.FindProperty("maxStacks").intValue = maxStacks;
             so.FindProperty("roomLootChance").floatValue = roomLootChance;
+            so.FindProperty("lookSeconds").floatValue = look;
             so.ApplyModifiedPropertiesWithoutUndo();
             return profile;
         }
@@ -329,6 +330,37 @@ namespace ProjectMayham.EditorTools
             t.Eq(nothing.Prompt, "Шкаф (пусто)", "after that the prompt says it is empty");
             nothing.Inventory.Add(mug, 1);
             t.Eq(nothing.Prompt, "Открыть: Шкаф", "unless the player left something there");
+
+            // The first look: nothing shows before it is over, not even that the container is empty.
+            var looked = Container(Profile("Шкаф", 4, 5, table, 0f, 1, 1, 0f, 1f, 0.8f));
+            looked.Fill(new System.Random(4));
+            t.Ok(!looked.IsLookingIn, "nothing is looked into before it is opened");
+            t.Eq(looked.Search(1f), 0, "and nothing is found in a closed container");
+            looked.Open();
+            t.Ok(looked.IsLookingIn, "opening it starts the first look");
+            t.Eq(looked.Search(0.5f), 0, "during the look nothing is found");
+            t.Ok(Mathf.Abs(looked.LookProgress - 0.625f) < 0.001f, "the look shows how far it has got");
+            t.Eq(looked.Prompt, "Обыскать: Шкаф", "the prompt still asks to search");
+            looked.Search(0.5f);
+            t.Ok(!looked.IsLookingIn, "the look ends when its time is up");
+            t.Ok(Mathf.Abs(looked.SearchProgress - 0.2f) < 0.001f, "the time over goes to the first thing");
+
+            var emptyLook = Container(Profile("Урна", 2, 2, table, 1f, 1, 1, 0f, 1f, 0.5f));
+            emptyLook.Fill(new System.Random(5));
+            emptyLook.Open();
+            t.Ok(!emptyLook.IsSearched, "an empty container is not searched before the look is over");
+            emptyLook.Search(0.5f);
+            t.Ok(emptyLook.IsSearched, "it is after the look");
+            t.Eq(emptyLook.Prompt, "Урна (пусто)", "and the prompt says it is empty");
+            emptyLook.Open();
+            t.Ok(!emptyLook.IsLookingIn, "a container looked into once is not looked into again");
+
+            var broken = Container(Profile("Ящик", 4, 4, table, 0f, 1, 1, 0f, 1f, 1f));
+            broken.Fill(new System.Random(6));
+            broken.Open();
+            broken.Search(0.6f);
+            broken.Open();
+            t.Ok(broken.IsLookingIn && Mathf.Abs(broken.LookProgress - 0.6f) < 0.001f, "a look broken off goes on where it stopped");
 
             var bin = Container(Profile("Урна", 2, 2, table, 1f, 1, 1));
             t.Ok(bin.CanHide(mug, 1), "a mug can be hidden in a bin");

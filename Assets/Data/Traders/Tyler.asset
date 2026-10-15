@@ -43,6 +43,12 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 9db2a3298e5cfec4ba9bc3ab2033c32f, type: 2}
     count: 1
     priceOverride: 0
+  - item: {fileID: 11400000, guid: 6a54ee52855061740a1c062f41574129, type: 2}
+    count: 2
+    priceOverride: 0
+  - item: {fileID: 11400000, guid: ba25532fc727b2f4a9f13ef08c865fee, type: 2}
+    count: 1
+    priceOverride: 0
   barter:
   - title: "\u041A\u0440\u0443\u0436\u043A\u0430 \u043D\u0430 \u043F\u0430\u043F\u043A\u0438"
     playerGives:

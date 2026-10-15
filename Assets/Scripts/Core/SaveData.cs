@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ProjectMayham.Core
 {
@@ -20,6 +21,10 @@ namespace ProjectMayham.Core
     {
         public List<StackData> stacks = new List<StackData>();
         public string held;
+        // What is worn (item ids, empty when nothing). Only the player's inventory uses them.
+        public string head;
+        public string back;
+        public string feet;
     }
 
     /// <summary>How many pieces of an item a trader has left.</summary>
@@ -34,7 +39,12 @@ namespace ProjectMayham.Core
     [Serializable]
     public class SaveData
     {
-        public const int CurrentVersion = 1;
+        // 2: the player wears things, and the backpack sets the size of the inventory.
+        public const int CurrentVersion = 2;
+        /// <summary>The backpack of a new game.</summary>
+        public const string StartBackpack = "Briefcase";
+        /// <summary>The backpack as big as the inventory was before version 2 (8x5), given to older saves.</summary>
+        public const string OldInventoryBackpack = "Backpack";
         public const string DefaultPlayerName = "Тайлер";
 
         public int version = CurrentVersion;
@@ -42,7 +52,7 @@ namespace ProjectMayham.Core
         public int money = 25;
         /// <summary>Health the player returns with; negative means "full" (a new game, or after death).</summary>
         public float health = -1f;
-        public InventoryData player = new InventoryData();
+        public InventoryData player = new InventoryData { back = StartBackpack };
         public InventoryData stash = new InventoryData();
         /// <summary>Trader id to what is left of his stock. A trader that is not listed starts with the stock of his definition.</summary>
         public List<TraderStockData> traders = new List<TraderStockData>();
@@ -50,6 +60,28 @@ namespace ProjectMayham.Core
         public List<string> builtModules = new List<string>();
         /// <summary>Quests the player has taken or turned in, in the order they were taken. See <see cref="Quests.QuestLog"/>.</summary>
         public List<QuestProgressData> quests = new List<QuestProgressData>();
+
+        /// <summary>
+        /// Brings a save of an older version up to date. Before version 2 nobody wore anything and the inventory was
+        /// 8x5: such a player gets the backpack of that size, so nothing they carry is lost, and Tyler, who already
+        /// has a stock in the save, gets the backpacks he sells now.
+        /// </summary>
+        public void Upgrade()
+        {
+            if (version >= CurrentVersion) return;
+            if (version < 2)
+            {
+                if (player == null) player = new InventoryData();
+                player.back = OldInventoryBackpack;
+                var tyler = traders?.Find(t => t.trader == "Tyler");
+                if (tyler != null)
+                {
+                    if (tyler.stock.All(s => s.item != StartBackpack)) tyler.stock.Add(new StockData { item = StartBackpack, count = 2 });
+                    if (tyler.stock.All(s => s.item != OldInventoryBackpack)) tyler.stock.Add(new StockData { item = OldInventoryBackpack, count = 1 });
+                }
+            }
+            version = CurrentVersion;
+        }
     }
 
     [Serializable]

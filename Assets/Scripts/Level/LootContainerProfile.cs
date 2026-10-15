@@ -18,6 +18,8 @@ namespace ProjectMayham.Level
         [SerializeField] private Vector2Int gridSize = new Vector2Int(3, 3);
         [Tooltip("Seconds of searching it takes to find one thing.")]
         [SerializeField, Min(0.05f)] private float secondsPerItem = 1f;
+        [Tooltip("Seconds of the first look into a container, before it shows what is in it or that it is empty.")]
+        [SerializeField, Min(0f)] private float lookSeconds = 0.8f;
 
         [Header("Contents")]
         [SerializeField] private LootTable loot;
@@ -31,6 +33,7 @@ namespace ProjectMayham.Level
         public string Title => title;
         public Vector2Int GridSize => new Vector2Int(Mathf.Max(1, gridSize.x), Mathf.Max(1, gridSize.y));
         public float SecondsPerItem => Mathf.Max(0.05f, secondsPerItem);
+        public float LookSeconds => Mathf.Max(0f, lookSeconds);
         public LootTable Loot => loot;
         public float EmptyChance => emptyChance;
 

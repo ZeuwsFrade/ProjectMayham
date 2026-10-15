@@ -33,3 +33,23 @@ MonoBehaviour:
     weight: 2
     minCount: 2
     maxCount: 8
+  - item: {fileID: 11400000, guid: 6a54ee52855061740a1c062f41574129, type: 2}
+    weight: 0.4
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: ba25532fc727b2f4a9f13ef08c865fee, type: 2}
+    weight: 0.25
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: 654c1a3357dcaf94ca267ab7fe424dd1, type: 2}
+    weight: 0.1
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: 7e5cc5547a5457648bce1e1be60308e1, type: 2}
+    weight: 0.4
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: e5b559268d3bb3e4b98648505e1ca828, type: 2}
+    weight: 0.3
+    minCount: 1
+    maxCount: 1

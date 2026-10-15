@@ -10,12 +10,15 @@ namespace ProjectMayham.UI
     /// <summary>
     /// Two grid inventories side by side (the player's and a storage) with items moved between them: drag a stack
     /// with the left mouse button (R turns it), or right click / Shift+click to send it to the other side at once.
+    /// A double click on a thing that is worn (a backpack, a cap) puts it on, from either side.
     /// Dropping on a stack of the same item merges them. A sealed stack (a thing in a container that is not found
     /// yet) is drawn as "?" and cannot be touched. The pointer is read straight from the devices.
     /// </summary>
     public class TransferWindow : ModalWindow
     {
         private const float Cell = 56f;
+        // Two presses on the same thing within this time are a double click.
+        private const float DoubleClickSeconds = 0.35f;
         // A storage that can hold more than this has no weight limit worth showing.
         private const float UnlimitedWeight = 10000f;
         // A grid narrower than this has room for the name of its storage only, not for the weight next to it.
@@ -39,9 +42,14 @@ namespace ProjectMayham.UI
         }
 
         private readonly View[] views = new View[2];
+        // The sizes of the grids the UI was built for: the player's grid changes with the backpack.
+        private Vector2Int builtLeft, builtRight;
         private RectTransform panel;
         private RectTransform ghost;
         private TMP_Text infoLabel;
+
+        private GridInventory.Stack lastClicked;
+        private float lastClickTime;
 
         private View dragFrom;
         private GridInventory.Stack dragged;
@@ -61,7 +69,8 @@ namespace ProjectMayham.UI
         protected void Prepare(GridInventory player, GridInventory storage, string storageName)
         {
             // The layout depends on the sizes of the two grids, so another pair of inventories gets a new one.
-            if (views[0] == null || views[0].Inventory != player || views[1].Inventory != storage)
+            if (views[0] == null || views[0].Inventory != player || views[1].Inventory != storage
+                || builtLeft != player.GridSize || builtRight != storage.GridSize)
             {
                 DiscardUI();
                 views[0] = new View { Inventory = player, Name = "Рюкзак" };
@@ -85,6 +94,18 @@ namespace ProjectMayham.UI
         /// <summary>The least width the storage gets in the panel, so that small storages do not make a tiny window.</summary>
         protected virtual float MinStorageWidth => 0f;
 
+        /// <summary>The rectangle of the storage's grid, for a window that draws over it; null before the window is built.</summary>
+        protected RectTransform StorageGrid => views[1] != null ? views[1].Grid : null;
+
+        /// <summary>True while the storage cannot be touched: what is in it does not show yet.</summary>
+        protected virtual bool StorageBusy => false;
+
+        /// <summary>False while the "?" of the things not found yet are not to be drawn either.</summary>
+        protected virtual bool ShowSealed => true;
+
+        /// <summary>Draws the stacks again, for a window whose own state changes what is shown.</summary>
+        protected void Redraw() => Rebuild();
+
         /// <summary>Called for every stack that was just drawn, for a window that wants to add something to it.</summary>
         protected virtual void OnWidgetBuilt(GridInventory inventory, GridInventory.Stack stack, RectTransform widget) { }
 
@@ -95,6 +116,8 @@ namespace ProjectMayham.UI
 
             var left = views[0].Inventory.GridSize;
             var right = views[1].Inventory.GridSize;
+            builtLeft = left;
+            builtRight = right;
             float leftWidth = left.x * Cell, rightWidth = Mathf.Max(right.x * Cell, MinStorageWidth);
             float gridsHeight = Mathf.Max(left.y, right.y) * Cell;
             const float margin = 36f, gap = 70f, top = 110f, bottom = 120f;
@@ -127,6 +150,7 @@ namespace ProjectMayham.UI
 
         private void BuildView(View view, Vector2 topLeft, Vector2Int size)
         {
+            view.Widgets.Clear();   // what was drawn before went with the old UI
             float gridWidth = size.x * Cell;
             bool showWeight = view.Inventory.MaxWeight < UnlimitedWeight || gridWidth >= WeightLabelMinWidth;
             var title = UIKit.Label(panel, view.Name, showWeight ? 34f : 30f, TextAlignmentOptions.Left, UIKit.Accent);
@@ -216,7 +240,28 @@ namespace ProjectMayham.UI
 
             bool shift = keyboard != null && keyboard.shiftKey.isPressed;
             if (mouse.rightButton.wasPressedThisFrame || (shift && mouse.leftButton.wasPressedThisFrame)) QuickTransfer(view, stack);
-            else if (mouse.leftButton.wasPressedThisFrame) BeginDrag(view, stack, screen);
+            else if (mouse.leftButton.wasPressedThisFrame)
+            {
+                if (IsDoubleClick(stack)) Wear(view, stack);
+                else BeginDrag(view, stack, screen);
+            }
+        }
+
+        // The time is the real one: the stash window stops the game.
+        private bool IsDoubleClick(GridInventory.Stack stack)
+        {
+            bool twice = ReferenceEquals(stack, lastClicked) && Time.unscaledTime - lastClickTime <= DoubleClickSeconds;
+            lastClicked = twice ? null : stack;
+            lastClickTime = Time.unscaledTime;
+            return twice;
+        }
+
+        private void Wear(View view, GridInventory.Stack stack)
+        {
+            if (!stack.Item.Wearable) return;
+            var equipment = views[0].Inventory.GetComponent<PlayerEquipment>();
+            if (equipment == null) return;
+            if (!equipment.WearFrom(view.Inventory, stack)) infoLabel.text = "Не надеть: будет слишком тяжело";
         }
 
         private View ViewUnder(Vector2 screen, out GridInventory.Stack stack)
@@ -224,6 +269,7 @@ namespace ProjectMayham.UI
             stack = null;
             foreach (var view in views)
             {
+                if (view == views[1] && StorageBusy) continue;
                 if (!RectTransformUtility.RectangleContainsScreenPoint(view.Grid, screen, null)) continue;
                 if (ToLocal(view, screen, out var local)) stack = view.Inventory.StackAt(CellOf(local));
                 return view;
@@ -355,6 +401,13 @@ namespace ProjectMayham.UI
         private void Rebuild()
         {
             if (!IsOpen) return;
+            // A backpack was put on while the window is open: the player's grid has another size now.
+            if (views[0].Inventory.GridSize != builtLeft || views[1].Inventory.GridSize != builtRight)
+            {
+                CancelDrag();
+                RebuildUI();
+                infoLabel.text = Hint;
+            }
             foreach (var view in views)
             {
                 foreach (var widget in view.Widgets) Destroy(widget);
@@ -362,7 +415,7 @@ namespace ProjectMayham.UI
 
                 foreach (var stack in view.Inventory.Stacks)
                 {
-                    if (stack == dragged) continue;
+                    if (stack == dragged || (stack.Sealed && !ShowSealed)) continue;
                     var widget = stack.Sealed
                         ? CreateSealedWidget(view.Items, stack)
                         : CreateWidget(view.Items, stack.Item, stack.Count, stack.Rotated, TopLeftOf(stack.Origin));
@@ -439,7 +492,8 @@ namespace ProjectMayham.UI
 
             var item = stack.Item;
             string count = stack.Count > 1 ? $" ×{stack.Count}" : string.Empty;
-            return $"{item.DisplayName}{count} — {item.Weight * stack.Count:0.##} кг ({item.Weight:0.##} кг/шт), {item.GridSize.x}×{item.GridSize.y}";
+            string wear = item.Wearable ? ". Двойной клик — надеть" : string.Empty;
+            return $"{item.DisplayName}{count} — {item.Weight * stack.Count:0.##} кг ({item.Weight:0.##} кг/шт), {item.GridSize.x}×{item.GridSize.y}{wear}";
         }
     }
 }
