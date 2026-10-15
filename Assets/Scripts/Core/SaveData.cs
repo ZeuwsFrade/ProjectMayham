@@ -40,11 +40,14 @@ namespace ProjectMayham.Core
     public class SaveData
     {
         // 2: the player wears things, and the backpack sets the size of the inventory.
-        public const int CurrentVersion = 2;
+        // 3: Tyler sells the weapons of the fight.
+        public const int CurrentVersion = 3;
         /// <summary>The backpack of a new game.</summary>
         public const string StartBackpack = "Briefcase";
         /// <summary>The backpack as big as the inventory was before version 2 (8x5), given to older saves.</summary>
         public const string OldInventoryBackpack = "Backpack";
+        /// <summary>The weapons Tyler sells since version 3, one of each.</summary>
+        public static readonly string[] TylerWeapons = { "Pipe", "Sledgehammer" };
         public const string DefaultPlayerName = "Тайлер";
 
         public int version = CurrentVersion;
@@ -64,25 +67,34 @@ namespace ProjectMayham.Core
         public List<WeaponWearData> weaponWear = new List<WeaponWearData>();
 
         /// <summary>
-        /// Brings a save of an older version up to date. Before version 2 nobody wore anything and the inventory was
-        /// 8x5: such a player gets the backpack of that size, so nothing they carry is lost, and Tyler, who already
-        /// has a stock in the save, gets the backpacks he sells now.
+        /// Brings a save of an older version up to date. A trader whose stock is in the save keeps that stock and
+        /// never sees what was added to his definition later, so what he sells now is added here.
+        /// Before version 2 nobody wore anything and the inventory was 8x5: such a player gets the backpack of that
+        /// size, so nothing they carry is lost, and Tyler gets the backpacks. Before version 3 Tyler had no weapons.
         /// </summary>
         public void Upgrade()
         {
             if (version >= CurrentVersion) return;
+            var tyler = traders?.Find(t => t.trader == "Tyler");
             if (version < 2)
             {
                 if (player == null) player = new InventoryData();
                 player.back = OldInventoryBackpack;
-                var tyler = traders?.Find(t => t.trader == "Tyler");
-                if (tyler != null)
-                {
-                    if (tyler.stock.All(s => s.item != StartBackpack)) tyler.stock.Add(new StockData { item = StartBackpack, count = 2 });
-                    if (tyler.stock.All(s => s.item != OldInventoryBackpack)) tyler.stock.Add(new StockData { item = OldInventoryBackpack, count = 1 });
-                }
+                AddToStock(tyler, StartBackpack, 2);
+                AddToStock(tyler, OldInventoryBackpack, 1);
+            }
+            if (version < 3)
+            {
+                foreach (string weapon in TylerWeapons) AddToStock(tyler, weapon, 1);
             }
             version = CurrentVersion;
+        }
+
+        // Only what he does not have in any amount yet.
+        private static void AddToStock(TraderStockData trader, string item, int count)
+        {
+            if (trader == null || trader.stock.Any(s => s.item == item)) return;
+            trader.stock.Add(new StockData { item = item, count = count });
         }
     }
 

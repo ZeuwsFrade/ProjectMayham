@@ -274,6 +274,20 @@ namespace ProjectMayham.EditorTools
             loaded.Upgrade();
             t.Eq(tyler.stock.Count(s => s.item == SaveData.StartBackpack), 1, "a second upgrade adds nothing");
 
+            t.Ok(SaveData.TylerWeapons.All(w => tyler.stock.Any(s => s.item == w)), "and the weapons too");
+
+            // A save of version 2: equipment already, but Tyler without the weapons; one of them he has sold out.
+            const string two = "{\"version\":2,\"player\":{\"stacks\":[],\"held\":\"\",\"back\":\"Backpack\"},"
+                + "\"traders\":[{\"trader\":\"Tyler\",\"stock\":[{\"item\":\"Papers\",\"count\":30},{\"item\":\"Pipe\",\"count\":0}]}]}";
+            var second = JsonUtility.FromJson<SaveData>(two);
+            second.Upgrade();
+            var tyler2 = second.traders.Find(x => x.trader == "Tyler");
+            t.Eq(second.version, SaveData.CurrentVersion, "a save of version 2 is brought up to date");
+            t.Eq(second.player.back, "Backpack", "what is worn stays as it is");
+            t.Ok(tyler2.stock.Any(s => s.item == "Sledgehammer" && s.count == 1), "Tyler gets the sledgehammer");
+            t.Eq(tyler2.stock.Count(s => s.item == "Pipe"), 1, "a weapon he has in his list already is not added twice");
+            t.Ok(tyler2.stock.All(s => s.item != SaveData.StartBackpack), "and the backpacks of version 2 are not added again");
+
             var current = JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(new SaveData { player = new InventoryData { back = "" } }));
             current.Upgrade();
             t.Eq(current.player.back, string.Empty, "a current save without a backpack stays without one");
