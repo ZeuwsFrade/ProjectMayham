@@ -16,6 +16,9 @@ MonoBehaviour:
   requires:
   - {fileID: 11400000, guid: 996e882dfc472d84c9d3503b498a1cc3, type: 2}
   order: 2
+  minLoyalty: 1
+  requiredChoices: []
+  excludingChoices: []
   title: "\u041A\u0440\u0430\u0441\u043D\u0430\u044F \u043F\u0430\u043F\u043A\u0430"
   offerText: "\u0412 \u043A\u0430\u0431\u0438\u043D\u0435\u0442\u0435 \u0431\u043E\u0441\u0441\u0430
     \u043B\u0435\u0436\u0438\u0442 \u043A\u0440\u0430\u0441\u043D\u0430\u044F \u043F\u0430\u043F\u043A\u0430.
@@ -31,6 +34,7 @@ MonoBehaviour:
     item: {fileID: 11400000, guid: 0e839add1e17df848a3615b825f6609d, type: 2}
     count: 1
     room: 2
+    hidden: 0
     text: 
   reminderText: "\u041A\u0440\u0430\u0441\u043D\u0430\u044F \u043F\u0430\u043F\u043A\u0430
     \u0438\u0437 \u043A\u0430\u0431\u0438\u043D\u0435\u0442\u0430 \u0431\u043E\u0441\u0441\u0430.
@@ -42,3 +46,4 @@ MonoBehaviour:
   rewardItems:
   - item: {fileID: 11400000, guid: 4ce0146741e42be4980289a915a80e7c, type: 2}
     count: 1
+  rewardLoyalty: 5

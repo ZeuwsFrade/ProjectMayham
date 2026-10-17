@@ -140,7 +140,7 @@ namespace ProjectMayham.Trade
 
         private void BuildBuy()
         {
-            var wares = book.Wares.Where(w => w.Count > 0).ToList();
+            var wares = book.Offered.Where(w => w.Count > 0).ToList();
             if (wares.Count == 0) AddHint("У торговца ничего нет.");
 
             foreach (var ware in wares)
@@ -158,7 +158,7 @@ namespace ProjectMayham.Trade
 
         private void BuildSell()
         {
-            var items = inventory.Stacks.Select(s => s.Item).Distinct().OrderBy(i => i.DisplayName).ToList();
+            var items = inventory.Stacks.Select(s => s.Item).Where(i => !i.IsPerson).Distinct().OrderBy(i => i.DisplayName).ToList();
             if (items.Count == 0) AddHint("Ваш инвентарь пуст.");
 
             foreach (var item in items)

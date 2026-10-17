@@ -21,6 +21,8 @@ namespace ProjectMayham.Trade
         [Min(0)] public int count = 5;
         [Tooltip("Price in money when the trader sells it. 0 = derived from the item's value.")]
         [Min(0)] public int priceOverride;
+        [Tooltip("The loyalty level of the trader from which this is sold (1: always).")]
+        [Range(1, 4)] public int minLoyalty = 1;
     }
 
     /// <summary>A trade of things for things: the player gives some items and gets others, no money involved.</summary>
@@ -49,6 +51,8 @@ namespace ProjectMayham.Trade
         [SerializeField, Min(0.1f)] private float sellMarkup = 1.3f;
         [Tooltip("The trader pays this share of an item's value.")]
         [SerializeField, Range(0f, 1f)] private float buyRate = 0.5f;
+        [Tooltip("Off the price of what the trader sells, for every loyalty level above the first.")]
+        [SerializeField, Range(0f, 0.25f)] private float discountPerLevel = 0.05f;
 
         [Header("Trade")]
         [SerializeField] private List<StockEntry> stock = new List<StockEntry>();
@@ -61,6 +65,7 @@ namespace ProjectMayham.Trade
         public string Greeting => greeting;
         public float SellMarkup => sellMarkup;
         public float BuyRate => buyRate;
+        public float DiscountPerLevel => discountPerLevel;
         public IReadOnlyList<StockEntry> Stock => stock;
         public IReadOnlyList<BarterOffer> Barter => barter;
     }

@@ -18,6 +18,12 @@ namespace ProjectMayham.Quests
         [SerializeField] private List<QuestDefinition> requires = new List<QuestDefinition>();
         [Tooltip("Place in the list of offers: smaller comes first.")]
         [SerializeField] private int order;
+        [Tooltip("The loyalty level of the giver it takes for the quest to be offered (1: any).")]
+        [SerializeField, Range(1, 4)] private int minLoyalty = 1;
+        [Tooltip("Offered only after the player gave all of these answers (ids of remembered choices in the dialogues).")]
+        [SerializeField] private List<string> requiredChoices = new List<string>();
+        [Tooltip("Never offered once the player gave one of these answers: the other branch of a fork.")]
+        [SerializeField] private List<string> excludingChoices = new List<string>();
 
         [Tooltip("Short name, shown on the answer button.")]
         [SerializeField] private string title = "Квест";
@@ -32,12 +38,18 @@ namespace ProjectMayham.Quests
         [Header("Reward")]
         [SerializeField, Min(0)] private int rewardMoney;
         [SerializeField] private List<ItemAmount> rewardItems = new List<ItemAmount>();
+        [Tooltip("Loyalty points of the giver for handing it in. Hidden from the player: not shown in the reward.")]
+        [SerializeField, Min(0)] private int rewardLoyalty;
 
         /// <summary>Stable key used in the save file: the name of the asset.</summary>
         public string Id => name;
         public QuestGiverDefinition Giver => giver;
         public IReadOnlyList<QuestDefinition> Requires => requires;
         public int Order => order;
+        public int MinLoyalty => Mathf.Clamp(minLoyalty, 1, 4);
+        public IReadOnlyList<string> RequiredChoices => requiredChoices;
+        public IReadOnlyList<string> ExcludingChoices => excludingChoices;
+        public int RewardLoyalty => Mathf.Max(0, rewardLoyalty);
         public string Title => string.IsNullOrWhiteSpace(title) ? name : title;
         public string OfferText => offerText;
         public IReadOnlyList<QuestObjective> Objectives => objectives;

@@ -35,13 +35,14 @@ namespace ProjectMayham.Items
         }
 
         [Header("Grid")]
-        [Tooltip("Columns and rows of the grid. Changing it at runtime is not supported.")]
+        [Tooltip("Columns and rows of the grid. At run time it is changed with Resize (the player's backpack does it).")]
         [SerializeField] private Vector2Int gridSize = new Vector2Int(8, 5);
 
         private readonly List<Stack> stacks = new List<Stack>();
         private Stack[,] cells;
         private readonly List<Stack> selection = new List<Stack>();
         private float weight;
+        private float extraWeight;
         private ItemDefinition held;
 
         /// <summary>Raised when the item in the hands changes.</summary>
@@ -62,8 +63,21 @@ namespace ProjectMayham.Items
         /// <summary>The item in the hands (one piece, outside of the grid), or null.</summary>
         public ItemDefinition HeldItem => held;
 
-        // What is carried in the hands weighs as much as what is in the grid.
-        public override float TotalWeight => weight + (held != null ? held.Weight : 0f);
+        // What is carried in the hands weighs as much as what is in the grid, and so does what is worn.
+        public override float TotalWeight => weight + (held != null ? held.Weight : 0f) + extraWeight;
+
+        /// <summary>Weight carried outside of the grid and the hands: what the owner wears.</summary>
+        public float ExtraWeight
+        {
+            get => extraWeight;
+            set
+            {
+                float clamped = Mathf.Max(0f, value);
+                if (Mathf.Approximately(clamped, extraWeight)) return;
+                extraWeight = clamped;
+                NotifyChanged();
+            }
+        }
         // The slot members of Inventory do not apply to a grid.
         public override int SlotCount => 0;
         public override int Selected => -1;
@@ -189,6 +203,51 @@ namespace ProjectMayham.Items
         }
 
         /// <summary>
+        /// Gives the grid another size and lays the stacks out again: each keeps its place when it still fits there,
+        /// the others go to the first free spots, and what finds no spot is taken out and added to
+        /// <paramref name="spilled"/> (the caller decides where it goes). The hands are not touched.
+        /// </summary>
+        public void Resize(Vector2Int size, List<(ItemDefinition item, int count)> spilled)
+        {
+            size = new Vector2Int(Mathf.Max(1, size.x), Mathf.Max(1, size.y));
+            if (cells != null && size == GridSize) return;
+
+            var old = stacks.OrderBy(s => s.Origin.y).ThenBy(s => s.Origin.x).ToList();
+            stacks.Clear();
+            gridSize = size;
+            cells = null;
+
+            var moved = new List<Stack>();
+            foreach (var stack in old)
+            {
+                var footprint = stack.Size;
+                bool inside = stack.Origin.x + footprint.x <= size.x && stack.Origin.y + footprint.y <= size.y;
+                if (inside && IsFree(stack.Origin, footprint))
+                {
+                    stacks.Add(stack);
+                    Place(stack);
+                }
+                else moved.Add(stack);
+            }
+            foreach (var stack in moved)
+            {
+                if (FindSpot(stack.Item, out var origin, out bool rotated))
+                {
+                    stack.Origin = origin;
+                    stack.Rotated = rotated;
+                    stacks.Add(stack);
+                    Place(stack);
+                }
+                else spilled?.Add((stack.Item, stack.Count));
+            }
+
+            selection.RemoveAll(s => !stacks.Contains(s));
+            Recalculate();
+            NotifyChanged();
+            SelectedStackChanged?.Invoke();
+        }
+
+        /// <summary>
         /// Puts one new stack (up to the max stack of the item) on free cells as a thing that is not found yet.
         /// It never joins a stack that is already there. Returns the stack, or null when there is no room.
         /// </summary>
@@ -246,6 +305,16 @@ namespace ProjectMayham.Items
             if (stack.Count <= 0) Remove(stack);
             else { Recalculate(); NotifyChanged(); }
 
+            held = item;
+            HeldChanged?.Invoke();
+            NotifyChanged();
+            return true;
+        }
+
+        /// <summary>Takes a thing from outside straight into the hands, when they are empty and the weight allows it.</summary>
+        public bool HoldNew(ItemDefinition item)
+        {
+            if (item == null || held != null || !FitsByWeight(item)) return false;
             held = item;
             HeldChanged?.Invoke();
             NotifyChanged();

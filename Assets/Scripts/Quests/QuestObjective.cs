@@ -15,6 +15,8 @@ namespace ProjectMayham.Quests
         /// <summary>Enter a room of a kind in a raid and come back alive.</summary>
         VisitRoom = 2,
         // 3 is kept for "kill enemies".
+        /// <summary>Bring the quest giver, lost in the maze, home alive. The item is what they are carried as, for the name.</summary>
+        Rescue = 4,
     }
 
     /// <summary>One thing a quest asks the player to do.</summary>
@@ -49,7 +51,10 @@ namespace ProjectMayham.Quests
         private bool HasOwnText => !string.IsNullOrWhiteSpace(text);
         private string ItemName => item != null ? item.DisplayName : "?";
 
-        /// <summary>What the objective is about, without the amount: "Папки", "Красная папка (Офис босса)", "Побывать: Парковка".</summary>
+        /// <summary>
+        /// What the objective is about, without the amount: "Папки", "Красная папка (Офис босса)", "Побывать: Парковка",
+        /// "Довести до убежища: Стажёр".
+        /// </summary>
         public string Subject
         {
             get
@@ -59,6 +64,7 @@ namespace ProjectMayham.Quests
                 {
                     case QuestObjectiveKind.Deliver: return ItemName;
                     case QuestObjectiveKind.FindSpecial: return $"{ItemName} ({RoomSizes.Title(room)})";
+                    case QuestObjectiveKind.Rescue: return item != null ? $"Довести до убежища: {item.DisplayName}" : "Довести до убежища";
                     default: return $"Побывать: {RoomSizes.Title(room)}";
                 }
             }

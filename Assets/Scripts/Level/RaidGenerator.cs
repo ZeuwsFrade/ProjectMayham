@@ -35,6 +35,10 @@ namespace ProjectMayham.Level
         private const string RootName = "Raid";
         // Mixed into the seed for the dice of the containers.
         private const int ContainerSalt = 0x2C0FFEE;
+        // And for the places of the lost NPCs.
+        private const int NpcSalt = 0x51A7E;
+        // No lost NPC closer than this to the start or the exit, and none moved closer than this to the player.
+        private const float NpcClearance = 12f;
 
         private static readonly Vector2Int[] Directions = { Vector2Int.right, Vector2Int.left, Vector2Int.up, Vector2Int.down };
 
@@ -101,6 +105,9 @@ namespace ProjectMayham.Level
         private readonly List<RoomKind> missingKinds = new List<RoomKind>();
         private readonly List<LootContainer> containers = new List<LootContainer>();
         private readonly List<LootContainer> questContainers = new List<LootContainer>();
+        private readonly List<Npcs.LostNpc> lostNpcs = new List<Npcs.LostNpc>();
+        // Tiles a lost NPC can sit on: floor with no wall, window or furniture on it or next to it. Made once a raid.
+        private List<Vector2> npcSpots;
         // The containers have dice of their own: what lies in them changes nothing about the rooms, the loot on
         // the floor, the barricades and the holes of a seed.
         private System.Random containerRng;
@@ -115,6 +122,8 @@ namespace ProjectMayham.Level
         public IReadOnlyList<LootContainer> Containers => containers;
         /// <summary>Containers that hold a thing the demands asked to be hidden.</summary>
         public IReadOnlyList<LootContainer> QuestContainers => questContainers;
+        /// <summary>The lost NPCs sitting somewhere in this raid.</summary>
+        public IReadOnlyList<Npcs.LostNpc> LostNpcs => lostNpcs;
         /// <summary>Kinds of rooms that were asked for and found no slot in this raid.</summary>
         public IReadOnlyList<RoomKind> MissingKinds => missingKinds;
 
@@ -159,6 +168,8 @@ namespace ProjectMayham.Level
             ScatterCorridorLoot(root.transform, slots, rng);
             // Last: a hole opens a wall, and what is a passage or a dead end was decided with the walls whole.
             PlaceHoles(root.transform, slots, rng);
+            // With dice of their own: whoever is lost changes nothing else about the raid.
+            PlaceLostNpcs(root.transform, new System.Random(seed ^ NpcSalt));
 
             string summary = string.Join(", ", rooms.Select(r => $"{r.Slot.name}={RoomSizes.Title(r.Kind)}"));
             Debug.Log($"Raid seed {seed}: {summary}; barricades: {barricades.Count}; holes: {holes.Count}; "
@@ -187,6 +198,8 @@ namespace ProjectMayham.Level
             missingKinds.Clear();
             containers.Clear();
             questContainers.Clear();
+            lostNpcs.Clear();
+            npcSpots = null;
 
             for (int i = transform.childCount - 1; i >= 0; i--)
             {
@@ -630,6 +643,92 @@ namespace ProjectMayham.Level
             var instance = Instantiate(entry.item.WorldPrefab, position, Quaternion.identity, parent);
             if (instance.TryGetComponent<ItemPickup>(out var pickup)) pickup.Set(entry.item, table.RollCount(entry, rng));
             return true;
+        }
+
+        // ---- lost NPCs ----
+
+        private void PlaceLostNpcs(Transform root, System.Random dice)
+        {
+            foreach (var npc in Npcs.NpcCatalog.All.Where(n => n.LostInMaze && n.RaidPrefab != null && !Npcs.NpcRescue.IsRescued(n.Id)).OrderBy(n => n.Id, System.StringComparer.Ordinal))
+            {
+                var spots = NpcSpots().Where(s => !NearKeepClear(s, NpcClearance)).ToList();
+                if (spots.Count == 0)
+                {
+                    Debug.LogWarning($"RaidGenerator: no free floor for {npc.Id}.", this);
+                    continue;
+                }
+                var spot = spots[dice.Next(spots.Count)];
+                var instance = Instantiate(npc.RaidPrefab, new Vector3(spot.x, spot.y, 0f), Quaternion.identity, root);
+                instance.name = npc.Id;
+                if (instance.TryGetComponent<Npcs.LostNpc>(out var lost)) lostNpcs.Add(lost);
+            }
+        }
+
+        /// <summary>
+        /// Moves a lost NPC to another free place: out of the player's sight, away from the player and from every
+        /// enemy. False when there is no such place (the NPC stays).
+        /// </summary>
+        public bool Relocate(Npcs.LostNpc npc)
+        {
+            if (npc == null) return false;
+            var wrap = World.WrapWorld.Active;
+            var cone = Vision.VisionCone.Active;
+            Vector2 Delta(Vector2 a, Vector2 b) => wrap != null ? wrap.Delta(a, b) : b - a;
+
+            var player = cone != null ? (Vector2)cone.transform.position : (Vector2?)null;
+            var enemies = AI.EnemyAI.All.Where(e => e != null && e.isActiveAndEnabled).Select(e => (Vector2)e.transform.position).ToList();
+            float keepAway = npc.Npc != null ? npc.Npc.FleeDistance * 2f : 12f;
+            var spots = NpcSpots().Where(s =>
+                (!player.HasValue || (Delta(player.Value, s).magnitude > NpcClearance && !cone.IsPointVisible(player.Value + Delta(player.Value, s))))
+                && enemies.All(e => Delta(e, s).magnitude > keepAway)).ToList();
+            if (spots.Count == 0) return false;
+
+            var spot = spots[UnityEngine.Random.Range(0, spots.Count)];
+            npc.transform.position = new Vector3(spot.x, spot.y, npc.transform.position.z);
+            return true;
+        }
+
+        private List<Vector2> NpcSpots()
+        {
+            if (npcSpots != null) return npcSpots;
+
+            int tiles = Tiles;
+            var blocked = new bool[tiles, tiles];
+            int furniture = LayerMask.NameToLayer("Furniture");
+            foreach (var box in GetComponentsInChildren<BoxCollider2D>())
+            {
+                if (box.isTrigger || box.gameObject.layer != furniture) continue;
+                Vector2 center = box.transform.TransformPoint(box.offset);
+                Vector2 half = Vector2.Scale(box.size, box.transform.lossyScale) * 0.5f;
+                float hx = Mathf.Abs(half.x), hy = Mathf.Abs(half.y);
+                for (int x = Mathf.FloorToInt(center.x - hx + 0.05f); x <= Mathf.CeilToInt(center.x + hx - 0.05f) - 1; x++)
+                {
+                    for (int y = Mathf.FloorToInt(center.y - hy + 0.05f); y <= Mathf.CeilToInt(center.y + hy - 0.05f) - 1; y++)
+                    {
+                        int tx = x - gridOrigin.x, ty = y - gridOrigin.y;
+                        if (tx >= 0 && ty >= 0 && tx < tiles && ty < tiles) blocked[tx, ty] = true;
+                    }
+                }
+            }
+
+            bool Free(int tx, int ty)
+            {
+                if (tx < 0 || ty < 0 || tx >= tiles || ty >= tiles || blocked[tx, ty]) return false;
+                var cell = new Vector3Int(gridOrigin.x + tx, gridOrigin.y + ty, 0);
+                return floorMap.HasTile(cell) && !wallMap.HasTile(cell) && (windowMap == null || !windowMap.HasTile(cell));
+            }
+
+            npcSpots = new List<Vector2>();
+            for (int tx = 1; tx < tiles - 1; tx++)
+            {
+                for (int ty = 1; ty < tiles - 1; ty++)
+                {
+                    // Free itself and on all four sides: room to sit and to be reached.
+                    if (!Free(tx, ty) || !Free(tx + 1, ty) || !Free(tx - 1, ty) || !Free(tx, ty + 1) || !Free(tx, ty - 1)) continue;
+                    npcSpots.Add(new Vector2(gridOrigin.x + tx + 0.5f, gridOrigin.y + ty + 0.5f));
+                }
+            }
+            return npcSpots;
         }
 
         // Destroy is not allowed in edit mode (preview), DestroyImmediate is not wanted while playing.

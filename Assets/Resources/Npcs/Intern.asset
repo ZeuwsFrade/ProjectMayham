@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 878fe78703e218c4cad6d192adf8be88, type: 3}
+  m_Name: Intern
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Npcs.NpcDefinition
+  displayName: "\u0421\u0442\u0430\u0436\u0451\u0440 \u0412\u0438\u0442\u044F"
+  portrait: {fileID: 21300000, guid: 88383bec8eb18a94db252056b63ebdb2, type: 3}
+  dialogue: {fileID: 11400000, guid: 5084263c6163f844eb943b0d1a1e639d, type: 2}
+  trader: {fileID: 11400000, guid: e6b0350f195595a4c84f209c3a31ec0c, type: 2}
+  loyaltyLevels: 0a0000001900000032000000
+  lostInMaze: 1
+  raidPrefab: {fileID: 8217352054659401380, guid: 34708291a10be874b8e0b8be3a636b77, type: 3}
+  carryItem: {fileID: 11400000, guid: 3f6f86f1c35010a469bc6f14b7ef8326, type: 2}
+  takeAlongLevel: 1
+  fleeDistance: 6
+  shelterPrefab: {fileID: 8217352054659401380, guid: 799d7c05fdca4cb4a99dadc02ee85e3b, type: 3}

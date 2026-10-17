@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1535f234464af44bc9cd19be8f9d04, type: 3}
+  m_Name: Intern_01_Mug
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Quests.QuestDefinition
+  giver: {fileID: 11400000, guid: cca81ec7558d74e4db68b1bf5ffbf38b, type: 2}
+  requires:
+  - {fileID: 11400000, guid: 925d6f41c433f2345839a779cd4c7910, type: 2}
+  order: 1
+  minLoyalty: 1
+  requiredChoices: []
+  excludingChoices: []
+  title: "\u041A\u0440\u0443\u0436\u043A\u0430"
+  offerText: "\u041A\u0440\u0443\u0436\u043A\u0430. \u041C\u043D\u0435 \u043D\u0443\u0436\u043D\u0430
+    \u043A\u0440\u0443\u0436\u043A\u0430. \u0411\u0435\u0437 \u043A\u043E\u0444\u0435
+    \u044F \u0442\u0443\u0442 \u0441\u043E\u0439\u0434\u0443 \u0441 \u0443\u043C\u0430
+    \u2014 \u0430 \u043A\u043E\u0444\u0435 \u0442\u0443\u0442 \u043D\u0435\u0442,
+    \u043D\u043E \u0445\u043E\u0442\u044C \u043F\u043E\u0434\u0435\u0440\u0436\u0443."
+  objectives:
+  - kind: 0
+    item: {fileID: 11400000, guid: 4ce0146741e42be4980289a915a80e7c, type: 2}
+    count: 1
+    room: 0
+    hidden: 0
+    text: 
+  reminderText: 
+  completedText: "\u0421\u043F\u0430\u0441\u0438\u0431\u043E\u2026 \u0414\u0430\u0436\u0435
+    \u0431\u0435\u0437 \u043A\u043E\u0444\u0435 \u0443\u0436\u0435 \u043B\u0435\u0433\u0447\u0435."
+  rewardMoney: 10
+  rewardItems: []
+  rewardLoyalty: 5

@@ -3,6 +3,7 @@ using System.Linq;
 using ProjectMayham.Core;
 using ProjectMayham.Items;
 using ProjectMayham.Level;
+using ProjectMayham.Npcs;
 
 namespace ProjectMayham.Quests
 {
@@ -95,6 +96,10 @@ namespace ProjectMayham.Quests
             {
                 if (required != null && !IsTurnedIn(required)) return QuestStatus.Locked;
             }
+            // The giver has to trust the player enough, and the answers the quest line forks on have to be the right ones.
+            if (quest.Giver != null && Loyalty.Level(quest.Giver.Id) < quest.MinLoyalty) return QuestStatus.Locked;
+            if (quest.RequiredChoices.Any(c => !string.IsNullOrWhiteSpace(c) && !PlayerChoices.Has(c))) return QuestStatus.Locked;
+            if (quest.ExcludingChoices.Any(PlayerChoices.Has)) return QuestStatus.Locked;
             return QuestStatus.Available;
         }
 
@@ -136,6 +141,11 @@ namespace ProjectMayham.Quests
                 {
                     line.Need = 1;
                     line.Have = record != null && record.marks != null && record.marks.Contains(objective.VisitMark) ? 1 : 0;
+                }
+                else if (objective.Kind == QuestObjectiveKind.Rescue)
+                {
+                    line.Need = 1;
+                    line.Have = quest.Giver != null && NpcRescue.IsRescued(quest.Giver.Id) ? 1 : 0;
                 }
                 else
                 {
@@ -184,6 +194,7 @@ namespace ProjectMayham.Quests
             }
 
             GameSession.AddMoney(quest.RewardMoney);
+            if (quest.Giver != null) Loyalty.Add(quest.Giver.Id, quest.RewardLoyalty);
             record.state = StateTurnedIn;
             return TurnInResult.Done;
         }
