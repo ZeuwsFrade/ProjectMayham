@@ -21,6 +21,7 @@ namespace ProjectMayham.EditorTools
     public static class PlayerPrefabBuilder
     {
         public const string PrefabPath = "Assets/Prefabs/Player.prefab";
+        public const string FootstepsTrackPath = "Assets/Audio/Player/Steps_Track.mp3";
 
         // Obstacle + Window: nothing can be used through walls and glass; Furniture is added for the landing spot.
         private const int ObstacleWindowMask = (1 << 6) | (1 << 10);
@@ -57,6 +58,7 @@ namespace ProjectMayham.EditorTools
             Ensure<PlayerPersistence>(temp, null);
             Ensure<MeleeCombat>(temp, null);
             Ensure<PlayerNoise>(temp, null);
+            Ensure<PlayerFootsteps>(temp, SetFootsteps);
             Ensure<PlayerDeath>(temp, null);
             Ensure<HitFlash>(temp, null);
 
@@ -142,9 +144,32 @@ namespace ProjectMayham.EditorTools
             return null;
         }
 
+        /// <summary>
+        /// The track of <see cref="FootstepsTrackPath"/> with its steps found, when the component has no sound yet
+        /// (or always, with <paramref name="replace"/>).
+        /// </summary>
+        public static void SetFootsteps(SerializedObject footsteps) => SetFootsteps(footsteps, false);
+
+        public static void SetFootsteps(SerializedObject footsteps, bool replace)
+        {
+            var track = footsteps.FindProperty("track");
+            var steps = footsteps.FindProperty("steps");
+            if (!replace && (track.objectReferenceValue != null || steps.arraySize > 0)) return;
+            var clip = AssetDatabase.LoadAssetAtPath<AudioClip>(FootstepsTrackPath);
+            if (clip == null) return;
+            footsteps.FindProperty("kind").enumValueIndex = (int)PlayerFootsteps.SoundKind.Track;
+            track.objectReferenceValue = clip;
+            steps.arraySize = 0;
+            // The same recording for the loop, so switching to "the whole track" plays at once.
+            var loop = footsteps.FindProperty("loopTrack");
+            if (loop.objectReferenceValue == null) loop.objectReferenceValue = clip;
+            FootstepTrackAnalyzer.Fill(footsteps);
+        }
+
         private static void Ensure<T>(GameObject go, System.Action<SerializedObject> configure) where T : Component
         {
-            var component = go.GetComponent<T>() ?? go.AddComponent<T>();
+            // A missing component is not null for ?? in the Editor, so ask with TryGetComponent.
+            if (!go.TryGetComponent<T>(out var component)) component = go.AddComponent<T>();
             if (configure == null) return;
             var so = new SerializedObject(component);
             configure(so);

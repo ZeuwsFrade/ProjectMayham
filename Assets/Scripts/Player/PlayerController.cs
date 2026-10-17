@@ -44,6 +44,9 @@ namespace ProjectMayham.Player
         private bool sprintHeld;
 
         public Vector2 Velocity => body.linearVelocity;
+        /// <summary>Speed of a walk and of a sprint without load or a raised weapon.</summary>
+        public float WalkSpeed => walkSpeed;
+        public float SprintSpeed => sprintSpeed;
         /// <summary>Cursor position in world space, refreshed every frame.</summary>
         public Vector2 AimPoint { get; private set; }
         public bool IsSprinting => !MovementLocked && !SprintBlocked && sprintHeld && moveInput.sqrMagnitude > 0.01f && CanSprint;

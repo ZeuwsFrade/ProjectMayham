@@ -25,6 +25,7 @@ GameObject:
   - component: {fileID: 5462201963381821}
   - component: {fileID: 5688020143123859839}
   - component: {fileID: 1269164290590023120}
+  - component: {fileID: 9144053764511502101}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -388,3 +389,60 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Items.PlayerEquipment
   pockets: {x: 4, y: 2}
+--- !u!114 &9144053764511502101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9094376001055331127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b051d4be71b2514caa88794305aff0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Player.PlayerFootsteps
+  kind: 1
+  steps: []
+  track: {fileID: 8300000, guid: 39ba5740d3c54934789b41d30f574257, type: 3}
+  trackSteps:
+  - 0.125
+  - 0.72499996
+  - 1.3349999
+  - 1.925
+  - 2.5249999
+  - 3.155
+  - 3.715
+  - 4.9449997
+  - 5.595
+  - 6.1749997
+  - 6.835
+  - 7.4249997
+  - 8.035
+  trackGains:
+  - 0.9779928
+  - 1
+  - 0.7899079
+  - 0.9075465
+  - 1
+  - 1
+  - 0.73606193
+  - 1
+  - 0.7063523
+  - 1
+  - 0.5475949
+  - 1
+  - 1
+  trackThreshold: 0.18
+  trackEvenVolume: 1
+  trackStepLength: 0.45
+  loopTrack: {fileID: 8300000, guid: 39ba5740d3c54934789b41d30f574257, type: 3}
+  loopSprintTrack: {fileID: 0}
+  loopFade: 0.15
+  loopRate: {x: 0.85, y: 1.15}
+  stride: 1.6
+  minSpeed: 0.8
+  walkVolume: 0.5
+  sprintVolume: 0.8
+  pitchRange: {x: 0.92, y: 1.08}
+  volumeJitter: {x: 0.85, y: 1}
+  output: {fileID: 0}
