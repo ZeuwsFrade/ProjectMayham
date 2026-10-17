@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7e1a1cbfea978c478f4efd207e20c43, type: 3}
+  m_Name: Pipe
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.WeaponDefinition
+  displayName: "\u0422\u0440\u0443\u0431\u0430"
+  icon: {fileID: 21300000, guid: bbad04d5148027d4cb2ecb93a16e458b, type: 3}
+  maxStack: 1
+  gridSize: {x: 1, y: 3}
+  canRotate: 1
+  weight: 2.5
+  value: 15
+  holdable: 1
+  heldSprite: {fileID: 0}
+  heldOffset: {x: 0.45, y: 0.55}
+  heldAngle: 0
+  heldMatchesWorld: 1
+  heldScale: 1
+  worldPrefab: {fileID: 8217352054659401380, guid: 01947701a937e734ebeb22beaac88228, type: 3}
+  damage: 18
+  heavyDamageMultiplier: 2
+  range: 1.55
+  arc: 95
+  heavyArcMultiplier: 1.15
+  swingSeconds: 0.18
+  heavySwingSeconds: 0.28
+  recoverSeconds: 0.12
+  heavyRecoverSeconds: 0.3
+  chargeSeconds: 0.55
+  staminaCost: 8
+  heavyStaminaCost: 20
+  knockback: 3.5
+  heavyKnockbackMultiplier: 1.8
+  stagger: 0.3
+  heavyStagger: 0.8
+  hitStop: 0.035
+  heavyHitStop: 0.08
+  shake: 0.18
+  heavyShake: 0.5
+  raisedSpeedMultiplier: 0.65
+  swingSpeedMultiplier: 0.35
+  raisedConeScale: 0.65
+  maxDurability: 70
+  durabilityPerHit: 1
+  heavyWearMultiplier: 2
+  brokenItem: {fileID: 0}
+  swingNoise: 3.5
+  hitNoise: 7

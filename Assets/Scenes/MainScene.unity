@@ -746,11 +746,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RoomSlot
   size: 0
   interiorOrigin: {x: 44, y: -4}
-  doorTiles:
-  - {x: 43, y: -1}
-  - {x: 43, y: 0}
-  - {x: 47, y: -5}
-  - {x: 48, y: -5}
 --- !u!1 &66118913
 GameObject:
   m_ObjectHideFlags: 0
@@ -9481,11 +9476,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RoomSlot
   size: 1
   interiorOrigin: {x: 5, y: 35}
-  doorTiles:
-  - {x: 13, y: 35}
-  - {x: 13, y: 36}
-  - {x: 4, y: 35}
-  - {x: 4, y: 36}
 --- !u!1 &217009295
 GameObject:
   m_ObjectHideFlags: 0
@@ -31183,6 +31173,7 @@ GameObject:
   - component: {fileID: 519420030}
   - component: {fileID: 519420033}
   - component: {fileID: 519420034}
+  - component: {fileID: 519420035}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -31338,6 +31329,21 @@ MonoBehaviour:
   cone: {fileID: 2105572048}
   compositeShader: {fileID: 4800000, guid: c9e7bfc29ef3c9346924ab7c378d56ac, type: 3}
   maskShader: {fileID: 4800000, guid: 4cb1e1e321ae5eb419b8cc8812f801cc, type: 3}
+--- !u!114 &519420035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9534b3116ffaef648b796245322c6ce1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.CameraShake
+  maxOffset: 0.45
+  decay: 2.2
+  frequency: 28
 --- !u!1 &523687370
 GameObject:
   m_ObjectHideFlags: 0
@@ -31936,11 +31942,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RoomSlot
   size: 0
   interiorOrigin: {x: -13, y: -1}
-  doorTiles:
-  - {x: -10, y: -2}
-  - {x: -9, y: -2}
-  - {x: -10, y: 4}
-  - {x: -9, y: 4}
 --- !u!1 &554770516
 GameObject:
   m_ObjectHideFlags: 0
@@ -183274,6 +183275,59 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &886084513
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 886084515}
+  - component: {fileID: 886084514}
+  m_Layer: 0
+  m_Name: NavGrid
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &886084514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 886084513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 686fef5d61ee7b14c959da25c0269a70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.AI.NavGrid
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 1600
+  manualMin: {x: 0, y: 0}
+  manualSize: {x: 0, y: 0}
+  agentRadius: 0.38
+  refreshPerFrame: 250
+  searchesPerFrame: 4
+  maxExpansions: 40000
+--- !u!4 &886084515
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 886084513}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &888733975
 GameObject:
   m_ObjectHideFlags: 0
@@ -184281,6 +184335,57 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &998371981
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 998371983}
+  - component: {fileID: 998371982}
+  m_Layer: 0
+  m_Name: EnemySpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &998371982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 998371981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a9f0c65eeca8c94ab9d46c9c3c03751, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.AI.EnemySpawner
+  prefabs:
+  - {fileID: 811892609437014573, guid: ada5dd7e69934c747a9b8e8b062ff86b, type: 3}
+  packs: 4
+  packSize: {x: 2, y: 5}
+  spread: 2.2
+  minPlayerDistance: 22
+  parent: {fileID: 1565167322}
+--- !u!4 &998371983
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 998371981}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1001770699
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -186710,11 +186815,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RoomSlot
   size: 0
   interiorOrigin: {x: -49, y: -13}
-  doorTiles:
-  - {x: -49, y: -8}
-  - {x: -48, y: -8}
-  - {x: -46, y: -14}
-  - {x: -45, y: -14}
 --- !u!1 &1132514299
 GameObject:
   m_ObjectHideFlags: 0
@@ -187358,11 +187458,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RoomSlot
   size: 1
   interiorOrigin: {x: 44, y: 26}
-  doorTiles:
-  - {x: 47, y: 31}
-  - {x: 48, y: 31}
-  - {x: 47, y: 25}
-  - {x: 48, y: 25}
 --- !u!1 &1199156993
 GameObject:
   m_ObjectHideFlags: 0
@@ -187821,11 +187916,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RoomSlot
   size: 1
   interiorOrigin: {x: -43, y: -40}
-  doorTiles:
-  - {x: -44, y: -37}
-  - {x: -44, y: -36}
-  - {x: -37, y: -35}
-  - {x: -36, y: -35}
 --- !u!1 &1247073005
 GameObject:
   m_ObjectHideFlags: 0
@@ -191004,11 +191094,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RoomSlot
   size: 2
   interiorOrigin: {x: -10, y: -37}
-  doorTiles:
-  - {x: -7, y: -29}
-  - {x: -6, y: -29}
-  - {x: -11, y: -37}
-  - {x: -11, y: -36}
 --- !u!1 &1473674809
 GameObject:
   m_ObjectHideFlags: 0
@@ -192076,15 +192161,31 @@ MonoBehaviour:
   library: {fileID: 11400000, guid: 99d7cb65ed2788f48bf3e634c5691322, type: 2}
   floorMap: {fileID: 788194771}
   wallMap: {fileID: 730578302}
+  windowMap: {fileID: 0}
+  gridOrigin: {x: 0, y: 0}
+  cells: 39
+  barricadePrefabs: []
+  barricadeCount: 12
+  barricadeSpacing: 4
+  holePrefabs: []
+  holeCount: 12
+  holeSpacing: 6
+  holeMinDetour: 12
   corridorLoot: {fileID: 11400000, guid: cd81f24df06667440b0d04bd9f5ee70e, type: 2}
   corridorLootCount: 30
+  deadEndLootWeight: 6
   keepClear:
   - {fileID: 1436795681}
   - {fileID: 320820242}
+  barricadeClearance: 9
+  holeClearance: 12
   useFixedSeed: 0
   fixedSeed: 1
   paintedFloor: []
   paintedWalls: []
+  paintedWindows: []
+  holeCells: []
+  holeTiles: []
 --- !u!114 &1509659129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -192948,6 +193049,37 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &1565167321
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1565167322}
+  m_Layer: 0
+  m_Name: Raid Enemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1565167322
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1565167321}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1565453494
 GameObject:
   m_ObjectHideFlags: 0
@@ -197427,11 +197559,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RoomSlot
   size: 0
   interiorOrigin: {x: 35, y: -46}
-  doorTiles:
-  - {x: 40, y: -46}
-  - {x: 40, y: -45}
-  - {x: 34, y: -46}
-  - {x: 34, y: -45}
 --- !u!1 &1746837340
 GameObject:
   m_ObjectHideFlags: 0
@@ -201169,6 +201296,7 @@ MonoBehaviour:
   stats: {fileID: 2105572046}
   persistence: {fileID: 2105572054}
   inventoryWindow: {fileID: 843922459}
+  shelterScene: Shelter
 --- !u!4 &1920461128
 Transform:
   m_ObjectHideFlags: 0
@@ -202108,10 +202236,10 @@ RectTransform:
   - {fileID: 1500984086}
   m_Father: {fileID: 860933864}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 160, y: -38}
+  m_SizeDelta: {x: 320, y: 16}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1968579080
 MonoBehaviour:
@@ -203151,10 +203279,10 @@ RectTransform:
   - {fileID: 400417389}
   m_Father: {fileID: 860933864}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 160, y: -11}
+  m_SizeDelta: {x: 320, y: 22}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2001900571
 MonoBehaviour:
@@ -204417,11 +204545,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RoomSlot
   size: 2
   interiorOrigin: {x: -43, y: 44}
-  doorTiles:
-  - {x: -43, y: 52}
-  - {x: -42, y: 52}
-  - {x: -44, y: 44}
-  - {x: -44, y: 45}
 --- !u!1 &2067979631
 GameObject:
   m_ObjectHideFlags: 0
@@ -205664,6 +205787,10 @@ GameObject:
   - component: {fileID: 2105572046}
   - component: {fileID: 2105572047}
   - component: {fileID: 2105572054}
+  - component: {fileID: 2105572058}
+  - component: {fileID: 2105572057}
+  - component: {fileID: 2105572056}
+  - component: {fileID: 2105572055}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -205689,6 +205816,9 @@ MonoBehaviour:
   blockMask:
     serializedVersion: 2
     m_Bits: 64
+  reachBlockMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &2105572045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205923,6 +206053,75 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3505b9a366d9e045b700b0d00603e52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Core.PlayerPersistence
+--- !u!114 &2105572055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2105572043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 563606c1cd1154341bc4fa48fddc51b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.HitFlash
+  flashColor: {r: 1, g: 0.3, b: 0.25, a: 1}
+  seconds: 0.14
+--- !u!114 &2105572056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2105572043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 890edc1fb9095e648aa671dfd615eac8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.PlayerDeath
+  fallSeconds: 0.9
+  lieSeconds: 0.8
+  fallAngle: 90
+  deadTint: {r: 0.45, g: 0.1, b: 0.1, a: 1}
+  shrinkTo: 0.85
+--- !u!114 &2105572057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2105572043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf22d09f4830f3447969cdf2e1db9908, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.PlayerNoise
+  walkRadius: 3.5
+  sprintRadius: 9
+  interval: 0.4
+  minSpeed: 0.8
+--- !u!114 &2105572058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2105572043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 718e7a0d6254dc24daed93e30421879a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.MeleeCombat
+  inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 0
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 0
+  inventoryWindow: {fileID: 0}
+  showArc: 1
+  messageSeconds: 1.6
 --- !u!1 &2106501351
 GameObject:
   m_ObjectHideFlags: 0
@@ -206437,6 +206636,7 @@ GameObject:
   - component: {fileID: 2121672238}
   - component: {fileID: 2121672237}
   - component: {fileID: 2121672240}
+  - component: {fileID: 2121672241}
   m_Layer: 5
   m_Name: HUD
   m_TagString: Untagged
@@ -206525,6 +206725,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f7fb9cf76e059c498268b38b644cc1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.UI.MoneyHUD
+--- !u!114 &2121672241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2121672236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa598f76ba6efe14d9d533d276754479, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.UI.CombatHUD
+  combat: {fileID: 0}
+  bottomOffset: 190
 --- !u!1 &2125499213
 GameObject:
   m_ObjectHideFlags: 0
@@ -207090,3 +207304,6 @@ SceneRoots:
   - {fileID: 1715593346}
   - {fileID: 2121672239}
   - {fileID: 1920461128}
+  - {fileID: 886084515}
+  - {fileID: 998371983}
+  - {fileID: 1565167322}

@@ -12,6 +12,9 @@ namespace ProjectMayham.Vision
     {
         public static VisionCone Active { get; private set; }
 
+        // How fast the cone changes its width when it is narrowed or widened.
+        private const float ScaleSmoothing = 12f;
+
         [SerializeField] private VisionSettings settings;
 
         private readonly RaycastHit2D[] hits = new RaycastHit2D[8];
@@ -20,10 +23,19 @@ namespace ProjectMayham.Vision
 
         private float currentAngle;
         private float lastAngle;
+        private float lastScale = 1f;
         private Vector2 lastOrigin;
         private bool initialized;
 
         public VisionSettings Settings => settings;
+        /// <summary>
+        /// Share of the normal cone width the player sees with (a raised weapon narrows it). The cone eases towards
+        /// the value by itself. 1 = the width of the settings.
+        /// </summary>
+        public float ConeScale { get; set; } = 1f;
+        private float currentScale = 1f;
+        /// <summary>Full width of the cone right now, in degrees.</summary>
+        public float CurrentConeAngle => settings != null ? settings.coneAngle * currentScale : 0f;
         /// <summary>Incremented every time the geometry is rebuilt.</summary>
         public int Version { get; private set; }
         public Vector2 Origin { get; private set; }
@@ -64,9 +76,17 @@ namespace ProjectMayham.Vision
             float t = 1f - Mathf.Exp(-settings.rotationSmoothing * Time.deltaTime);
             currentAngle = Mathf.LerpAngle(currentAngle, targetAngle, t);
 
+            // Unscaled: the narrowing keeps its pace through the short freeze of a hit.
+            float goalScale = Mathf.Clamp(ConeScale, 0.1f, 1f);
+            currentScale = initialized
+                ? Mathf.Lerp(currentScale, goalScale, 1f - Mathf.Exp(-ScaleSmoothing * Time.unscaledDeltaTime))
+                : goalScale;
+            if (Mathf.Abs(currentScale - goalScale) < 0.002f) currentScale = goalScale;
+
             bool moved = (origin - lastOrigin).sqrMagnitude > settings.positionThreshold * settings.positionThreshold;
             bool turned = Mathf.Abs(Mathf.DeltaAngle(currentAngle, lastAngle)) > settings.angleThreshold;
-            if (!initialized || moved || turned)
+            bool scaled = !Mathf.Approximately(currentScale, lastScale);
+            if (!initialized || moved || turned || scaled)
             {
                 BuildFilter();
                 Origin = origin;
@@ -75,6 +95,7 @@ namespace ProjectMayham.Vision
 
                 lastOrigin = origin;
                 lastAngle = currentAngle;
+                lastScale = currentScale;
                 initialized = true;
                 Version++;
             }
@@ -101,8 +122,8 @@ namespace ProjectMayham.Vision
                 ConeWeights = new float[count];
             }
 
-            float half = settings.coneAngle * 0.5f;
-            float soft = settings.softEdgeAngle * 0.5f;
+            float half = CurrentConeAngle * 0.5f;
+            float soft = settings.softEdgeAngle * 0.5f * currentScale;
             float spread = Mathf.Min(half + soft, 180f);
 
             for (int i = 0; i < count; i++)
@@ -141,7 +162,7 @@ namespace ProjectMayham.Vision
 
             bool inAmbient = dist <= settings.ambientRadius;
             bool inCone = dist <= settings.radius &&
-                          Mathf.Abs(Mathf.DeltaAngle(currentAngle, Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg)) <= settings.coneAngle * 0.5f;
+                          Mathf.Abs(Mathf.DeltaAngle(currentAngle, Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg)) <= CurrentConeAngle * 0.5f;
             if (!inAmbient && !inCone) return false;
 
             int count = Physics2D.Linecast(origin, point, filter, hits);
