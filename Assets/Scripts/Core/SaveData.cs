@@ -41,7 +41,8 @@ namespace ProjectMayham.Core
     {
         // 2: the player wears things, and the backpack sets the size of the inventory.
         // 3: Tyler sells the weapons of the fight.
-        public const int CurrentVersion = 3;
+        // 4: the NPCs brought home are in the shelter or away, and the save says which.
+        public const int CurrentVersion = 4;
         /// <summary>The backpack of a new game.</summary>
         public const string StartBackpack = "Briefcase";
         /// <summary>The backpack as big as the inventory was before version 2 (8x5), given to older saves.</summary>
@@ -71,6 +72,8 @@ namespace ProjectMayham.Core
         public List<string> choices = new List<string>();
         /// <summary>Ids of the lost NPCs the player has brought home. See <see cref="Npcs.NpcRescue"/>.</summary>
         public List<string> rescued = new List<string>();
+        /// <summary>Whether each NPC brought home is in the shelter now. See <see cref="Npcs.NpcRescue.IsInShelter"/>.</summary>
+        public List<ShelterNpcData> shelterNpcs = new List<ShelterNpcData>();
 
         /// <summary>
         /// Brings a save of an older version up to date. A trader whose stock is in the save keeps that stock and
@@ -93,6 +96,16 @@ namespace ProjectMayham.Core
             {
                 foreach (string weapon in TylerWeapons) AddToStock(tyler, weapon, 1);
             }
+            if (version < 4)
+            {
+                // Everyone brought home before this lived in the shelter.
+                if (rescued == null) rescued = new List<string>();
+                if (shelterNpcs == null) shelterNpcs = new List<ShelterNpcData>();
+                foreach (string id in rescued)
+                {
+                    if (!shelterNpcs.Any(n => n.npc == id)) shelterNpcs.Add(new ShelterNpcData { npc = id, present = true });
+                }
+            }
             version = CurrentVersion;
         }
 
@@ -102,6 +115,14 @@ namespace ProjectMayham.Core
             if (trader == null || trader.stock.Any(s => s.item == item)) return;
             trader.stock.Add(new StockData { item = item, count = count });
         }
+    }
+
+    /// <summary>Whether one NPC brought home is in the shelter (true) or away (false).</summary>
+    [Serializable]
+    public class ShelterNpcData
+    {
+        public string npc;
+        public bool present;
     }
 
     /// <summary>Loyalty points of one NPC. An NPC that is not listed has none.</summary>

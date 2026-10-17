@@ -51,7 +51,7 @@ namespace ProjectMayham.Npcs
 
             var spots = FindObjectsByType<NpcSpot>(FindObjectsSortMode.None).OrderBy(s => s.name).ToList();
             var taken = new HashSet<NpcSpot>();
-            foreach (var npc in NpcCatalog.All.Where(n => NpcRescue.IsRescued(n.Id) && n.ShelterPrefab != null).OrderBy(n => n.Id))
+            foreach (var npc in NpcCatalog.All.Where(n => NpcRescue.IsInShelter(n.Id) && n.ShelterPrefab != null).OrderBy(n => n.Id))
             {
                 var spot = spots.FirstOrDefault(s => s.NpcId == npc.Id && !taken.Contains(s))
                     ?? spots.FirstOrDefault(s => s.NpcId.Length == 0 && !taken.Contains(s));

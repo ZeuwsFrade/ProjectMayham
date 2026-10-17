@@ -1827,7 +1827,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d7a1b2984c46ac4eb346682bab34fe1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.UI.InteractPrompt
-  interactor: {fileID: 2105572044}
+  interactor: {fileID: 1595962790}
   label: {fileID: 511160228}
   fullMessage: "\u041D\u0435\u0442 \u043C\u0435\u0441\u0442\u0430 \u0432 \u0438\u043D\u0432\u0435\u043D\u0442\u0430\u0440\u0435"
   tooHeavyMessage: "\u0421\u043B\u0438\u0448\u043A\u043E\u043C \u0442\u044F\u0436\u0435\u043B\u043E"
@@ -2083,7 +2083,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f4c3703857a1c3438b7aae09c15c6f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Player.CameraFollow
-  target: {fileID: 2105572053}
+  target: {fileID: 1595962794}
   smoothTime: 0.15
 --- !u!114 &519420034
 MonoBehaviour:
@@ -2098,7 +2098,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Vision.VisionRenderer
   settings: {fileID: 11400000, guid: fb709169dbebcc1438643d529a935b59, type: 2}
-  cone: {fileID: 2105572048}
+  cone: {fileID: 1595962793}
   compositeShader: {fileID: 4800000, guid: c9e7bfc29ef3c9346924ab7c378d56ac, type: 3}
   maskShader: {fileID: 4800000, guid: 4cb1e1e321ae5eb419b8cc8812f801cc, type: 3}
 --- !u!114 &519420035
@@ -15689,8 +15689,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d1361e445de20a44a743915227bee69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.UI.InventoryWindow
-  inventory: {fileID: 2105572045}
-  interactor: {fileID: 2105572044}
+  inventory: {fileID: 1595962791}
+  interactor: {fileID: 1595962790}
   window: {fileID: 179623739}
   grid: {fileID: 1654344527}
   itemsLayer: {fileID: 1762015956}
@@ -15973,7 +15973,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3133e8e9fdcfc3b4b972e405146f2fd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.UI.StatsHUD
-  stats: {fileID: 2105572046}
+  stats: {fileID: 1595962792}
   health:
     fill: {fileID: 773875010}
     fillImage: {fileID: 773875011}
@@ -18301,6 +18301,112 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1573680908}
   m_CullTransparentMesh: 1
+--- !u!1001 &1595962789
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3822351445897305721, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3822351445897305721, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3822351445897305721, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3822351445897305721, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3822351445897305721, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3822351445897305721, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3822351445897305721, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3822351445897305721, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3822351445897305721, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3822351445897305721, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9094376001055331127, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+      propertyPath: m_Name
+      value: Player
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+--- !u!114 &1595962790 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8659917961246841833, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+  m_PrefabInstance: {fileID: 1595962789}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9898ad447fa2aa54b99287de7203278c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Interaction.PlayerInteractor
+--- !u!114 &1595962791 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7465801075669899679, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+  m_PrefabInstance: {fileID: 1595962789}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6bfcd3169985ff4687b89493fc055aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Items.GridInventory
+--- !u!114 &1595962792 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6774316313431250737, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+  m_PrefabInstance: {fileID: 1595962789}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da7e28e6305b9db42a974d6b403d4082, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Player.PlayerStats
+--- !u!114 &1595962793 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3312669829058202223, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+  m_PrefabInstance: {fileID: 1595962789}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efaef93d71840174fbc04f03eb62810a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Vision.VisionCone
+--- !u!4 &1595962794 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3822351445897305721, guid: 3deb5fb94a1c02345a30ed7a8225aed0, type: 3}
+  m_PrefabInstance: {fileID: 1595962789}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1654344526
 GameObject:
   m_ObjectHideFlags: 0
@@ -21169,360 +21275,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2095293744}
   m_CullTransparentMesh: 1
---- !u!1 &2105572043
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2105572053}
-  - component: {fileID: 2105572052}
-  - component: {fileID: 2105572051}
-  - component: {fileID: 2105572050}
-  - component: {fileID: 2105572049}
-  - component: {fileID: 2105572048}
-  - component: {fileID: 2105572044}
-  - component: {fileID: 2105572045}
-  - component: {fileID: 2105572046}
-  - component: {fileID: 2105572047}
-  - component: {fileID: 2105572054}
-  - component: {fileID: 2105572058}
-  - component: {fileID: 2105572057}
-  - component: {fileID: 2105572056}
-  - component: {fileID: 2105572055}
-  m_Layer: 8
-  m_Name: Player
-  m_TagString: Player
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2105572044
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9898ad447fa2aa54b99287de7203278c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Interaction.PlayerInteractor
-  inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  interactRadius: 1.4
-  dropDistance: 0.9
-  blockMask:
-    serializedVersion: 2
-    m_Bits: 64
-  reachBlockMask:
-    serializedVersion: 2
-    m_Bits: 0
---- !u!114 &2105572045
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6bfcd3169985ff4687b89493fc055aa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Items.GridInventory
-  slotCount: 5
-  comfortableWeight: 10
-  maxWeight: 25
-  gridSize: {x: 8, y: 5}
---- !u!114 &2105572046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da7e28e6305b9db42a974d6b403d4082, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Player.PlayerStats
-  maxHealth: 100
-  lowHealthThreshold: 0.25
-  healthPerStamina: 0.1
-  maxStamina: 100
-  sprintDrain: 20
-  regenRate: 15
-  regenDelay: 1
-  exhaustedRegenDelay: 2
-  exhaustedRecoverThreshold: 0.3
-  drainAtComfortableWeight: 2
---- !u!114 &2105572047
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 002d84126fc0dca47a29900076f44437, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Items.HeldItemView
-  putAwayKey: 22
-  orderAbovePlayer: 1
---- !u!114 &2105572048
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efaef93d71840174fbc04f03eb62810a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Vision.VisionCone
-  settings: {fileID: 11400000, guid: fb709169dbebcc1438643d529a935b59, type: 2}
---- !u!114 &2105572049
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31119047633c6a147a0056334a8203f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Player.PlayerController
-  inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  walkSpeed: 3.5
-  sprintSpeed: 6
-  acceleration: 14
-  deceleration: 10
-  speedAtMaxWeight: 0.35
-  rotationOffset: -90
-  turnSpeed: 540
---- !u!58 &2105572050
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.4375
---- !u!50 &2105572051
-Rigidbody2D:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 4
---- !u!212 &2105572052
-SpriteRenderer:
-  serializedVersion: 2
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 10
-  m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 2c9367c759f444f46b5c398e4def612e, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 0.90625, y: 0.90625}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_SpriteSortPoint: 0
---- !u!4 &2105572053
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -8, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2105572054
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3505b9a366d9e045b700b0d00603e52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Core.PlayerPersistence
---- !u!114 &2105572055
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 563606c1cd1154341bc4fa48fddc51b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.HitFlash
-  flashColor: {r: 1, g: 0.3, b: 0.25, a: 1}
-  seconds: 0.14
---- !u!114 &2105572056
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 890edc1fb9095e648aa671dfd615eac8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.PlayerDeath
-  fallSeconds: 0.9
-  lieSeconds: 0.8
-  fallAngle: 90
-  deadTint: {r: 0.45, g: 0.1, b: 0.1, a: 1}
-  shrinkTo: 0.85
---- !u!114 &2105572057
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf22d09f4830f3447969cdf2e1db9908, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.PlayerNoise
-  walkRadius: 3.5
-  sprintRadius: 9
-  interval: 0.4
-  minSpeed: 0.8
---- !u!114 &2105572058
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105572043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 718e7a0d6254dc24daed93e30421879a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.MeleeCombat
-  inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  hitMask:
-    serializedVersion: 2
-    m_Bits: 0
-  wallMask:
-    serializedVersion: 2
-    m_Bits: 0
-  inventoryWindow: {fileID: 0}
-  showArc: 1
-  messageSeconds: 1.6
 --- !u!1 &2106690160
 GameObject:
   m_ObjectHideFlags: 0
@@ -21795,7 +21547,7 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 1509659131}
-  - {fileID: 2105572053}
+  - {fileID: 1595962789}
   - {fileID: 2121672239}
   - {fileID: 886084515}
   - {fileID: 998371983}

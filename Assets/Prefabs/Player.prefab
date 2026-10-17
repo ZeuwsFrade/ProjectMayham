@@ -14,6 +14,17 @@ GameObject:
   - component: {fileID: 1776174961868045677}
   - component: {fileID: 8289736195057531161}
   - component: {fileID: 3312669829058202223}
+  - component: {fileID: 8659917961246841833}
+  - component: {fileID: 7465801075669899679}
+  - component: {fileID: 6774316313431250737}
+  - component: {fileID: 3117256203174217878}
+  - component: {fileID: 9221056685706632035}
+  - component: {fileID: 8319529989656878898}
+  - component: {fileID: 2500213754192121823}
+  - component: {fileID: 9027911786985048548}
+  - component: {fileID: 5462201963381821}
+  - component: {fileID: 5688020143123859839}
+  - component: {fileID: 1269164290590023120}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -85,7 +96,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2311659948842064771, guid: caaccb244e4c308439aa0edf0bfac08b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2c9367c759f444f46b5c398e4def612e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -175,6 +186,7 @@ MonoBehaviour:
   sprintSpeed: 6
   acceleration: 14
   deceleration: 10
+  speedAtMaxWeight: 0.35
   rotationOffset: -90
   turnSpeed: 540
 --- !u!114 &3312669829058202223
@@ -190,3 +202,189 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Vision.VisionCone
   settings: {fileID: 11400000, guid: fb709169dbebcc1438643d529a935b59, type: 2}
+--- !u!114 &8659917961246841833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9094376001055331127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9898ad447fa2aa54b99287de7203278c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Interaction.PlayerInteractor
+  inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  interactRadius: 1.4
+  dropDistance: 0.9
+  blockMask:
+    serializedVersion: 2
+    m_Bits: 1088
+  reachBlockMask:
+    serializedVersion: 2
+    m_Bits: 1088
+--- !u!114 &7465801075669899679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9094376001055331127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6bfcd3169985ff4687b89493fc055aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Items.GridInventory
+  slotCount: 5
+  comfortableWeight: 10
+  maxWeight: 25
+  gridSize: {x: 8, y: 5}
+--- !u!114 &6774316313431250737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9094376001055331127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da7e28e6305b9db42a974d6b403d4082, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Player.PlayerStats
+  maxHealth: 100
+  lowHealthThreshold: 0.25
+  healthPerStamina: 0.1
+  maxStamina: 100
+  sprintDrain: 20
+  regenRate: 15
+  regenDelay: 1
+  exhaustedRegenDelay: 2
+  exhaustedRecoverThreshold: 0.3
+  drainAtComfortableWeight: 2
+--- !u!114 &3117256203174217878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9094376001055331127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 002d84126fc0dca47a29900076f44437, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Items.HeldItemView
+  putAwayKey: 22
+  orderAbovePlayer: 1
+--- !u!114 &9221056685706632035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9094376001055331127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3505b9a366d9e045b700b0d00603e52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Core.PlayerPersistence
+--- !u!114 &8319529989656878898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9094376001055331127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 718e7a0d6254dc24daed93e30421879a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.MeleeCombat
+  inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  hitMask:
+    serializedVersion: 2
+    m_Bits: 0
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 0
+  inventoryWindow: {fileID: 0}
+  showArc: 1
+  messageSeconds: 1.6
+--- !u!114 &2500213754192121823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9094376001055331127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf22d09f4830f3447969cdf2e1db9908, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.PlayerNoise
+  walkRadius: 3.5
+  sprintRadius: 9
+  interval: 0.4
+  minSpeed: 0.8
+--- !u!114 &9027911786985048548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9094376001055331127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 890edc1fb9095e648aa671dfd615eac8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.PlayerDeath
+  fallSeconds: 0.9
+  lieSeconds: 0.8
+  fallAngle: 90
+  deadTint: {r: 0.45, g: 0.1, b: 0.1, a: 1}
+  shrinkTo: 0.85
+--- !u!114 &5462201963381821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9094376001055331127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 563606c1cd1154341bc4fa48fddc51b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.HitFlash
+  flashColor: {r: 1, g: 0.3, b: 0.25, a: 1}
+  seconds: 0.14
+--- !u!114 &5688020143123859839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9094376001055331127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42204345269a54640b98639cf0cbe711, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Interaction.PlayerClimber
+  inputActions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  reach: 0.5
+  landingBlockMask:
+    serializedVersion: 2
+    m_Bits: 1600
+  landingGap: 0.1
+  messageSeconds: 1.5
+--- !u!114 &1269164290590023120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9094376001055331127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b09e193369d81684aa81677503947b67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Items.PlayerEquipment
+  pockets: {x: 4, y: 2}

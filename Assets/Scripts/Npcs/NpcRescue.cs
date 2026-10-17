@@ -16,10 +16,33 @@ namespace ProjectMayham.Npcs
     {
         public static bool IsRescued(string npcId) => !string.IsNullOrEmpty(npcId) && GameSession.Data.rescued.Contains(npcId);
 
+        /// <summary>
+        /// Whether the NPC is in the shelter now. Only a rescued NPC can be; one that was rescued but is not
+        /// listed as away counts as present.
+        /// </summary>
+        public static bool IsInShelter(string npcId)
+        {
+            if (!IsRescued(npcId)) return false;
+            var record = GameSession.Data.shelterNpcs.Find(n => n.npc == npcId);
+            return record == null || record.present;
+        }
+
+        /// <summary>Writes down that a rescued NPC is in the shelter or has left it. Others are ignored.</summary>
+        public static void SetInShelter(string npcId, bool present)
+        {
+            if (!IsRescued(npcId)) return;
+            var list = GameSession.Data.shelterNpcs;
+            var record = list.Find(n => n.npc == npcId);
+            if (record == null) list.Add(new ShelterNpcData { npc = npcId, present = present });
+            else record.present = present;
+        }
+
+        /// <summary>The NPC is home for good (rescued) and in the shelter; also brings back one who was away.</summary>
         public static void Rescue(string npcId)
         {
-            if (string.IsNullOrEmpty(npcId) || IsRescued(npcId)) return;
-            GameSession.Data.rescued.Add(npcId);
+            if (string.IsNullOrEmpty(npcId)) return;
+            if (!IsRescued(npcId)) GameSession.Data.rescued.Add(npcId);
+            SetInShelter(npcId, true);
         }
 
         /// <summary>The quests of this NPC that ask to bring them home.</summary>

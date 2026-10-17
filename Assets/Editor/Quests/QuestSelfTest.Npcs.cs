@@ -299,6 +299,19 @@ namespace ProjectMayham.EditorTools
                     NpcRescue.Rescue("TestLost");
                     NpcRescue.Rescue("TestLost");
                     t.Ok(NpcRescue.IsRescued("TestLost") && world.Data.rescued.Count == 1, "rescued once and for good");
+                    t.Ok(NpcRescue.IsInShelter("TestLost") && world.Data.shelterNpcs.Count == 1, "a rescued NPC is in the shelter, written down once");
+                    NpcRescue.SetInShelter("TestLost", false);
+                    t.Ok(!NpcRescue.IsInShelter("TestLost") && NpcRescue.IsRescued("TestLost"), "an NPC that left is away but still rescued");
+                    var reloaded = JsonUtility.FromJson<ProjectMayham.Core.SaveData>(JsonUtility.ToJson(world.Data));
+                    t.Ok(reloaded.shelterNpcs.Count == 1 && !reloaded.shelterNpcs[0].present, "their absence survives the save file");
+                    NpcRescue.SetInShelter("Nobody", true);
+                    t.Eq(world.Data.shelterNpcs.Count, 1, "a stranger is not written down");
+                    NpcRescue.Rescue("TestLost");
+                    t.Ok(NpcRescue.IsInShelter("TestLost") && world.Data.rescued.Count == 1, "bringing them home again puts them back");
+                    var legacy = new ProjectMayham.Core.SaveData { version = 3 };
+                    legacy.rescued.Add("Old");
+                    legacy.Upgrade();
+                    t.Ok(legacy.shelterNpcs.Count == 1 && legacy.shelterNpcs[0].present, "an old save: everyone rescued is in the shelter");
 
                     var trader = world.Make<TraderDefinition>("TestTrader");
                     var book = new TraderBook(trader);
