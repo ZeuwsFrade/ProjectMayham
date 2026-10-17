@@ -21,40 +21,52 @@ MonoBehaviour:
     \u0437\u0430\u043F\u043B\u0430\u0447\u0443 \u0447\u0435\u0441\u0442\u043D\u043E."
   sellMarkup: 1.3
   buyRate: 0.5
+  discountPerLevel: 0.05
   stock:
   - item: {fileID: 11400000, guid: 2a31e6a5d4fd3df4ab452becb0a1220a, type: 2}
     count: 30
     priceOverride: 0
+    minLoyalty: 1
   - item: {fileID: 11400000, guid: 4ce0146741e42be4980289a915a80e7c, type: 2}
     count: 2
     priceOverride: 0
+    minLoyalty: 1
   - item: {fileID: 11400000, guid: 4ceb3b894e212c542a9dd3f4a336a78e, type: 2}
     count: 12
     priceOverride: 0
+    minLoyalty: 1
   - item: {fileID: 11400000, guid: 1e1ffbe9365697049b9eda1ec353e834, type: 2}
     count: 6
     priceOverride: 0
+    minLoyalty: 1
   - item: {fileID: 11400000, guid: cf2bc34d7d360854d9f82e921e6f4c17, type: 2}
     count: 3
     priceOverride: 0
+    minLoyalty: 1
   - item: {fileID: 11400000, guid: 3f9fdd39319ba2f4699d86347ba30e45, type: 2}
     count: 4
     priceOverride: 0
+    minLoyalty: 1
   - item: {fileID: 11400000, guid: 9db2a3298e5cfec4ba9bc3ab2033c32f, type: 2}
     count: 1
     priceOverride: 0
+    minLoyalty: 1
   - item: {fileID: 11400000, guid: 6a54ee52855061740a1c062f41574129, type: 2}
     count: 2
     priceOverride: 0
+    minLoyalty: 1
   - item: {fileID: 11400000, guid: ba25532fc727b2f4a9f13ef08c865fee, type: 2}
     count: 1
     priceOverride: 0
+    minLoyalty: 1
   - item: {fileID: 11400000, guid: 8015f8dd84970aa4d8fc7d54749e0720, type: 2}
     count: 1
     priceOverride: 0
+    minLoyalty: 1
   - item: {fileID: 11400000, guid: 0389cb445c08f0847966cda6648a9e84, type: 2}
     count: 1
     priceOverride: 0
+    minLoyalty: 2
   barter:
   - title: "\u041A\u0440\u0443\u0436\u043A\u0430 \u043D\u0430 \u043F\u0430\u043F\u043A\u0438"
     playerGives:

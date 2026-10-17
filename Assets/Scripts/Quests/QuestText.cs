@@ -91,7 +91,7 @@ namespace ProjectMayham.Quests
         public static string Objectives(QuestDefinition quest) =>
             string.Join("; ", quest.Objectives.Select(objective => objective.Describe()));
 
-        /// <summary>What the quest pays: "30 $, Кружка ×2". Empty when it pays nothing.</summary>
+        /// <summary>What the quest pays: "30 $, Кружка ×2". Empty when it pays nothing. Loyalty is hidden from the player.</summary>
         public static string Reward(QuestDefinition quest)
         {
             var parts = new List<string>();
@@ -121,6 +121,7 @@ namespace ProjectMayham.Quests
         {
             string subject = line.Objective.Subject;
             if (line.Objective.Kind == QuestObjectiveKind.VisitRoom) return $"{subject} — {(line.Done ? "есть" : "ещё нет")}";
+            if (line.Objective.Kind == QuestObjectiveKind.Rescue) return $"{subject} — {(line.Done ? "готово" : "ещё нет")}";
 
             string text = $"{subject} — {Mathf.Min(line.Have, line.Need)}/{line.Need}";
             if (!line.Done && line.InStash > 0) text += $", в тайнике: {line.InStash}";

@@ -9,6 +9,7 @@ namespace ProjectMayham.Shelter
     /// <summary>
     /// The trader / quest giver of the shelter (Tyler). E starts a dialogue; from it the player can trade
     /// (buy, sell, barter) or ask for work; the talk about work is built by <see cref="QuestDialogue"/>.
+    /// An NPC with a dialogue asset (Resources/Npcs, the same id as the trader) talks from it instead.
     /// </summary>
     public class NpcTrader : ShelterInteractable
     {
@@ -25,6 +26,15 @@ namespace ProjectMayham.Shelter
         public override void Interact(GameObject actor)
         {
             if (!actor.TryGetComponent<GridInventory>(out var inventory)) return;
+
+            var npc = Npcs.NpcCatalog.Find(trader.Id);
+            if (npc != null && npc.Dialogue != null)
+            {
+                var face = npc.Portrait != null ? npc.Portrait : trader.Portrait;
+                if (face == null && TryGetComponent<SpriteRenderer>(out var sprite)) face = sprite.sprite;
+                Npcs.NpcConversation.Open(new Npcs.ConversationContext { Npc = npc, Backpack = inventory, Book = book }, face);
+                return;
+            }
 
             var root = new DialogueNode { Text = trader.Greeting };
 

@@ -40,6 +40,10 @@ namespace ProjectMayham.Items
         [Tooltip("For a backpack: columns and rows of the inventory while it is worn.")]
         [SerializeField] private Vector2Int backpackGrid = new Vector2Int(8, 5);
 
+        [Header("Person")]
+        [Tooltip("A person carried out of the maze: heavy, never put into a container, the stash or a trader's hands.")]
+        [SerializeField] private bool isPerson;
+
         [Header("World")]
         [Tooltip("Prefab with an ItemPickup that is spawned when the item is dropped.")]
         [SerializeField] private GameObject worldPrefab;
@@ -64,6 +68,8 @@ namespace ProjectMayham.Items
             : Mathf.Max(0.01f, heldScale);
         public GameObject WorldPrefab => worldPrefab;
         public EquipSlot EquipSlot => equipSlot;
+        /// <summary>A person the player carries: they cannot be stored or sold, and put down they sit where they are.</summary>
+        public bool IsPerson => isPerson;
         /// <summary>True for a thing that is put on: a headwear, a backpack, footwear.</summary>
         public bool Wearable => equipSlot != EquipSlot.None;
         /// <summary>For a backpack: the size of the inventory grid while it is worn.</summary>

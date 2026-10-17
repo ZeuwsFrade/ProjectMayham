@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 350a60d4598fa5147bb5e41b396704b1, type: 3}
+  m_Name: Intern
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Items.ItemDefinition
+  displayName: "\u0421\u0442\u0430\u0436\u0451\u0440"
+  icon: {fileID: 21300000, guid: 2ed505b7341455e46adc9c0a7769e776, type: 3}
+  maxStack: 1
+  gridSize: {x: 6, y: 2}
+  canRotate: 1
+  weight: 15
+  value: 0
+  holdable: 1
+  heldSprite: {fileID: 21300000, guid: 2ed505b7341455e46adc9c0a7769e776, type: 3}
+  heldOffset: {x: 0.4, y: 0.45}
+  heldAngle: 0
+  heldMatchesWorld: 0
+  heldScale: 0.3
+  equipSlot: 0
+  backpackGrid: {x: 8, y: 5}
+  isPerson: 1
+  worldPrefab: {fileID: 8217352054659401380, guid: 34708291a10be874b8e0b8be3a636b77, type: 3}

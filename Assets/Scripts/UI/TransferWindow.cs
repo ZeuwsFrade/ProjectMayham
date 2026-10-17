@@ -17,6 +17,7 @@ namespace ProjectMayham.UI
     public class TransferWindow : ModalWindow
     {
         private const float Cell = 56f;
+        private const string PersonRefusal = "Человека сюда не положить";
         // Two presses on the same thing within this time are a double click.
         private const float DoubleClickSeconds = 0.35f;
         // A storage that can hold more than this has no weight limit worth showing.
@@ -301,6 +302,11 @@ namespace ProjectMayham.UI
         private void QuickTransfer(View from, GridInventory.Stack stack)
         {
             var to = Other(from);
+            if (to == views[1] && stack.Item.IsPerson)
+            {
+                infoLabel.text = PersonRefusal;
+                return;
+            }
             var item = stack.Item;
             int count = stack.Count;
             int left = to.Inventory.Add(item, count);
@@ -367,6 +373,11 @@ namespace ProjectMayham.UI
 
             if (!onGrid) return; // dropped outside of the grids: it stays where it was
 
+            if (target == views[1] && from != target && stack.Item.IsPerson)
+            {
+                infoLabel.text = PersonRefusal;
+                return;
+            }
             if (target == from)
             {
                 from.Inventory.TryMove(stack, origin, rotated);

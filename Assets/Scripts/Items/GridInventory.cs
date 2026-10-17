@@ -311,6 +311,16 @@ namespace ProjectMayham.Items
             return true;
         }
 
+        /// <summary>Takes a thing from outside straight into the hands, when they are empty and the weight allows it.</summary>
+        public bool HoldNew(ItemDefinition item)
+        {
+            if (item == null || held != null || !FitsByWeight(item)) return false;
+            held = item;
+            HeldChanged?.Invoke();
+            NotifyChanged();
+            return true;
+        }
+
         /// <summary>Puts the item in the hands back into the grid. Returns false when there is no room.</summary>
         public bool Unhold()
         {

@@ -17,6 +17,8 @@ namespace ProjectMayham.Trade
             public ItemDefinition Item;
             public int Count;
             public int PriceOverride;
+            /// <summary>The loyalty level from which the trader sells it.</summary>
+            public int MinLoyalty = 1;
         }
 
         private readonly TraderDefinition definition;
@@ -35,14 +37,22 @@ namespace ProjectMayham.Trade
         public TraderDefinition Definition => definition;
         public IReadOnlyList<Ware> Wares => wares;
 
+        /// <summary>The loyalty level of the player with this trader.</summary>
+        public int LoyaltyLevel => Npcs.Loyalty.Level(definition.Id);
+
+        /// <summary>What the trader sells at the player's loyalty: the wares of a higher level stay hidden.</summary>
+        public IEnumerable<Ware> Offered => wares.Where(w => w.MinLoyalty <= LoyaltyLevel);
+
         // ---- prices ----
 
         /// <summary>What the player pays for one piece.</summary>
         public int BuyPrice(ItemDefinition item)
         {
             var ware = wares.Find(w => w.Item == item);
-            if (ware != null && ware.PriceOverride > 0) return ware.PriceOverride;
-            return Mathf.Max(1, Mathf.CeilToInt(item.Value * definition.SellMarkup));
+            float price = ware != null && ware.PriceOverride > 0 ? ware.PriceOverride : item.Value * definition.SellMarkup;
+            // The more the trader trusts the player, the cheaper.
+            price *= 1f - definition.DiscountPerLevel * (LoyaltyLevel - 1);
+            return Mathf.Max(1, Mathf.CeilToInt(price - 0.0001f));
         }
 
         /// <summary>What the player gets for one piece; 0 means the trader does not want it.</summary>
@@ -62,6 +72,7 @@ namespace ProjectMayham.Trade
             error = null;
             var ware = wares.Find(w => w.Item == item);
             if (ware == null || ware.Count <= 0) { error = "Этого больше нет"; return false; }
+            if (ware.MinLoyalty > LoyaltyLevel) { error = "Это пока не продаётся"; return false; }
 
             count = Mathf.Min(count, ware.Count);
             int price = BuyPrice(item) * count;
@@ -78,6 +89,7 @@ namespace ProjectMayham.Trade
         public bool TrySell(GridInventory inventory, ItemDefinition item, int count, out string error)
         {
             error = null;
+            if (item.IsPerson) { error = "Людей не продают"; return false; }
             int unit = SellPrice(item);
             if (unit <= 0) { error = "Торговцу это не нужно"; return false; }
 
@@ -129,7 +141,7 @@ namespace ProjectMayham.Trade
             {
                 foreach (var entry in definition.Stock)
                 {
-                    if (entry.item != null) wares.Add(new Ware { Item = entry.item, Count = entry.count, PriceOverride = entry.priceOverride });
+                    if (entry.item != null) wares.Add(new Ware { Item = entry.item, Count = entry.count, PriceOverride = entry.priceOverride, MinLoyalty = entry.minLoyalty });
                 }
                 return;
             }
@@ -139,7 +151,7 @@ namespace ProjectMayham.Trade
                 var item = ItemDatabase.Find(line.item);
                 if (item == null) continue;
                 var defined = definition.Stock.FirstOrDefault(e => e.item == item);
-                wares.Add(new Ware { Item = item, Count = line.count, PriceOverride = defined != null ? defined.priceOverride : 0 });
+                wares.Add(new Ware { Item = item, Count = line.count, PriceOverride = defined != null ? defined.priceOverride : 0, MinLoyalty = defined != null ? defined.minLoyalty : 1 });
             }
         }
 

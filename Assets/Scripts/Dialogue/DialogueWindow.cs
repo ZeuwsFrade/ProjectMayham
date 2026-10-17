@@ -29,8 +29,8 @@ namespace ProjectMayham.Dialogue
 
     /// <summary>
     /// Dialogue on its own canvas, as described in the design document: the speaker's sprite, their line and the
-    /// answers to pick from; the game is paused meanwhile. Only the window is made; there are no dialogue
-    /// assets or scripting yet, nodes are built in code by whoever starts a conversation.
+    /// answers to pick from (four fit); the game is paused meanwhile. The nodes are built in code by whoever starts
+    /// a conversation: <see cref="Npcs.NpcConversation"/> builds them from a dialogue asset.
     /// </summary>
     public class DialogueWindow : ModalWindow
     {
@@ -66,7 +66,7 @@ namespace ProjectMayham.Dialogue
             portraitImage.rectTransform.pivot = new Vector2(0f, 0f);
 
             var panel = UIKit.Panel(dim.transform, "Panel", UIKit.PanelColor).rectTransform;
-            UIKit.Place(panel, new Vector2(0.5f, 0f), new Vector2(0f, 40f), new Vector2(1500f, 360f));
+            UIKit.Place(panel, new Vector2(0.5f, 0f), new Vector2(0f, 40f), new Vector2(1500f, 412f));
             panel.pivot = new Vector2(0.5f, 0f);
 
             nameLabel = UIKit.Label(panel, string.Empty, 36f, TextAlignmentOptions.Left, UIKit.Accent);
@@ -78,7 +78,7 @@ namespace ProjectMayham.Dialogue
             textLabel.rectTransform.pivot = new Vector2(0f, 1f);
 
             choices = UIKit.Rect("Choices", panel);
-            UIKit.Place(choices, new Vector2(0f, 0f), new Vector2(30f, 20f), new Vector2(1440f, 150f));
+            UIKit.Place(choices, new Vector2(0f, 0f), new Vector2(30f, 20f), new Vector2(1440f, 202f));
             choices.pivot = new Vector2(0f, 0f);
             var layout = choices.gameObject.AddComponent<VerticalLayoutGroup>();
             layout.spacing = 8f;
@@ -103,7 +103,7 @@ namespace ProjectMayham.Dialogue
             foreach (var choice in node.Choices)
             {
                 var picked = choice;
-                var button = UIKit.MakeButton(choices, "▸ " + Personalize(choice.Text), () => Pick(picked), 26f);
+                var button = UIKit.MakeButton(choices, "› " + Personalize(choice.Text), () => Pick(picked), 26f);
                 var text = button.GetComponentInChildren<TMP_Text>();
                 text.alignment = TextAlignmentOptions.Left;
                 UIKit.Stretch(text.rectTransform, 0f);

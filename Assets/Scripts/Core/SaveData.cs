@@ -65,6 +65,12 @@ namespace ProjectMayham.Core
         public List<QuestProgressData> quests = new List<QuestProgressData>();
         /// <summary>How worn the weapons are. See <see cref="Combat.WeaponWear"/>.</summary>
         public List<WeaponWearData> weaponWear = new List<WeaponWearData>();
+        /// <summary>Loyalty points of the NPCs. See <see cref="Npcs.Loyalty"/>.</summary>
+        public List<LoyaltyData> loyalty = new List<LoyaltyData>();
+        /// <summary>Answers the story remembers. See <see cref="Npcs.PlayerChoices"/>.</summary>
+        public List<string> choices = new List<string>();
+        /// <summary>Ids of the lost NPCs the player has brought home. See <see cref="Npcs.NpcRescue"/>.</summary>
+        public List<string> rescued = new List<string>();
 
         /// <summary>
         /// Brings a save of an older version up to date. A trader whose stock is in the save keeps that stock and
@@ -96,6 +102,14 @@ namespace ProjectMayham.Core
             if (trader == null || trader.stock.Any(s => s.item == item)) return;
             trader.stock.Add(new StockData { item = item, count = count });
         }
+    }
+
+    /// <summary>Loyalty points of one NPC. An NPC that is not listed has none.</summary>
+    [Serializable]
+    public class LoyaltyData
+    {
+        public string npc;
+        public int points;
     }
 
     /// <summary>Durability left in a weapon. A weapon that is not listed is as good as new.</summary>

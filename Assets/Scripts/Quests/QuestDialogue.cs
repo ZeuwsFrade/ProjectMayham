@@ -186,6 +186,34 @@ namespace ProjectMayham.Quests
         }
 
         /// <summary>
+        /// What the giver says about a quest handed in without a talk (a rescue, on arrival at the shelter): thanks and
+        /// what was received, or that the reward has no room; the last answer closes the window.
+        /// </summary>
+        public static DialogueNode Outcome(QuestDefinition quest, TurnInResult result)
+        {
+            var giver = quest.Giver;
+            var pages = new List<string>();
+            if (result == TurnInResult.Done)
+            {
+                pages.AddRange(QuestText.Pages(quest.CompletedText));
+                string reward = QuestText.Reward(quest);
+                if (reward.Length > 0) pages.Add(QuestText.Small($"Получено: {reward}"));
+            }
+            else pages.AddRange(QuestText.Pages(giver != null ? giver.NoRoomText : string.Empty));
+            if (pages.Count == 0) pages.Add(quest.Title);
+
+            DialogueNode Build(int index)
+            {
+                var node = new DialogueNode { Text = pages[index] };
+                node.Choices.Add(index < pages.Count - 1
+                    ? Go(AnswerNext, () => Build(index + 1))
+                    : new DialogueChoice { Text = AnswerOk, Closes = true });
+                return node;
+            }
+            return Build(0);
+        }
+
+        /// <summary>
         /// The pages of a text one after another, with an optional last page written by the game; the answer under
         /// the last page leads on to <paramref name="then"/>.
         /// </summary>

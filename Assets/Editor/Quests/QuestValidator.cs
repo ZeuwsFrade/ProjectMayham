@@ -152,7 +152,7 @@ namespace ProjectMayham.EditorTools
         }
 
         // What is wrong with the pages of a text as the writer marked them: too long, or too many lines.
-        private static IEnumerable<string> PageProblems(string text)
+        public static IEnumerable<string> PageProblems(string text)
         {
             var blocks = QuestText.Blocks(text);
             int tooLong = blocks.Count(page => page.Length > QuestText.PageLimit);
@@ -191,7 +191,8 @@ namespace ProjectMayham.EditorTools
                         warning(quest, $"предмет «{item.DisplayName}» не встречается ни в луте, ни у торговца — его негде взять");
                 }
 
-                if (objective.Kind != QuestObjectiveKind.Deliver) CheckRoom(quest, objective, facts, error, warning);
+                if (objective.Kind == QuestObjectiveKind.FindSpecial || objective.Kind == QuestObjectiveKind.VisitRoom)
+                    CheckRoom(quest, objective, facts, error, warning);
             }
         }
 
