@@ -192,9 +192,7 @@ namespace ProjectMayham.EditorTools
                     t.Ok(line != null, "a line is found by its name");
                     var manyNode = typeof(NpcConversation).GetMethod("LineNode", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
                         .Invoke(null, new object[] { many, line }) as DialogueNode;
-                    t.Eq(Labels(manyNode), "1|2|3|Ещё…", "five answers do not fit: three and 'more'");
-                    var (rest, _) = Choose(manyNode, "Ещё…");
-                    t.Eq(Labels(rest), "4|5", "the rest on the next page");
+                    t.Eq(Labels(manyNode), "1|2|3|4|5", "five answers are all shown: the window scrolls");
                 }
                 finally
                 {
@@ -454,6 +452,71 @@ namespace ProjectMayham.EditorTools
                     t.Ok(Problems(false, new[] { npc }, new QuestDefinition[0]).Contains("Довести до убежища"), "a lost NPC without a rescue quest is a warning");
                     var (_, home) = LostGiver(world, false);
                     t.Ok(Problems(true, new[] { home }, new[] { rescue }).Contains("не потерян"), "a rescue quest of an NPC who is not lost is an error");
+                }
+                finally
+                {
+                    NpcCatalog.Reset();
+                }
+            }
+
+            // ---- hiding from enemies ----
+            {
+                var hiding = new NpcHiding();
+                t.Ok(!hiding.Hidden, "a lost NPC sits in the open");
+                t.Ok(hiding.Step(true, 0.25f, 8f) && hiding.Hidden, "an enemy near: they hide at once");
+                t.Ok(!hiding.Step(false, 5f, 8f) && hiding.Hidden, "five quiet seconds are not enough");
+                t.Ok(!hiding.Step(true, 0.25f, 8f) && hiding.Hidden, "the enemy comes back: still hidden");
+                t.Ok(!hiding.Step(false, 5f, 8f) && hiding.Hidden, "and the quiet starts over");
+                t.Ok(hiding.Step(false, 3f, 8f) && !hiding.Hidden, "eight quiet seconds in a row: back where they sat");
+                t.Ok(!hiding.Step(false, 1f, 8f) && !hiding.Hidden, "and they stay");
+            }
+
+            // ---- the rescue is not offered in the list of work, only by going along ----
+            using (var world = new World())
+            {
+                var (person, lost) = LostGiver(world);
+                var mugQuest = world.Quest("Mug");
+                world.Objective(mugQuest, QuestObjectiveKind.Deliver, mug, 1);
+                var rescue = world.Quest("Rescue", 1, mugQuest);
+                world.Objective(rescue, QuestObjectiveKind.Rescue, person, 1);
+
+                var dialogue = world.Make<DialogueDefinition>("LostTalk");
+                NpcSamples.Fill(dialogue, new List<NpcSamples.Line>
+                {
+                    new NpcSamples.Line
+                    {
+                        Id = "raid", Start = true, Text = "В лабиринте.",
+                        Answers =
+                        {
+                            new NpcSamples.Answer { Text = "Работа", Actions = { (DialogueActionKind.OpenWork, "", 0) } },
+                            new NpcSamples.Answer { Text = "Пойдём", Actions = { (DialogueActionKind.TakeAlong, "", 0) }, QuestConditions = { (rescue, QuestStage.Available) } },
+                            new NpcSamples.Answer { Text = "Пойдём!", Actions = { (DialogueActionKind.TakeAlong, "", 0) }, QuestConditions = { (rescue, QuestStage.Active) } },
+                            new NpcSamples.Answer { Text = "Пока" },
+                        },
+                    },
+                });
+                var so = new SerializedObject(lost);
+                so.FindProperty("dialogue").objectReferenceValue = dialogue;
+                so.ApplyModifiedPropertiesWithoutUndo();
+                NpcCatalog.Override(new[] { lost });
+                try
+                {
+                    var backpack = world.Inventory();
+                    var context = new ConversationContext { Npc = lost, Backpack = backpack, InRaid = true, TakeAlong = () => null };
+                    t.Eq(Labels(NpcConversation.Start(context)), "Работа|Пока", "before the mug there is no going along");
+                    var (menu, _) = Choose(NpcConversation.Start(context), "Работа");
+                    t.Eq(Labels(menu), "Новое дело: Mug|Назад", "the mug is offered");
+
+                    QuestLog.Accept(mugQuest);
+                    backpack.Add(mug, 1);
+                    QuestLog.TryTurnIn(mugQuest, backpack);
+                    t.Eq(QuestLog.StatusOf(rescue), QuestStatus.Available, "after the mug the rescue is open");
+                    var start = NpcConversation.Start(context);
+                    t.Eq(Labels(start), "Пойдём|Пока", "and he can be taken along; with nothing new to offer, 'work' is not asked");
+                    t.Ok(!QuestDialogue.HasOffers(lost.Id), "the rescue is not in the list of work");
+
+                    NpcRescue.StartRescue(lost.Id);
+                    t.Eq(Labels(NpcConversation.Start(context)), "Пойдём!|Пока", "taken already (after a death): he can be taken along again");
                 }
                 finally
                 {

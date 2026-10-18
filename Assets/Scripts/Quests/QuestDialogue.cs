@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ProjectMayham.Dialogue;
 using ProjectMayham.Items;
 using ProjectMayham.Shelter;
@@ -8,30 +9,36 @@ using UnityEngine;
 namespace ProjectMayham.Quests
 {
     /// <summary>
-    /// The talk about work with a quest giver, built from the nodes of <see cref="DialogueWindow"/>: a list of
-    /// quests (ready to hand in, new, in progress), the offer of a quest, a reminder of what is still missing and
-    /// the turn-in. Stays within what the window fits: three answers and about three lines of text per node.
+    /// The talk about quests with a quest giver, built from the nodes of <see cref="DialogueWindow"/>. Two lists:
+    /// the work the giver has (new quests to take) and the quests the player has taken from them (hand in what is
+    /// ready, hear what is still missing, refuse where allowed). The offer of a quest can be taken and the talk
+    /// ended, or taken and the talk go on from its start. Lists are as long as they need to be: the window scrolls.
     /// </summary>
     public static class QuestDialogue
     {
-        public const int TopicsPerPage = 2;
+        public const string DefaultTakenChoice = "По поводу твоего задания";
 
         // What the player can answer; the same for every NPC.
         private const string AnswerAccept = "Берусь";
+        private const string AnswerAcceptMore = "Берусь. И ещё вопрос";
+        private const string AnswerBye = "До встречи";
         private const string AnswerDecline = "Не сейчас";
         private const string AnswerTurnIn = "Вот, держи";
         private const string AnswerLater = "Позже";
         private const string AnswerOk = "Понятно";
         private const string AnswerNext = "Дальше";
-        private const string AnswerMore = "Что ещё?";
         private const string AnswerBack = "Назад";
+        private const string AnswerAbandon = "Отказаться";
+        private const string AnswerAbandonYes = "Да, отказываюсь";
+        private const string AnswerAbandonNo = "Нет, сделаю";
 
-        private enum TopicKind { Ready, Offer, Reminder }
-
-        private struct Topic
+        /// <summary>What a list is about.</summary>
+        private enum ListKind
         {
-            public TopicKind Kind;
-            public QuestDefinition Quest;
+            /// <summary>New quests the giver offers.</summary>
+            Offers,
+            /// <summary>Quests the player has taken from the giver.</summary>
+            Taken,
         }
 
         // What one conversation is about.
@@ -41,15 +48,41 @@ namespace ProjectMayham.Quests
             public QuestGiverDefinition Giver;
             public GridInventory Backpack;
             public DialogueNode Back;
+            public ListKind List;
+            /// <summary>
+            /// The start of the whole conversation, with this line of the giver in place of its own (null: its own
+            /// line, as when the talk began); null when there is no conversation around the talk about quests.
+            /// </summary>
+            public Func<string, DialogueNode> Restart;
         }
 
-        /// <summary>The answer that opens the talk about work with this NPC; add it to the NPC's first node.</summary>
-        public static DialogueChoice WorkChoice(string npcId, GridInventory backpack, DialogueNode back)
+        /// <summary>
+        /// The answer that opens the list of new quests of this NPC. "Back" leads to <paramref name="back"/>;
+        /// <paramref name="restart"/> builds the start of the conversation for "take it, and one more question".
+        /// </summary>
+        public static DialogueChoice WorkChoice(string npcId, GridInventory backpack, DialogueNode back, Func<string, DialogueNode> restart = null)
         {
-            var talk = new Talk { NpcId = npcId, Giver = QuestCatalog.Giver(npcId), Backpack = backpack, Back = back };
+            var talk = NewTalk(npcId, backpack, back, ListKind.Offers, restart);
             string ask = talk.Giver != null ? talk.Giver.AskChoice : QuestGiverDefinition.DefaultAskChoice;
-            return Go(ask, () => Menu(talk, 0));
+            return Go(ask, () => Menu(talk));
         }
+
+        /// <summary>The answer that opens the list of the quests the player has taken from this NPC.</summary>
+        public static DialogueChoice TakenChoice(string npcId, GridInventory backpack, DialogueNode back, Func<string, DialogueNode> restart = null)
+        {
+            var talk = NewTalk(npcId, backpack, back, ListKind.Taken, restart);
+            string ask = talk.Giver != null ? talk.Giver.TakenChoice : DefaultTakenChoice;
+            return Go(ask, () => Menu(talk));
+        }
+
+        /// <summary>True when the NPC has a new quest to offer (the answer about work is shown only then).</summary>
+        public static bool HasOffers(string npcId) => QuestLog.Offers(npcId).Any(q => !q.IsRescue);
+
+        /// <summary>True when the player has taken a quest from the NPC (the answer about it is shown only then).</summary>
+        public static bool HasTaken(string npcId) => QuestLog.ActiveOf(npcId).Any(q => !q.IsRescue);
+
+        private static Talk NewTalk(string npcId, GridInventory backpack, DialogueNode back, ListKind list, Func<string, DialogueNode> restart) =>
+            new Talk { NpcId = npcId, Giver = QuestCatalog.Giver(npcId), Backpack = backpack, Back = back, List = list, Restart = restart };
 
         // The window runs the action of an answer before it reads where the answer leads, so the next node can be
         // built at the moment of the click: what it says is then always up to date, also after trading.
@@ -60,57 +93,40 @@ namespace ProjectMayham.Quests
             return choice;
         }
 
-        private static List<Topic> Topics(Talk talk)
+        private static DialogueNode Menu(Talk talk)
         {
-            var topics = new List<Topic>();
-            var waiting = new List<Topic>();
-            foreach (var quest in QuestLog.ActiveOf(talk.NpcId))
-            {
-                if (QuestLog.Check(quest, talk.Backpack).Ready) topics.Add(new Topic { Kind = TopicKind.Ready, Quest = quest });
-                else waiting.Add(new Topic { Kind = TopicKind.Reminder, Quest = quest });
-            }
-            foreach (var quest in QuestLog.Offers(talk.NpcId)) topics.Add(new Topic { Kind = TopicKind.Offer, Quest = quest });
-            topics.AddRange(waiting);
-            return topics;
-        }
-
-        private static DialogueNode Menu(Talk talk, int page)
-        {
-            var topics = Topics(talk);
+            // A rescue is in neither list: it is taken when the NPC goes along and handed in when they arrive.
             var node = new DialogueNode();
-            if (topics.Count == 0)
+            if (talk.List == ListKind.Offers)
             {
-                node.Text = talk.Giver != null ? talk.Giver.NoWorkText : QuestGiverDefinition.DefaultNoWorkText;
-                node.Choices.Add(new DialogueChoice { Text = AnswerOk, Next = talk.Back });
-                return node;
+                var offers = QuestLog.Offers(talk.NpcId).Where(q => !q.IsRescue).ToList();
+                if (offers.Count == 0) return Empty(talk, talk.Giver != null ? talk.Giver.NoWorkText : QuestGiverDefinition.DefaultNoWorkText);
+                // There are quests, so their giver is known even when the catalog was asked too early.
+                talk.Giver ??= offers[0].Giver;
+                node.Text = talk.Giver.MenuText;
+                foreach (var quest in offers) node.Choices.Add(Go($"Новое дело: {quest.Title}", () => OfferNode(talk, quest, 0)));
             }
-
-            // There are quests, so their giver is known even when the catalog was asked too early.
-            talk.Giver ??= topics[0].Quest.Giver;
-            int pages = (topics.Count + TopicsPerPage - 1) / TopicsPerPage;
-            page = Mathf.Clamp(page, 0, pages - 1);
-            node.Text = talk.Giver.MenuText;
-
-            int end = Mathf.Min(topics.Count, (page + 1) * TopicsPerPage);
-            for (int i = page * TopicsPerPage; i < end; i++)
+            else
             {
-                var quest = topics[i].Quest;
-                switch (topics[i].Kind)
+                var taken = QuestLog.ActiveOf(talk.NpcId).Where(q => !q.IsRescue).ToList();
+                if (taken.Count == 0) return Empty(talk, talk.Giver != null ? talk.Giver.NoTakenText : QuestGiverDefinition.DefaultNoTakenText);
+                talk.Giver ??= taken[0].Giver;
+                node.Text = talk.Giver.TakenText;
+                // What can be handed in comes first.
+                foreach (var quest in taken.OrderBy(q => QuestLog.Check(q, talk.Backpack).Ready ? 0 : 1))
                 {
-                    case TopicKind.Ready:
-                        node.Choices.Add(Go($"Сдать: {quest.Title}", () => ReadyNode(talk, quest)));
-                        break;
-                    case TopicKind.Offer:
-                        node.Choices.Add(Go($"Новое дело: {quest.Title}", () => OfferNode(talk, quest, 0)));
-                        break;
-                    default:
-                        node.Choices.Add(Go($"Напомни: {quest.Title}", () => ReminderNode(talk, quest)));
-                        break;
+                    if (QuestLog.Check(quest, talk.Backpack).Ready) node.Choices.Add(Go($"Сдать: {quest.Title}", () => ReadyNode(talk, quest)));
+                    else node.Choices.Add(Go($"Напомни: {quest.Title}", () => ReminderNode(talk, quest)));
                 }
             }
+            node.Choices.Add(new DialogueChoice { Text = AnswerBack, Next = talk.Back });
+            return node;
+        }
 
-            if (page < pages - 1) node.Choices.Add(Go(AnswerMore, () => Menu(talk, page + 1)));
-            else node.Choices.Add(new DialogueChoice { Text = AnswerBack, Next = talk.Back });
+        private static DialogueNode Empty(Talk talk, string text)
+        {
+            var node = new DialogueNode { Text = text };
+            node.Choices.Add(new DialogueChoice { Text = AnswerOk, Next = talk.Back });
             return node;
         }
 
@@ -128,12 +144,18 @@ namespace ProjectMayham.Quests
 
             string summary = QuestText.OfferSummary(quest);
             node.Text = summary.Length > 0 ? QuestText.Small(summary) : quest.Title;
+            // Take it and go, or take it and go on talking from the start.
             node.Choices.Add(Go(AnswerAccept, () =>
             {
                 QuestLog.Accept(quest);
-                return Say(talk.Giver.AcceptedText, () => Menu(talk, 0));
+                return Farewell(talk.Giver.AcceptedText);
             }));
-            node.Choices.Add(Go(AnswerDecline, () => Menu(talk, 0)));
+            node.Choices.Add(Go(AnswerAcceptMore, () =>
+            {
+                QuestLog.Accept(quest);
+                return talk.Restart != null ? SayThen(talk.Giver.AcceptedText, talk.Restart) : Say(talk.Giver.AcceptedText, () => Menu(talk));
+            }));
+            node.Choices.Add(Go(AnswerDecline, () => Menu(talk)));
             return node;
         }
 
@@ -141,7 +163,40 @@ namespace ProjectMayham.Quests
         {
             string text = string.IsNullOrWhiteSpace(quest.ReminderText) ? talk.Giver.ReminderText : quest.ReminderText;
             var progress = QuestLog.Check(quest, talk.Backpack, Stash());
-            return Say(text, () => Menu(talk, 0), QuestText.Small(QuestText.Checklist(progress)));
+            string checklist = QuestText.Small(QuestText.Checklist(progress));
+            if (!QuestLog.CanAbandon(quest)) return Say(text, () => Menu(talk), checklist);
+
+            // A quest that may be refused: the last page has a second answer.
+            var pages = QuestText.Pages(text);
+            pages.Add(checklist);
+            return ReminderPage(talk, quest, pages, 0);
+        }
+
+        private static DialogueNode ReminderPage(Talk talk, QuestDefinition quest, List<string> pages, int index)
+        {
+            var node = new DialogueNode { Text = pages[index] };
+            if (index < pages.Count - 1)
+            {
+                node.Choices.Add(Go(AnswerNext, () => ReminderPage(talk, quest, pages, index + 1)));
+                return node;
+            }
+            node.Choices.Add(Go(AnswerOk, () => Menu(talk)));
+            node.Choices.Add(Go(AnswerAbandon, () => AbandonAsk(talk, quest)));
+            return node;
+        }
+
+        // The giver asks once more; the player confirms or changes their mind. What it costs is not shown.
+        private static DialogueNode AbandonAsk(Talk talk, QuestDefinition quest)
+        {
+            string ask = string.IsNullOrWhiteSpace(talk.Giver.AbandonAskText) ? string.Empty : talk.Giver.AbandonAskText.Trim() + "\n";
+            var node = new DialogueNode { Text = ask + QuestText.Small($"Отказаться от «{quest.Title}»?") };
+            node.Choices.Add(Go(AnswerAbandonYes, () =>
+            {
+                QuestLog.Abandon(quest);
+                return Say(talk.Giver.AbandonedText, () => Menu(talk));
+            }));
+            node.Choices.Add(Go(AnswerAbandonNo, () => Menu(talk)));
+            return node;
         }
 
         // The giver's line and the progress. The progress says what will be taken, so it must never be pushed
@@ -175,13 +230,15 @@ namespace ProjectMayham.Quests
             node.Choices.Add(Go(AnswerTurnIn, () =>
             {
                 var result = QuestLog.TryTurnIn(quest, talk.Backpack);
-                if (result == TurnInResult.NoRoom) return Say(talk.Giver.NoRoomText, () => Menu(talk, 0));
-                if (result != TurnInResult.Done) return Menu(talk, 0);
+                if (result == TurnInResult.NoRoom) return Say(talk.Giver.NoRoomText, () => Menu(talk));
+                if (result != TurnInResult.Done) return Menu(talk);
 
+                // Handed in: after the thanks and the reward the talk starts over from its beginning.
                 string reward = QuestText.Reward(quest);
-                return Say(quest.CompletedText, () => Menu(talk, 0), reward.Length > 0 ? QuestText.Small($"Получено: {reward}") : null);
+                return Say(quest.CompletedText, () => talk.Restart != null ? talk.Restart(null) : Menu(talk),
+                    reward.Length > 0 ? QuestText.Small($"Получено: {reward}") : null);
             }));
-            node.Choices.Add(Go(AnswerLater, () => Menu(talk, 0)));
+            node.Choices.Add(Go(AnswerLater, () => Menu(talk)));
             return node;
         }
 
@@ -201,16 +258,38 @@ namespace ProjectMayham.Quests
             }
             else pages.AddRange(QuestText.Pages(giver != null ? giver.NoRoomText : string.Empty));
             if (pages.Count == 0) pages.Add(quest.Title);
+            return Closing(pages, AnswerOk);
+        }
 
+        // The giver's line, page by page, and the talk is over.
+        private static DialogueNode Farewell(string text)
+        {
+            var pages = QuestText.Pages(text);
+            if (pages.Count == 0) pages.Add(QuestGiverDefinition.DefaultAcceptedText);
+            return Closing(pages, AnswerBye);
+        }
+
+        private static DialogueNode Closing(List<string> pages, string lastAnswer)
+        {
             DialogueNode Build(int index)
             {
                 var node = new DialogueNode { Text = pages[index] };
                 node.Choices.Add(index < pages.Count - 1
                     ? Go(AnswerNext, () => Build(index + 1))
-                    : new DialogueChoice { Text = AnswerOk, Closes = true });
+                    : new DialogueChoice { Text = lastAnswer, Closes = true });
                 return node;
             }
             return Build(0);
+        }
+
+        // The giver's line, page by page; its last page is shown with the answers of <paramref name="then"/>.
+        private static DialogueNode SayThen(string text, Func<string, DialogueNode> then)
+        {
+            var pages = QuestText.Pages(text);
+            if (pages.Count == 0) return then(string.Empty);
+            string last = pages[pages.Count - 1];
+            pages.RemoveAt(pages.Count - 1);
+            return pages.Count == 0 ? then(last) : Page(pages, 0, () => then(last), AnswerNext);
         }
 
         /// <summary>

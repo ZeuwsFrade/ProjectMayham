@@ -34,11 +34,7 @@ namespace ProjectMayham.Npcs
     /// </summary>
     public static class NpcConversation
     {
-        /// <summary>Answers on one page of a line; with more, the last place is taken by "more".</summary>
-        public const int AnswersPerPage = 4;
-
         private const string AnswerNext = "Дальше";
-        private const string AnswerMore = "Ещё…";
         private const string AnswerLeave = "Я пойду";
 
         /// <summary>Starts the conversation. Without a dialogue asset: a greeting, trade and work, as it was before.</summary>
@@ -134,13 +130,14 @@ namespace ProjectMayham.Npcs
                 node.Choices.Add(Go(AnswerNext, () => Page(context, line, pages, index + 1)));
                 return node;
             }
-            return Answers(context, line, pages[index], 0);
+            return Answers(context, line, pages[index]);
         }
 
-        private static DialogueNode Answers(ConversationContext context, DialogueLine line, string text, int first)
+        // Every answer whose conditions hold, as many as there are: the window scrolls.
+        private static DialogueNode Answers(ConversationContext context, DialogueLine line, string text)
         {
             var node = new DialogueNode { Text = text };
-            var shown = line.Answers.Where(a => a != null && Holds(a.Conditions, context)).ToList();
+            var shown = line.Answers.Where(a => a != null && Holds(a.Conditions, context) && HasSomethingToSay(a, context)).ToList();
             if (shown.Count == 0)
             {
                 // A line nobody can answer still has to let the player go.
@@ -148,23 +145,46 @@ namespace ProjectMayham.Npcs
                 return node;
             }
 
-            bool paged = shown.Count - first > AnswersPerPage;
-            int take = paged ? AnswersPerPage - 1 : AnswersPerPage;
-            foreach (var answer in shown.Skip(first).Take(take))
+            foreach (var answer in shown)
             {
                 var picked = answer;
                 node.Choices.Add(Go(answer.Text, () => Pick(context, line, picked)));
             }
-            if (paged) node.Choices.Add(Go(AnswerMore, () => Answers(context, line, text, first + take)));
             return node;
+        }
+
+        // An answer about work shows only when the NPC has new quests, one about taken quests only when there are some.
+        private static bool HasSomethingToSay(DialogueAnswer answer, ConversationContext context)
+        {
+            foreach (var action in answer.Actions)
+            {
+                if (action == null) continue;
+                if (action.Kind == DialogueActionKind.OpenWork && !QuestDialogue.HasOffers(context.Npc.Id)) return false;
+                if (action.Kind == DialogueActionKind.OpenTaken && !QuestDialogue.HasTaken(context.Npc.Id)) return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// The start of the conversation again: with <paramref name="text"/> said in place of the first line (where
+        /// "take it, and one more question" leads), or with null as when the talk began (after a quest is handed in).
+        /// </summary>
+        private static DialogueNode Restart(ConversationContext context, string text)
+        {
+            if (text == null) return Start(context);
+            var dialogue = context.Npc.Dialogue;
+            var line = dialogue == null ? null
+                : dialogue.Lines.FirstOrDefault(l => l != null && l.Start && Holds(l.Conditions, context)) ?? dialogue.Lines.FirstOrDefault(l => l != null);
+            return line != null ? Answers(context, line, text) : Plain(context, text);
         }
 
         /// <summary>Runs the actions of the answer and returns the next node (null ends the conversation).</summary>
         private static DialogueNode Pick(ConversationContext context, DialogueLine line, DialogueAnswer answer)
         {
-            bool work = false;
-            foreach (var action in answer.Actions)
+            bool work = false, taken = false;
+            for (int a = 0; a < answer.Actions.Count; a++)
             {
+                var action = answer.Actions[a];
                 if (action == null) continue;
                 switch (action.Kind)
                 {
@@ -172,6 +192,10 @@ namespace ProjectMayham.Npcs
                         PlayerChoices.Remember(action.Choice);
                         break;
                     case DialogueActionKind.AddLoyalty:
+                        // Once for this answer: choosing it again in a later talk changes nothing.
+                        string given = LoyaltyKey(context, line, answer, a);
+                        if (PlayerChoices.Has(given)) break;
+                        PlayerChoices.Remember(given);
                         Loyalty.Add(context.Npc.Id, action.Amount);
                         break;
                     case DialogueActionKind.OpenTrade:
@@ -179,6 +203,9 @@ namespace ProjectMayham.Npcs
                         break;
                     case DialogueActionKind.OpenWork:
                         work = true;
+                        break;
+                    case DialogueActionKind.OpenTaken:
+                        taken = true;
                         break;
                     case DialogueActionKind.TakeAlong:
                         if (context.TakeAlong == null) break;
@@ -190,13 +217,27 @@ namespace ProjectMayham.Npcs
             }
 
             var target = context.Npc.Dialogue != null ? context.Npc.Dialogue.Find(answer.Next) : null;
-            if (!work) return target != null ? LineNode(context, target) : null;
+            if (!work && !taken) return target != null ? LineNode(context, target) : null;
 
-            // The talk about work, and back to the line the answer leads to (or this one).
+            // The talk about quests, and back to the line the answer leads to (or this one).
             var back = LineNode(context, target ?? line);
-            var choice = QuestDialogue.WorkChoice(context.Npc.Id, context.Backpack, back);
+            var choice = work
+                ? QuestDialogue.WorkChoice(context.Npc.Id, context.Backpack, back, text => Restart(context, text))
+                : QuestDialogue.TakenChoice(context.Npc.Id, context.Backpack, back, text => Restart(context, text));
             choice.Action?.Invoke();
             return choice.Next;
+        }
+
+        /// <summary>
+        /// The remembered mark that the loyalty of an answer was given: the dialogue, the line, the answer and the
+        /// action by their place. Renaming a line or reordering its answers gives the loyalty once more.
+        /// </summary>
+        public static string LoyaltyKey(ConversationContext context, DialogueLine line, DialogueAnswer answer, int action)
+        {
+            string dialogue = context.Npc.Dialogue != null ? context.Npc.Dialogue.name : context.Npc.Id;
+            int index = 0;
+            while (index < line.Answers.Count && line.Answers[index] != answer) index++;
+            return $"loyalty:{dialogue}/{line.Id}/{index}/{action}";
         }
 
         private static DialogueNode Refusal(ConversationContext context, DialogueLine line, string text)
@@ -207,13 +248,14 @@ namespace ProjectMayham.Npcs
         }
 
         // An NPC without a dialogue: what the trader said before dialogues were assets.
-        private static DialogueNode Plain(ConversationContext context)
+        private static DialogueNode Plain(ConversationContext context, string text = null)
         {
             var npc = context.Npc;
-            var root = new DialogueNode { Text = npc.Trader != null ? npc.Trader.Greeting : $"Привет, [ИГРОК]." };
+            var root = new DialogueNode { Text = text ?? (npc.Trader != null ? npc.Trader.Greeting : $"Привет, [ИГРОК].") };
             if (context.Book != null && context.Backpack != null)
                 root.Choices.Add(new DialogueChoice { Text = "Давай посмотрим товары", Action = () => TradeWindow.Open(context.Book, context.Backpack) });
-            root.Choices.Add(QuestDialogue.WorkChoice(npc.Id, context.Backpack, root));
+            if (QuestDialogue.HasOffers(npc.Id)) root.Choices.Add(QuestDialogue.WorkChoice(npc.Id, context.Backpack, root, t => Plain(context, t)));
+            if (QuestDialogue.HasTaken(npc.Id)) root.Choices.Add(QuestDialogue.TakenChoice(npc.Id, context.Backpack, root, t => Plain(context, t)));
             root.Choices.Add(new DialogueChoice { Text = AnswerLeave, Closes = true });
             return root;
         }

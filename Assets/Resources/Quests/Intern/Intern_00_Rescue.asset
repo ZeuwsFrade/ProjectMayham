@@ -13,15 +13,15 @@ MonoBehaviour:
   m_Name: Intern_00_Rescue
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Quests.QuestDefinition
   giver: {fileID: 11400000, guid: cca81ec7558d74e4db68b1bf5ffbf38b, type: 2}
-  requires: []
-  order: 0
+  requires:
+  - {fileID: 11400000, guid: dccc41e98dcd0b942b1e380cfd3e8a66, type: 2}
+  order: 1
   minLoyalty: 1
   requiredChoices: []
   excludingChoices: []
   title: "\u0412\u044B\u0432\u0435\u0434\u0438 \u043C\u0435\u043D\u044F"
   offerText: "\u0412\u044B\u0432\u0435\u0434\u0438 \u043C\u0435\u043D\u044F \u043E\u0442\u0441\u044E\u0434\u0430,
-    \u0430? \u0421\u0430\u043C \u044F \u043D\u0435 \u0434\u043E\u0439\u0434\u0443
-    \u2014 \u043D\u043E\u0433\u0438 \u043D\u0435 \u0434\u0435\u0440\u0436\u0430\u0442."
+    \u0430? \u041E\u0434\u0438\u043D \u044F \u043D\u0435 \u0434\u043E\u0439\u0434\u0443."
   objectives:
   - kind: 4
     item: {fileID: 11400000, guid: 3f6f86f1c35010a469bc6f14b7ef8326, type: 2}
@@ -41,3 +41,7 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 6a54ee52855061740a1c062f41574129, type: 2}
     count: 1
   rewardLoyalty: 10
+  repeatable: 0
+  repeatAfterRaids: 1
+  canAbandon: 0
+  abandonPenalty: 0

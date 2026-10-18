@@ -26,6 +26,8 @@ namespace ProjectMayham.EditorTools
             public string Text, Next;
             public List<(DialogueActionKind kind, string choice, int amount)> Actions = new List<(DialogueActionKind, string, int)>();
             public List<(DialogueConditionKind kind, int level, string choice)> Conditions = new List<(DialogueConditionKind, int, string)>();
+            /// <summary>Conditions on the stage of a quest ("the rescue is offered").</summary>
+            public List<(QuestDefinition quest, QuestStage stage)> QuestConditions = new List<(QuestDefinition, QuestStage)>();
         }
 
         public class Line
@@ -40,7 +42,8 @@ namespace ProjectMayham.EditorTools
         [MenuItem("Mayham/Dialogue/Create Tyler Dialogue")]
         public static void CreateMenu() => Debug.Log(Create());
 
-        public static string Create()
+        /// <summary>Makes what is missing; with <paramref name="overwrite"/> also writes the sample lines into Tyler's dialogue.</summary>
+        public static string Create(bool overwrite = false)
         {
             var made = new List<string>();
             var trader = AssetDatabase.LoadAssetAtPath<TraderDefinition>(TylerTrader);
@@ -56,6 +59,12 @@ namespace ProjectMayham.EditorTools
                 Fill(dialogue, TylerLines(trader.Greeting));
                 AssetDatabase.CreateAsset(dialogue, dialoguePath);
                 made.Add("Dialogue_Tyler");
+            }
+            else if (overwrite)
+            {
+                Fill(dialogue, TylerLines(trader.Greeting));
+                EditorUtility.SetDirty(dialogue);
+                made.Add("Dialogue_Tyler (rewritten)");
             }
 
             string npcPath = $"{NpcsFolder}/Tyler.asset";
@@ -103,6 +112,8 @@ namespace ProjectMayham.EditorTools
         {
             Answer Trade(string back) => new Answer { Text = "Давай посмотрим товары", Next = back, Actions = { (DialogueActionKind.OpenTrade, "", 0) } };
             Answer Work() => new Answer { Text = "Есть для меня работа?", Actions = { (DialogueActionKind.OpenWork, "", 0) } };
+            Answer Taken() => new Answer { Text = "По поводу твоего задания", Actions = { (DialogueActionKind.OpenTaken, "", 0) } };
+            Answer Advice() => new Answer { Text = "Что посоветуешь перед рейдом?", Next = "advice" };
             Answer Leave() => new Answer { Text = "Я пойду" };
 
             return new List<Line>
@@ -111,13 +122,13 @@ namespace ProjectMayham.EditorTools
                 {
                     Id = "start_friend", Start = true, MinLoyalty = 2,
                     Text = "Здорово, [ИГРОК]! Своим у меня всегда найдётся что-нибудь получше.",
-                    Answers = { Trade("start_friend"), Work(), new Answer { Text = "Что нового?", Next = "news" }, Leave() },
+                    Answers = { Trade("start_friend"), Work(), Taken(), new Answer { Text = "Что нового?", Next = "news" }, Advice(), Leave() },
                 },
                 new Line
                 {
                     Id = "start", Start = true,
                     Text = string.IsNullOrWhiteSpace(greeting) ? "Привет, [ИГРОК]. Смотри, что есть." : greeting,
-                    Answers = { Trade("start"), Work(), Leave() },
+                    Answers = { Trade("start"), Work(), Taken(), Advice(), Leave() },
                 },
                 new Line
                 {
@@ -125,6 +136,29 @@ namespace ProjectMayham.EditorTools
                     Text = "Говорят, в лабиринте кто-то сидит. Живой. Стажёр из бухгалтерии, если верить слухам.\n\n"
                         + "Не знаю, кто его туда затащил, но сам он оттуда вряд ли выберется.",
                     Answers = { new Answer { Text = "Ясно", Next = "start_friend" } },
+                },
+                // Many answers at once: the list scrolls.
+                new Line
+                {
+                    Id = "advice",
+                    Text = "Смотря куда собрался. Ну, выкладывай.",
+                    Answers =
+                    {
+                        new Answer { Text = "По кабинетам", Next = "advice_reply" },
+                        new Answer { Text = "В комнату отдыха", Next = "advice_reply" },
+                        new Answer { Text = "В кабинет босса", Next = "advice_reply" },
+                        new Answer { Text = "В туалет", Next = "advice_reply" },
+                        new Answer { Text = "На парковку", Next = "advice_reply" },
+                        new Answer { Text = "На склад", Next = "advice_reply" },
+                        new Answer { Text = "В копировальную", Next = "advice_reply" },
+                        new Answer { Text = "Пока не знаю", Next = "advice_reply" },
+                    },
+                },
+                new Line
+                {
+                    Id = "advice_reply",
+                    Text = "Везде одно и то же: не шуми, не геройствуй и смотри под ноги.",
+                    Answers = { new Answer { Text = "Ясно", Next = "start" } },
                 },
             };
         }
@@ -172,13 +206,23 @@ namespace ProjectMayham.EditorTools
                         action.FindPropertyRelative("amount").intValue = answer.Actions[k].amount;
                     }
                     var answerConditions = a.FindPropertyRelative("conditions");
-                    answerConditions.arraySize = answer.Conditions.Count;
+                    answerConditions.arraySize = answer.Conditions.Count + answer.QuestConditions.Count;
                     for (int k = 0; k < answer.Conditions.Count; k++)
                     {
                         var condition = answerConditions.GetArrayElementAtIndex(k);
                         condition.FindPropertyRelative("kind").enumValueIndex = (int)answer.Conditions[k].kind;
                         condition.FindPropertyRelative("level").intValue = Mathf.Max(1, answer.Conditions[k].level);
                         condition.FindPropertyRelative("choice").stringValue = answer.Conditions[k].choice ?? string.Empty;
+                        condition.FindPropertyRelative("quest").objectReferenceValue = null;
+                    }
+                    for (int k = 0; k < answer.QuestConditions.Count; k++)
+                    {
+                        var condition = answerConditions.GetArrayElementAtIndex(answer.Conditions.Count + k);
+                        condition.FindPropertyRelative("kind").enumValueIndex = (int)DialogueConditionKind.Quest;
+                        condition.FindPropertyRelative("quest").objectReferenceValue = answer.QuestConditions[k].quest;
+                        condition.FindPropertyRelative("stage").intValue = (int)answer.QuestConditions[k].stage;
+                        condition.FindPropertyRelative("level").intValue = 1;
+                        condition.FindPropertyRelative("choice").stringValue = string.Empty;
                     }
                 }
             }

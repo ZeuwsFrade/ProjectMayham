@@ -39,7 +39,8 @@ namespace ProjectMayham.Shelter
             var root = new DialogueNode { Text = trader.Greeting };
 
             root.Choices.Add(new DialogueChoice { Text = "Давай посмотрим товары", Action = () => TradeWindow.Open(book, inventory) });
-            root.Choices.Add(QuestDialogue.WorkChoice(trader.Id, inventory, root));
+            if (QuestDialogue.HasOffers(trader.Id)) root.Choices.Add(QuestDialogue.WorkChoice(trader.Id, inventory, root, _ => root));
+            if (QuestDialogue.HasTaken(trader.Id)) root.Choices.Add(QuestDialogue.TakenChoice(trader.Id, inventory, root, _ => root));
             root.Choices.Add(new DialogueChoice { Text = "Я пойду", Closes = true });
 
             var portrait = trader.Portrait;

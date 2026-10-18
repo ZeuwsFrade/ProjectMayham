@@ -79,6 +79,39 @@ namespace ProjectMayham.EditorTools
                 AddObjective(so, QuestObjectiveKind.Deliver, mug, 2, RoomKind.Office);
             });
 
+            // Dailies: Tyler offers two of them a day, at random; each may be refused for the loyalty it gives.
+            var books = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/Data/Items/Books.asset");
+            Ensure<QuestDefinition>($"{Root}/Tyler/Tyler_Daily_Papers.asset", ref created, so =>
+            {
+                Fill(so, tyler, 20, "Макулатура на сегодня",
+                    "Бумаги опять кончились. Пять пачек, [ИГРОК], — и на сегодня мы в расчёте.",
+                    "Пять пачек бумаги. Сегодня.",
+                    "Вот и славно. До завтра хватит.",
+                    15);
+                AddObjective(so, QuestObjectiveKind.Deliver, papers, 5, RoomKind.Office);
+                Daily(so, 2);
+            });
+            Ensure<QuestDefinition>($"{Root}/Tyler/Tyler_Daily_Books.asset", ref created, so =>
+            {
+                Fill(so, tyler, 21, "Книги для растопки",
+                    "Холодает. Принеси две стопки книг — читать их всё равно никто не будет.",
+                    "Две стопки книг, [ИГРОК].",
+                    "Отлично горят. То есть — отличные книги.",
+                    20);
+                AddObjective(so, QuestObjectiveKind.Deliver, books, 2, RoomKind.Office);
+                Daily(so, 2);
+            });
+            Ensure<QuestDefinition>($"{Root}/Tyler/Tyler_Daily_Toilet.asset", ref created, so =>
+            {
+                Fill(so, tyler, 22, "Обход туалета",
+                    "Загляни сегодня в туалет в лабиринте. Просто проверь, что там всё как обычно. И вернись.",
+                    "Туалет. Загляни и возвращайся.",
+                    "Как обычно? Ну и хорошо. Держи.",
+                    25);
+                AddObjective(so, QuestObjectiveKind.VisitRoom, null, 1, RoomKind.Toilet);
+                Daily(so, 2);
+            });
+
             AssetDatabase.SaveAssets();
             QuestCatalog.Reset();
             return $"{created} quest assets created; quest item: {folder.name}";
@@ -113,6 +146,14 @@ namespace ProjectMayham.EditorTools
             quest.FindProperty("reminderText").stringValue = reminder;
             quest.FindProperty("completedText").stringValue = completed;
             quest.FindProperty("rewardMoney").intValue = money;
+        }
+
+        // A daily that may be refused; the refusal costs as much loyalty as the quest gives.
+        private static void Daily(SerializedObject quest, int loyalty)
+        {
+            quest.FindProperty("repeatable").boolValue = true;
+            quest.FindProperty("canAbandon").boolValue = true;
+            quest.FindProperty("rewardLoyalty").intValue = loyalty;
         }
 
         private static void Require(SerializedObject quest, QuestDefinition required)

@@ -29,7 +29,7 @@ namespace ProjectMayham.Dialogue
 
     /// <summary>
     /// Dialogue on its own canvas, as described in the design document: the speaker's sprite, their line and the
-    /// answers to pick from (four fit); the game is paused meanwhile. The nodes are built in code by whoever starts
+    /// answers to pick from (four are seen at once, more scroll with the wheel or the bar); the game is paused meanwhile. The nodes are built in code by whoever starts
     /// a conversation: <see cref="Npcs.NpcConversation"/> builds them from a dialogue asset.
     /// </summary>
     public class DialogueWindow : ModalWindow
@@ -38,6 +38,7 @@ namespace ProjectMayham.Dialogue
         private TMP_Text nameLabel;
         private TMP_Text textLabel;
         private RectTransform choices;
+        private ScrollRect choicesScroll;
         private Action onClosed;
 
         protected override int SortingOrder => 100;
@@ -77,16 +78,65 @@ namespace ProjectMayham.Dialogue
             UIKit.Place(textLabel.rectTransform, new Vector2(0f, 1f), new Vector2(30f, -70f), new Vector2(1440f, 120f));
             textLabel.rectTransform.pivot = new Vector2(0f, 1f);
 
-            choices = UIKit.Rect("Choices", panel);
-            UIKit.Place(choices, new Vector2(0f, 0f), new Vector2(30f, 20f), new Vector2(1440f, 202f));
-            choices.pivot = new Vector2(0f, 0f);
+            // The answers: a list that scrolls when there are more than four, with a bar on the right.
+            var area = UIKit.Rect("Choices", panel);
+            UIKit.Place(area, new Vector2(0f, 0f), new Vector2(30f, 20f), new Vector2(1440f, 202f));
+            area.pivot = new Vector2(0f, 0f);
+
+            var viewport = UIKit.Rect("Viewport", area);
+            UIKit.Stretch(viewport);
+            viewport.gameObject.AddComponent<RectMask2D>();
+            // Invisible, but catches the wheel between and beside the answers.
+            viewport.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0f);
+
+            choices = UIKit.Rect("Content", viewport);
+            choices.anchorMin = new Vector2(0f, 1f);
+            choices.anchorMax = new Vector2(1f, 1f);
+            choices.pivot = new Vector2(0.5f, 1f);
+            choices.offsetMin = choices.offsetMax = Vector2.zero;
             var layout = choices.gameObject.AddComponent<VerticalLayoutGroup>();
             layout.spacing = 8f;
             layout.childControlWidth = true;
             layout.childControlHeight = true;
             layout.childForceExpandWidth = true;
             layout.childForceExpandHeight = false;
-            layout.childAlignment = TextAnchor.LowerLeft;
+            layout.childAlignment = TextAnchor.UpperLeft;
+            choices.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            choicesScroll = area.gameObject.AddComponent<ScrollRect>();
+            choicesScroll.content = choices;
+            choicesScroll.viewport = viewport;
+            choicesScroll.horizontal = false;
+            choicesScroll.movementType = ScrollRect.MovementType.Clamped;
+            choicesScroll.scrollSensitivity = 40f;
+            choicesScroll.verticalScrollbar = ScrollBar(area);
+            choicesScroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
+            choicesScroll.verticalScrollbarSpacing = 8f;
+        }
+
+        // A thin bar on the right edge of the answers; shown only when they do not all fit.
+        private static Scrollbar ScrollBar(RectTransform area)
+        {
+            var bar = UIKit.Rect("Scrollbar", area);
+            bar.anchorMin = new Vector2(1f, 0f);
+            bar.anchorMax = new Vector2(1f, 1f);
+            bar.pivot = new Vector2(1f, 0.5f);
+            bar.sizeDelta = new Vector2(16f, 0f);
+            bar.anchoredPosition = Vector2.zero;
+            bar.gameObject.AddComponent<Image>().color = new Color(1f, 1f, 1f, 0.08f);
+
+            var slide = UIKit.Rect("Sliding Area", bar);
+            UIKit.Stretch(slide);
+            var handle = UIKit.Rect("Handle", slide);
+            UIKit.Stretch(handle);
+            var handleImage = handle.gameObject.AddComponent<Image>();
+            handleImage.color = UIKit.ButtonColor;
+
+            var scrollbar = bar.gameObject.AddComponent<Scrollbar>();
+            scrollbar.handleRect = handle;
+            scrollbar.targetGraphic = handleImage;
+            scrollbar.direction = Scrollbar.Direction.BottomToTop;
+            return scrollbar;
         }
 
         protected override void OnClosed()
@@ -110,6 +160,9 @@ namespace ProjectMayham.Dialogue
                 text.rectTransform.offsetMin = new Vector2(16f, 0f);
                 button.gameObject.AddComponent<LayoutElement>().preferredHeight = 44f;
             }
+            // Every line starts with its first answers in view.
+            Canvas.ForceUpdateCanvases();
+            choicesScroll.verticalNormalizedPosition = 1f;
         }
 
         private void Pick(DialogueChoice choice)

@@ -64,6 +64,10 @@ namespace ProjectMayham.Core
         public List<string> builtModules = new List<string>();
         /// <summary>Quests the player has taken or turned in, in the order they were taken. See <see cref="Quests.QuestLog"/>.</summary>
         public List<QuestProgressData> quests = new List<QuestProgressData>();
+        /// <summary>Raids the player has set out on: the days of the dailies.</summary>
+        public int raids;
+        /// <summary>The dailies each giver offers today. See <see cref="Quests.QuestLog"/>.</summary>
+        public List<DailyOfferData> dailies = new List<DailyOfferData>();
         /// <summary>How worn the weapons are. See <see cref="Combat.WeaponWear"/>.</summary>
         public List<WeaponWearData> weaponWear = new List<WeaponWearData>();
         /// <summary>Loyalty points of the NPCs. See <see cref="Npcs.Loyalty"/>.</summary>
@@ -154,9 +158,22 @@ namespace ProjectMayham.Core
     {
         /// <summary>Id of the quest: the name of its asset.</summary>
         public string quest;
-        /// <summary>1 = taken, 2 = turned in. Anything else means "no entry".</summary>
+        /// <summary>1 = taken, 2 = turned in, 3 = refused. Anything else means "no entry".</summary>
         public int state;
         /// <summary>Things done and brought home, for example "visit:Parking".</summary>
         public List<string> marks = new List<string>();
+        /// <summary>The raid from which a daily or a refused quest is offered again.</summary>
+        public int again;
+        /// <summary>How many times the quest was turned in (a daily more than once).</summary>
+        public int done;
+    }
+
+    /// <summary>The dailies a giver offers on one day (a day is a raid): picked once a day, so they do not change.</summary>
+    [Serializable]
+    public class DailyOfferData
+    {
+        public string giver;
+        public int day;
+        public List<string> quests = new List<string>();
     }
 }

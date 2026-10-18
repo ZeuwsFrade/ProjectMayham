@@ -133,7 +133,9 @@ namespace ProjectMayham.Level
         {
             if (!Application.isPlaying) return;
 
-            // What the quests the player has taken need from this raid; the tracker reports back what was reached.
+            // A raid is a new day for the dailies. What the quests the player has taken need from this raid; the
+            // tracker reports back what was reached.
+            QuestLog.CountRaid();
             var demands = QuestLog.BuildRaidDemands();
             Generate(useFixedSeed ? fixedSeed : Random.Range(1, int.MaxValue), demands);
             gameObject.AddComponent<RaidQuestTracker>().Begin(this, demands);
@@ -647,45 +649,26 @@ namespace ProjectMayham.Level
 
         // ---- lost NPCs ----
 
+        // One lost NPC a raid at most: picked at random among those not brought home yet, put on free floor.
         private void PlaceLostNpcs(Transform root, System.Random dice)
         {
-            foreach (var npc in Npcs.NpcCatalog.All.Where(n => n.LostInMaze && n.RaidPrefab != null && !Npcs.NpcRescue.IsRescued(n.Id)).OrderBy(n => n.Id, System.StringComparer.Ordinal))
+            var candidates = Npcs.NpcCatalog.All
+                .Where(n => n.LostInMaze && n.RaidPrefab != null && !Npcs.NpcRescue.IsRescued(n.Id))
+                .OrderBy(n => n.Id, System.StringComparer.Ordinal).ToList();
+            if (candidates.Count == 0) return;
+            // With one candidate no dice is thrown for the choice: the raids of one lost NPC stay as they were.
+            var npc = candidates.Count == 1 ? candidates[0] : candidates[dice.Next(candidates.Count)];
+
+            var spots = NpcSpots().Where(s => !NearKeepClear(s, NpcClearance)).ToList();
+            if (spots.Count == 0)
             {
-                var spots = NpcSpots().Where(s => !NearKeepClear(s, NpcClearance)).ToList();
-                if (spots.Count == 0)
-                {
-                    Debug.LogWarning($"RaidGenerator: no free floor for {npc.Id}.", this);
-                    continue;
-                }
-                var spot = spots[dice.Next(spots.Count)];
-                var instance = Instantiate(npc.RaidPrefab, new Vector3(spot.x, spot.y, 0f), Quaternion.identity, root);
-                instance.name = npc.Id;
-                if (instance.TryGetComponent<Npcs.LostNpc>(out var lost)) lostNpcs.Add(lost);
+                Debug.LogWarning($"RaidGenerator: no free floor for {npc.Id}.", this);
+                return;
             }
-        }
-
-        /// <summary>
-        /// Moves a lost NPC to another free place: out of the player's sight, away from the player and from every
-        /// enemy. False when there is no such place (the NPC stays).
-        /// </summary>
-        public bool Relocate(Npcs.LostNpc npc)
-        {
-            if (npc == null) return false;
-            var wrap = World.WrapWorld.Active;
-            var cone = Vision.VisionCone.Active;
-            Vector2 Delta(Vector2 a, Vector2 b) => wrap != null ? wrap.Delta(a, b) : b - a;
-
-            var player = cone != null ? (Vector2)cone.transform.position : (Vector2?)null;
-            var enemies = AI.EnemyAI.All.Where(e => e != null && e.isActiveAndEnabled).Select(e => (Vector2)e.transform.position).ToList();
-            float keepAway = npc.Npc != null ? npc.Npc.FleeDistance * 2f : 12f;
-            var spots = NpcSpots().Where(s =>
-                (!player.HasValue || (Delta(player.Value, s).magnitude > NpcClearance && !cone.IsPointVisible(player.Value + Delta(player.Value, s))))
-                && enemies.All(e => Delta(e, s).magnitude > keepAway)).ToList();
-            if (spots.Count == 0) return false;
-
-            var spot = spots[UnityEngine.Random.Range(0, spots.Count)];
-            npc.transform.position = new Vector3(spot.x, spot.y, npc.transform.position.z);
-            return true;
+            var spot = spots[dice.Next(spots.Count)];
+            var instance = Instantiate(npc.RaidPrefab, new Vector3(spot.x, spot.y, 0f), Quaternion.identity, root);
+            instance.name = npc.Id;
+            if (instance.TryGetComponent<Npcs.LostNpc>(out var lost)) lostNpcs.Add(lost);
         }
 
         private List<Vector2> NpcSpots()

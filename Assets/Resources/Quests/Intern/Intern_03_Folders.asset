@@ -38,3 +38,7 @@ MonoBehaviour:
   rewardMoney: 20
   rewardItems: []
   rewardLoyalty: 5
+  repeatable: 0
+  repeatAfterRaids: 1
+  canAbandon: 0
+  abandonPenalty: 0

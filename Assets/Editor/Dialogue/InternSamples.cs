@@ -33,10 +33,30 @@ namespace ProjectMayham.EditorTools
         public const string ChoiceFled = "intern_fled";
         public const string ChoiceSaw = "intern_saw";
 
+        // While true, Ensure writes the sample into assets that exist already (Create with overwrite).
+        private static bool rewrite;
+
         [MenuItem("Mayham/Dialogue/Create Intern")]
         public static void CreateMenu() => Debug.Log(Create());
 
-        public static string Create()
+        /// <summary>
+        /// Makes what is missing of the intern. With <paramref name="overwrite"/> also writes the sample into the
+        /// assets that exist (quests, dialogue, NPC, item, trader), keeping them as assets: what refers to them stays.
+        /// </summary>
+        public static string Create(bool overwrite = false)
+        {
+            rewrite = overwrite;
+            try
+            {
+                return Build();
+            }
+            finally
+            {
+                rewrite = false;
+            }
+        }
+
+        private static string Build()
         {
             var made = new List<string>();
             foreach (string folder in new[] { SpritesFolder, PrefabsFolder, ItemsFolder, QuestsFolder, NpcSamples.DialoguesFolder, NpcSamples.NpcsFolder }) Folder(folder);
@@ -101,21 +121,22 @@ namespace ProjectMayham.EditorTools
             var notes = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/Data/Items/Notes.asset");
             var folders = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/Data/Items/Folders.asset");
             var briefcase = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/Data/Items/Equipment/Briefcase.asset");
-            // The rescue is taken when he goes along and handed in when he arrives; the others are given at the base.
-            var rescue = Quest("Intern_00_Rescue", giver, 0, made, "Выведи меня",
-                "Выведи меня отсюда, а? Сам я не дойду — ноги не держат.",
-                "Стены… Настоящие стены. Спасибо, [ИГРОК].\n\nВозьми мой портфель. Мне он теперь ни к чему — отчёт всё равно пропал.",
-                0, 10, null, new[] { (QuestObjectiveKind.Rescue, item, 1, RoomKind.Office) }, rewards: new[] { (briefcase, 1) });
-            var coffee = Quest("Intern_01_Mug", giver, 1, made, "Кружка",
+            // In the maze: the mug, then the rescue (taken when he goes along, handed in when he arrives). The rest at the base.
+            var coffee = Quest("Intern_01_Mug", giver, 0, made, "Кружка",
                 "Кружка. Мне нужна кружка. Без кофе я тут сойду с ума — а кофе тут нет, но хоть подержу.",
-                "Спасибо… Даже без кофе уже легче.", 10, 5, rescue, new[] { (QuestObjectiveKind.Deliver, mug, 1, RoomKind.Office) });
+                "Спасибо… Даже без кофе уже легче.\n\nСлушай… а выведешь меня отсюда? Я теперь хоть на ногах стою.",
+                10, 5, null, new[] { (QuestObjectiveKind.Deliver, mug, 1, RoomKind.Office) });
+            var rescue = Quest("Intern_00_Rescue", giver, 1, made, "Выведи меня",
+                "Выведи меня отсюда, а? Один я не дойду.",
+                "Стены… Настоящие стены. Спасибо, [ИГРОК].\n\nВозьми мой портфель. Мне он теперь ни к чему — отчёт всё равно пропал.",
+                0, 10, coffee, new[] { (QuestObjectiveKind.Rescue, item, 1, RoomKind.Office) }, rewards: new[] { (briefcase, 1) });
             Quest("Intern_02_Notes", giver, 2, made, "Записки",
                 "Я бежал так, что растерял все записи. Принеси записки — по ним я восстановлю отчёт.",
-                "Отлично. Теперь я почти полезный сотрудник.", 15, 6, coffee, new[] { (QuestObjectiveKind.Deliver, notes, 3, RoomKind.Office) },
+                "Отлично. Теперь я почти полезный сотрудник.", 15, 6, rescue, new[] { (QuestObjectiveKind.Deliver, notes, 3, RoomKind.Office) },
                 required: ChoiceFled);
             Quest("Intern_02_Parking", giver, 2, made, "Что у парковки",
                 "Ты спрашивал, что я видел у парковки. Сходи туда — только посмотри и сразу назад. Мне надо знать, что мне не показалось.",
-                "Значит, оно там… Мне не показалось. Спасибо, что сходил.", 15, 6, coffee, new[] { (QuestObjectiveKind.VisitRoom, (ItemDefinition)null, 1, RoomKind.Parking) },
+                "Значит, оно там… Мне не показалось. Спасибо, что сходил.", 15, 6, rescue, new[] { (QuestObjectiveKind.VisitRoom, (ItemDefinition)null, 1, RoomKind.Parking) },
                 required: ChoiceSaw);
             Quest("Intern_03_Folders", giver, 3, made, "Папки для учёта",
                 "Хочу навести порядок в нашем убежище. Принеси две пачки папок.",
@@ -126,9 +147,15 @@ namespace ProjectMayham.EditorTools
             if (dialogue == null)
             {
                 dialogue = ScriptableObject.CreateInstance<DialogueDefinition>();
-                NpcSamples.Fill(dialogue, Lines());
+                NpcSamples.Fill(dialogue, Lines(rescue));
                 AssetDatabase.CreateAsset(dialogue, $"{NpcSamples.DialoguesFolder}/Dialogue_Intern.asset");
                 made.Add("Dialogue_Intern");
+            }
+            else if (rewrite)
+            {
+                NpcSamples.Fill(dialogue, Lines(rescue));
+                EditorUtility.SetDirty(dialogue);
+                made.Add("Dialogue_Intern (rewritten)");
             }
 
             var npc = Ensure<NpcDefinition>($"{NpcSamples.NpcsFolder}/{Id}.asset", made, so =>
@@ -141,7 +168,8 @@ namespace ProjectMayham.EditorTools
                 so.FindProperty("raidPrefab").objectReferenceValue = raid;
                 so.FindProperty("carryItem").objectReferenceValue = item;
                 so.FindProperty("takeAlongLevel").intValue = 1;
-                so.FindProperty("fleeDistance").floatValue = 6f;
+                so.FindProperty("hideDistance").floatValue = 6f;
+                so.FindProperty("hideFor").floatValue = 8f;
                 so.FindProperty("shelterPrefab").objectReferenceValue = shelter;
             });
 
@@ -153,24 +181,37 @@ namespace ProjectMayham.EditorTools
             return $"Intern: made {made.Count} ({string.Join(", ", made)})";
         }
 
-        public static List<NpcSamples.Line> Lines()
+        public static List<NpcSamples.Line> Lines(QuestDefinition rescue)
         {
             NpcSamples.Answer Leave(string text) => new NpcSamples.Answer { Text = text };
-            NpcSamples.Answer Along() => new NpcSamples.Answer
+            // What the player can say to him in the maze. "Come with me" only once his rescue is open: offered after
+            // the mug, or taken already (after a death on the way out).
+            List<NpcSamples.Answer> RaidAnswers() => new List<NpcSamples.Answer>
             {
-                Text = "Пойдём со мной", Actions = { (DialogueActionKind.TakeAlong, "", 0) },
-                Conditions = { (DialogueConditionKind.ChoiceMade, 1, ChoiceHeard) },
-            };
-            NpcSamples.Answer Why() => new NpcSamples.Answer
-            {
-                Text = "Почему ты шепчешь?", Next = "hiding",
-                Conditions = { (DialogueConditionKind.ChoiceNotMade, 1, ChoiceHeard) },
+                new NpcSamples.Answer { Text = "Чем тебе помочь?", Actions = { (DialogueActionKind.OpenWork, "", 0) } },
+                new NpcSamples.Answer { Text = "По поводу твоей просьбы", Actions = { (DialogueActionKind.OpenTaken, "", 0) } },
+                new NpcSamples.Answer
+                {
+                    Text = "Пойдём со мной", Actions = { (DialogueActionKind.TakeAlong, "", 0) },
+                    QuestConditions = { (rescue, QuestStage.Available) },
+                },
+                new NpcSamples.Answer
+                {
+                    Text = "Пойдём со мной", Actions = { (DialogueActionKind.TakeAlong, "", 0) },
+                    QuestConditions = { (rescue, QuestStage.Active) },
+                },
+                new NpcSamples.Answer
+                {
+                    Text = "Почему ты шепчешь?", Next = "hiding",
+                    Conditions = { (DialogueConditionKind.ChoiceNotMade, 1, ChoiceHeard) },
+                },
+                Leave("Держись тут"),
             };
 
             return new List<NpcSamples.Line>
             {
-                // In the maze: who he is, why he hides (the fork), and going along. No work here: his first quest is
-                // the rescue itself, the others he gives at the base.
+                // In the maze: who he is, why he hides (the fork that picks his quest at the base), and his quests:
+                // first the mug, then his rescue.
                 new NpcSamples.Line
                 {
                     Id = "raid_first", Start = true,
@@ -203,20 +244,20 @@ namespace ProjectMayham.EditorTools
                 new NpcSamples.Line
                 {
                     Id = "go",
-                    Text = "Уходим?.. Да. Да! Выведи меня, пожалуйста. Сам я не дойду — ноги не держат.",
-                    Answers = { Along(), Leave("Подожди здесь") },
+                    Text = "Уходим?.. Не могу. Я так ослаб, что и шагу не сделаю. Помоги мне сначала прийти в себя.",
+                    Answers = RaidAnswers(),
                 },
                 new NpcSamples.Line
                 {
                     Id = "saw",
-                    Text = "Не знаю. Высокое. Стоит и не двигается, пока на него смотришь.\n\nВыведи меня — в убежище расскажу всё, что помню.",
-                    Answers = { Along(), Leave("Подожди здесь") },
+                    Text = "Не знаю. Высокое. Стоит и не двигается, пока на него смотришь.\n\nПомоги мне прийти в себя — а там видно будет.",
+                    Answers = RaidAnswers(),
                 },
                 new NpcSamples.Line
                 {
                     Id = "raid", Start = true, Conditions = { (DialogueConditionKind.InRaid, 1, "") },
                     Text = "Ты вернулся! Я уж думал, тебя кто-нибудь съел.",
-                    Answers = { Along(), Why(), Leave("Держись тут") },
+                    Answers = RaidAnswers(),
                 },
 
                 // At the base.
@@ -228,6 +269,7 @@ namespace ProjectMayham.EditorTools
                     {
                         new NpcSamples.Answer { Text = "Давай поторгуем", Next = "base", Actions = { (DialogueActionKind.OpenTrade, "", 0) } },
                         new NpcSamples.Answer { Text = "Есть работа?", Actions = { (DialogueActionKind.OpenWork, "", 0) } },
+                        new NpcSamples.Answer { Text = "По поводу твоего задания", Actions = { (DialogueActionKind.OpenTaken, "", 0) } },
                         new NpcSamples.Answer { Text = "Как тебе тут?", Next = "base_talk" },
                         Leave("Я пойду"),
                     },
@@ -286,7 +328,16 @@ namespace ProjectMayham.EditorTools
         private static T Ensure<T>(string path, List<string> made, System.Action<SerializedObject> fill) where T : ScriptableObject
         {
             var existing = AssetDatabase.LoadAssetAtPath<T>(path);
-            if (existing != null) return existing;
+            if (existing != null)
+            {
+                if (!rewrite) return existing;
+                var current = new SerializedObject(existing);
+                fill(current);
+                current.ApplyModifiedPropertiesWithoutUndo();
+                EditorUtility.SetDirty(existing);
+                made.Add(System.IO.Path.GetFileNameWithoutExtension(path) + " (rewritten)");
+                return existing;
+            }
             var asset = ScriptableObject.CreateInstance<T>();
             var so = new SerializedObject(asset);
             fill(so);

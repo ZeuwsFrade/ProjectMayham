@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Linq;
 using ProjectMayham.Dialogue;
+using ProjectMayham.Npcs;
 using ProjectMayham.Quests;
 
 namespace ProjectMayham.EditorTools
@@ -15,6 +17,14 @@ namespace ProjectMayham.EditorTools
 
         private static string Labels(DialogueNode node) => string.Join("|", node.Choices.Select(c => c.Text));
 
+        // The node behind the answer with this text, after "next" through every page.
+        private static DialogueNode Through(DialogueNode node, string answer)
+        {
+            node = Pick(node.Choices.First(c => c.Text == answer));
+            while (node != null && node.Choices.Count == 1 && node.Choices[0].Text == "Дальше") node = Pick(node.Choices[0]);
+            return node;
+        }
+
         static partial void DialogueTests(Checks t)
         {
             var papers = Item("Papers");
@@ -29,6 +39,9 @@ namespace ProjectMayham.EditorTools
                 t.Ok(node != null && node.Text == QuestGiverDefinition.DefaultNoWorkText && node.Choices.Count == 1,
                     "unknown npc: no work, one answer");
                 t.Ok(Pick(node.Choices[0]) == back, "unknown npc: the answer leads back");
+                var taken = Pick(QuestDialogue.TakenChoice("Somebody", world.Inventory(), back));
+                t.Ok(taken != null && taken.Text == QuestGiverDefinition.DefaultNoTakenText && Pick(taken.Choices[0]) == back,
+                    "unknown npc: nothing taken, and back");
             }
 
             // A giver whose "ready" line is long: it is said first, and the progress keeps a page of its own with the answers.
@@ -40,7 +53,7 @@ namespace ProjectMayham.EditorTools
                 var backpack = world.Inventory();
                 backpack.Add(papers, 1);
                 QuestLog.Accept(quest);
-                var menu = Pick(QuestDialogue.WorkChoice("TestGiver", backpack, new DialogueNode()));
+                var menu = Pick(QuestDialogue.TakenChoice("TestGiver", backpack, new DialogueNode()));
                 var ready = Pick(menu.Choices[0]);
                 t.Ok(ready.Text == "Первая строка.\nВторая строка.\nТретья строка." && Labels(ready) == "Дальше", "a long ready line comes first, on its own");
                 ready = Pick(ready.Choices[0]);
@@ -64,12 +77,10 @@ namespace ProjectMayham.EditorTools
 
                 var menu = Pick(QuestDialogue.WorkChoice("TestGiver", backpack, back));
                 t.Eq(menu.Text, world.Giver.MenuText, "the list starts with the giver's line");
-                t.Eq(Labels(menu), "Новое дело: Первое|Новое дело: Побочное|Что ещё?", "two topics and 'more'");
-                var page2 = Pick(menu.Choices[2]);
-                t.Eq(Labels(page2), "Новое дело: Третье|Назад", "the last page ends with 'back'");
-                t.Ok(Pick(page2.Choices[1]) == back, "'back' leads to where the talk came from");
+                t.Eq(Labels(menu), "Новое дело: Первое|Новое дело: Побочное|Новое дело: Третье|Назад", "every new quest at once, then 'back'");
+                t.Ok(Pick(menu.Choices[3]) == back, "'back' leads to where the talk came from");
 
-                // The offer: the writer's pages, then the summary with the two answers.
+                // The offer: the writer's pages, then the summary with the answers.
                 var offer = Pick(menu.Choices[0]);
                 t.Ok(offer.Text == "Страница один." && Labels(offer) == "Дальше", "first page of the offer");
                 offer = Pick(offer.Choices[0]);
@@ -77,33 +88,35 @@ namespace ProjectMayham.EditorTools
                 var summary = Pick(offer.Choices[0]);
                 t.Ok(summary.Text.Contains("Нужно: Бумаги ×3") && summary.Text.Contains("Награда: 30 $"),
                     "the summary names the objectives and the reward");
-                t.Eq(Labels(summary), "Берусь|Не сейчас", "answers to an offer");
+                t.Eq(Labels(summary), "Берусь|Берусь. И ещё вопрос|Не сейчас", "answers to an offer");
 
                 // "Not now" changes nothing.
-                var again = Pick(summary.Choices[1]);
+                var again = Pick(summary.Choices[2]);
                 t.Eq(QuestLog.StatusOf(first), QuestStatus.Available, "declined: still on offer");
-                t.Eq(Labels(again), "Новое дело: Первое|Новое дело: Побочное|Что ещё?", "declined: back in the list");
+                t.Eq(Labels(again), "Новое дело: Первое|Новое дело: Побочное|Новое дело: Третье|Назад", "declined: back in the list");
 
-                // Accepting.
+                // Taking it and going.
                 var accepted = Pick(summary.Choices[0]);
                 t.Eq(QuestLog.StatusOf(first), QuestStatus.Active, "accepted");
-                t.Ok(accepted.Text == world.Giver.AcceptedText && Labels(accepted) == "Понятно", "the giver confirms");
-                menu = Pick(accepted.Choices[0]);
-                t.Eq(Labels(menu), "Новое дело: Побочное|Новое дело: Третье|Что ещё?", "new offers come before quests in progress");
-                var last = Pick(menu.Choices[2]);
-                t.Eq(Labels(last), "Напомни: Первое|Назад", "the quest in progress is last");
+                t.Ok(accepted.Text == world.Giver.AcceptedText && Labels(accepted) == "До встречи" && accepted.Choices[0].Closes,
+                    "the giver confirms and the talk is over");
+                menu = Pick(QuestDialogue.WorkChoice("TestGiver", backpack, back));
+                t.Eq(Labels(menu), "Новое дело: Побочное|Новое дело: Третье|Назад", "a quest taken is no longer among the new ones");
 
-                // The reminder: the general line, then the progress.
-                var reminder = Pick(last.Choices[0]);
+                // The taken quests: the reminder, then the progress.
+                var taken = Pick(QuestDialogue.TakenChoice("TestGiver", backpack, back));
+                t.Eq(taken.Text, world.Giver.TakenText, "the list of taken quests starts with the giver's line");
+                t.Eq(Labels(taken), "Напомни: Первое|Назад", "the quest in progress is in the list of taken ones");
+                var reminder = Pick(taken.Choices[0]);
                 t.Ok(reminder.Text == world.Giver.ReminderText && Labels(reminder) == "Дальше", "the general reminder");
                 reminder = Pick(reminder.Choices[0]);
                 t.Ok(reminder.Text.Contains("Бумаги — 0/3") && Labels(reminder) == "Понятно", "then the progress");
 
-                // Ready: the quest moves to the top and can be handed in.
+                // Ready: it can be handed in.
                 backpack.Add(papers, 3);
-                menu = Pick(reminder.Choices[0]);
-                t.Ok(Labels(menu).StartsWith("Сдать: Первое|"), "a ready quest is first");
-                var ready = Pick(menu.Choices[0]);
+                taken = Pick(reminder.Choices[0]);
+                t.Eq(Labels(taken), "Сдать: Первое|Назад", "a ready quest is to be handed in");
+                var ready = Pick(taken.Choices[0]);
                 t.Ok(ready.Text.StartsWith(world.Giver.ReadyText) && ready.Text.Contains("Бумаги — 3/3"), "the ready line with the progress");
                 t.Eq(Labels(ready), "Вот, держи|Позже", "answers when ready");
                 int money = world.Data.money;
@@ -113,9 +126,60 @@ namespace ProjectMayham.EditorTools
                 var received = Pick(thanks.Choices[0]);
                 t.Ok(received.Text.Contains("Получено: 30 $") && Labels(received) == "Понятно" && world.Data.money == money + 30,
                     "what was received");
-                menu = Pick(received.Choices[0]);
-                t.Eq(Labels(menu), "Новое дело: Второе|Новое дело: Побочное|Что ещё?", "the quest that was unlocked is offered");
+                var none = Pick(received.Choices[0]);
+                t.Ok(none.Text == world.Giver.NoTakenText && Labels(none) == "Понятно", "nothing taken any more");
+                menu = Pick(QuestDialogue.WorkChoice("TestGiver", backpack, back));
+                t.Eq(Labels(menu), "Новое дело: Второе|Новое дело: Побочное|Новое дело: Третье|Назад", "the quest that was unlocked is offered");
                 t.Eq(string.Join(",", QuestService.GetAvailable("TestGiver")), "Второе,Побочное,Третье", "the old service lists the offers");
+            }
+
+            // In a dialogue: the answers about quests show only when there is something to say, and "take it, and one
+            // more question" goes on from the start of the talk.
+            using (var world = new World())
+            {
+                var job = world.Quest("Job");
+                world.Objective(job, QuestObjectiveKind.Deliver, papers, 1);
+                world.Reward(job, 5);
+                var dialogue = world.Make<DialogueDefinition>("Talk");
+                NpcSamples.Fill(dialogue, new List<NpcSamples.Line>
+                {
+                    new NpcSamples.Line
+                    {
+                        Id = "start", Start = true, Text = "Привет.",
+                        Answers =
+                        {
+                            new NpcSamples.Answer { Text = "Работа", Actions = { (DialogueActionKind.OpenWork, "", 0) } },
+                            new NpcSamples.Answer { Text = "О задании", Actions = { (DialogueActionKind.OpenTaken, "", 0) } },
+                            new NpcSamples.Answer { Text = "Пока" },
+                        },
+                    },
+                });
+                var npc = Npc(world, "TestGiver", dialogue);
+                NpcCatalog.Override(new[] { npc });
+                try
+                {
+                    var context = new ConversationContext { Npc = npc, Backpack = world.Inventory() };
+                    var start = NpcConversation.Start(context);
+                    t.Eq(Labels(start), "Работа|Пока", "nothing taken: no answer about taken quests");
+                    var summary = Through(Through(start, "Работа"), "Новое дело: Job");
+                    var more = Pick(summary.Choices.First(c => c.Text == "Берусь. И ещё вопрос"));
+                    t.Ok(more != null && more.Text == world.Giver.AcceptedText && Labels(more) == "О задании|Пока",
+                        "taken, the talk goes on from its start: nothing new to offer, the taken quest to ask about");
+                    var list = Through(more, "О задании");
+                    t.Eq(Labels(list), "Напомни: Job|Назад", "the taken quest is in its list");
+
+                    context.Backpack.Add(papers, 1);
+                    var ready = Through(Through(more, "О задании"), "Сдать: Job");
+                    var received = Through(ready, "Вот, держи");
+                    t.Ok(received != null && received.Text.Contains("Получено: 5 $") && Labels(received) == "Понятно", "handed in: what was received");
+                    var home = Pick(received.Choices[0]);
+                    t.Ok(home != null && home.Text == "Привет." && Labels(home) == "Пока",
+                        "then the talk starts over from its very beginning (nothing left to offer or to ask about)");
+                }
+                finally
+                {
+                    NpcCatalog.Reset();
+                }
             }
         }
     }

@@ -116,6 +116,9 @@ namespace ProjectMayham.EditorTools
                 if (!path.Contains("/Resources/Quests/")) Error(quest, "лежит вне Assets/Resources/Quests — игра его не найдёт");
                 if (quest.Giver == null) Error(quest, "не указан выдающий (Giver)");
 
+                if (quest.IsRescue && quest.CanAbandon) Error(quest, "от спасения отказаться нельзя — снимите «Can Abandon»");
+                if (quest.IsRescue && new SerializedObject(quest).FindProperty("repeatable").boolValue)
+                    Error(quest, "спасение не может быть дейликом — снимите «Repeatable»");
                 CheckObjectives(quest, facts, Error, Warning);
                 CheckReward(quest, facts, Error, Warning);
                 CheckRequires(quest, Error);
@@ -124,8 +127,11 @@ namespace ProjectMayham.EditorTools
 
             foreach (var giver in quests.Select(q => q.Giver).Where(g => g != null).Distinct())
             {
-                CheckGiver(giver, facts, message =>
-                    problems.Add(new Problem { IsError = false, Asset = giver, Message = $"{giver.name}: {message}" }));
+                void GiverWarning(string message) =>
+                    problems.Add(new Problem { IsError = false, Asset = giver, Message = $"{giver.name}: {message}" });
+                CheckGiver(giver, facts, GiverWarning);
+                if (giver.DailySlots == 0 && quests.Any(q => q.Giver == giver && q.Repeatable))
+                    GiverWarning("дейликов в день 0 (Daily Slots) — его повторяемые квесты никто не предложит");
             }
             return problems;
         }
@@ -143,7 +149,9 @@ namespace ProjectMayham.EditorTools
             var texts = new[]
             {
                 ("договорились", giver.AcceptedText), ("напоминание", giver.ReminderText),
-                ("всё готово", giver.ReadyText), ("нет места", giver.NoRoomText)
+                ("всё готово", giver.ReadyText), ("нет места", giver.NoRoomText),
+                ("отказ", giver.AbandonAskText), ("после отказа", giver.AbandonedText),
+                ("взятые задания", giver.TakenText), ("взятых заданий нет", giver.NoTakenText)
             };
             foreach (var (label, text) in texts)
             {

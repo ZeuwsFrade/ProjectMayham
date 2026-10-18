@@ -67,7 +67,7 @@ namespace ProjectMayham.EditorTools
     public class DialogueActionDrawer : PropertyDrawer
     {
         // In the order of DialogueActionKind.
-        private static readonly string[] KindNames = { "Запомнить выбор", "Разговор о работе", "Торговля", "Лояльность", "Взять с собой" };
+        private static readonly string[] KindNames = { "Запомнить выбор", "Разговор о работе", "Торговля", "Лояльность (один раз)", "Взять с собой", "Разговор о взятых заданиях" };
 
         private static float Row => EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
@@ -94,7 +94,8 @@ namespace ProjectMayham.EditorTools
                 EditorGUI.PropertyField(row, property.FindPropertyRelative("choice"),
                     new GUIContent("Выбор", "Имя, под которым игра запомнит этот ответ: квесты и условия спрашивают его по имени."));
             else if ((DialogueActionKind)picked == DialogueActionKind.AddLoyalty)
-                EditorGUI.PropertyField(row, property.FindPropertyRelative("amount"), new GUIContent("Очков", "Отрицательное число отнимает."));
+                EditorGUI.PropertyField(row, property.FindPropertyRelative("amount"),
+                    new GUIContent("Очков", "Отрицательное число отнимает. Срабатывает один раз за этот ответ: выбранный снова, он лояльность не меняет."));
             EditorGUI.EndProperty();
         }
     }
