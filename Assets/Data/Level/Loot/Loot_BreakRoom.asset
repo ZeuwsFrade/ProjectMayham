@@ -29,3 +29,31 @@ MonoBehaviour:
     weight: 1
     minCount: 1
     maxCount: 2
+  - item: {fileID: 11400000, guid: 70df99506542deb4794bdbbab2abefca, type: 2}
+    weight: 2
+    minCount: 1
+    maxCount: 2
+  - item: {fileID: 11400000, guid: 0327d8b2eb32f814c8e91590a9edb8b9, type: 2}
+    weight: 1.5
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: bb7af638f8a48e441aecf2740155f61e, type: 2}
+    weight: 1.5
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: d4248042b1a0d6741bd737075bb03ba0, type: 2}
+    weight: 2
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: 3e71592c8af4dc949a060fe0bd928dd9, type: 2}
+    weight: 1.2
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: 6c6b3703272ff4c4f98ee4245a89583b, type: 2}
+    weight: 1.5
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: 2229d932f3633d84e9002268e4321376, type: 2}
+    weight: 0.6
+    minCount: 1
+    maxCount: 1

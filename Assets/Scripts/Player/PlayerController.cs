@@ -47,6 +47,19 @@ namespace ProjectMayham.Player
         /// <summary>Cursor position in world space, refreshed every frame.</summary>
         public Vector2 AimPoint { get; private set; }
         public bool IsSprinting => !MovementLocked && !SprintBlocked && sprintHeld && moveInput.sqrMagnitude > 0.01f && CanSprint;
+        /// <summary>
+        /// The hidden speed of the character, 1 = full: what the carried weight and the call of nature leave of it.
+        /// Running, walking and (when there are real animations) the animations follow it.
+        /// </summary>
+        public float Speed
+        {
+            get
+            {
+                float speed = inventory != null ? Mathf.Lerp(1f, speedAtMaxWeight, inventory.Encumbrance) : 1f;
+                if (stats != null && stats.Needs != null) speed *= stats.Needs.SpeedFactor;
+                return speed;
+            }
+        }
         /// <summary>Walking speed is multiplied by this (a raised weapon slows the player down). 1 = no change.</summary>
         public float SpeedMultiplier { get; set; } = 1f;
         /// <summary>Turning speed is multiplied by this (a swing commits the player to a direction). 1 = no change.</summary>
@@ -120,8 +133,7 @@ namespace ProjectMayham.Player
             if (MovementLocked) return;
 
             float speed = IsSprinting ? sprintSpeed : walkSpeed;
-            if (inventory != null) speed *= Mathf.Lerp(1f, speedAtMaxWeight, inventory.Encumbrance);
-            speed *= SpeedMultiplier;
+            speed *= Speed * SpeedMultiplier;
             Vector2 target = moveInput * speed;
             float rate = moveInput.sqrMagnitude > 0.01f ? acceleration : deceleration;
             body.linearVelocity = Vector2.MoveTowards(body.linearVelocity, target, rate * Time.fixedDeltaTime);

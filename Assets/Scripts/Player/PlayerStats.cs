@@ -7,9 +7,10 @@ namespace ProjectMayham.Player
 {
     /// <summary>
     /// Health and stamina. Sprinting drains stamina (faster the more is carried); after a short pause without
-    /// sprinting it regenerates. Reaching zero leaves the player out of breath: no sprinting until stamina is back
-    /// to a threshold. While health is below the low-health threshold the whole regeneration goes into a slow
-    /// health regeneration instead, until health is back at the threshold.
+    /// sprinting it regenerates, and the health is healed slowly at the cost of stamina. Both depend on the needs
+    /// (<see cref="PlayerNeeds"/>): hunger lowers the stamina the player can use, a wound slows the stamina down
+    /// (the less health, the slower), thirst makes both worse. Reaching zero stamina leaves the player out of
+    /// breath: no sprinting until it is back to a threshold.
     /// </summary>
     [RequireComponent(typeof(PlayerController))]
     public class PlayerStats : MonoBehaviour, IDamageable
@@ -19,23 +20,27 @@ namespace ProjectMayham.Player
 
         [Header("Health")]
         [SerializeField, Min(1f)] private float maxHealth = 100f;
-        [Tooltip("Below this share of max health stamina regeneration is spent on healing instead.")]
-        [SerializeField, Range(0f, 1f)] private float lowHealthThreshold = 0.25f;
-        [Tooltip("Health restored per point of stamina regeneration while health is low.")]
-        [SerializeField, Min(0f)] private float healthPerStamina = 0.1f;
+        [Tooltip("Health healed per second while the player rests and has stamina to pay for it.")]
+        [SerializeField, Min(0f)] private float healthRegen = 0.8f;
+        [Tooltip("Stamina paid for a point of health (more when thirsty).")]
+        [SerializeField, Min(0f)] private float staminaPerHealth = 2f;
 
         [Header("Stamina")]
         [SerializeField, Min(1f)] private float maxStamina = 100f;
         [Tooltip("Stamina spent per second of sprinting with nothing carried.")]
         [SerializeField, Min(0f)] private float sprintDrain = 20f;
-        [Tooltip("Stamina restored per second once the regeneration delay is over.")]
+        [Tooltip("Stamina restored per second once the regeneration delay is over (at full health, not thirsty).")]
         [SerializeField, Min(0f)] private float regenRate = 15f;
         [Tooltip("Seconds without sprinting (or taking damage) before regeneration starts.")]
         [SerializeField, Min(0f)] private float regenDelay = 1f;
         [Tooltip("Regeneration delay after stamina has run out completely.")]
         [SerializeField, Min(0f)] private float exhaustedRegenDelay = 2f;
-        [Tooltip("Share of max stamina needed to sprint again after running out.")]
+        [Tooltip("Share of the usable stamina needed to sprint again after running out.")]
         [SerializeField, Range(0f, 1f)] private float exhaustedRecoverThreshold = 0.3f;
+        [Tooltip("Share of the stamina that full hunger takes away.")]
+        [SerializeField, Range(0f, 0.9f)] private float hungerStaminaLoss = 0.5f;
+        [Tooltip("The stamina regeneration never drops below this share of its speed, however wounded and thirsty.")]
+        [SerializeField, Range(0f, 1f)] private float minRegenShare = 0.1f;
 
         [Header("Carried weight")]
         [Tooltip("Sprint drain multiplier when carrying exactly the comfortable weight (empty hands = 1).")]
@@ -43,9 +48,11 @@ namespace ProjectMayham.Player
 
         private PlayerController controller;
         private Inventory inventory;
+        private PlayerNeeds needs;
 
         private float health;
         private float stamina;
+        private float cap;
         private float regenTimer;
         private bool exhausted;
         private bool recoveringHealth;
@@ -55,9 +62,11 @@ namespace ProjectMayham.Player
         public event Action<float, float> HealthChanged;
         /// <summary>(current, max) after every change of stamina.</summary>
         public event Action<float, float> StaminaChanged;
+        /// <summary>(usable, max) when hunger changes how much of the stamina can be used.</summary>
+        public event Action<float, float> StaminaCapChanged;
         /// <summary>True when the player runs out of breath, false when they can sprint again.</summary>
         public event Action<bool> ExhaustedChanged;
-        /// <summary>True while stamina regeneration is spent on healing.</summary>
+        /// <summary>True while the health is healing.</summary>
         public event Action<bool> HealthRecoveryChanged;
         /// <summary>Amount of health actually lost.</summary>
         public event Action<float> Damaged;
@@ -69,18 +78,24 @@ namespace ProjectMayham.Player
         public float Stamina => stamina;
         public float MaxStamina => maxStamina;
         public float StaminaFraction => stamina / maxStamina;
+        /// <summary>The stamina the player can use now: hunger takes part of the scale away.</summary>
+        public float StaminaCap => cap;
+        public float StaminaCapFraction => cap / maxStamina;
         public bool IsExhausted => exhausted;
         public bool IsRecoveringHealth => recoveringHealth;
         public bool IsDead => dead;
         public bool CanSprint => !dead && !exhausted && stamina > 0f;
-
-        private float LowHealth => maxHealth * lowHealthThreshold;
+        /// <summary>Hunger, thirst and the call of nature.</summary>
+        public PlayerNeeds Needs => needs;
 
         private void Awake()
         {
             controller = GetComponent<PlayerController>();
             inventory = GetComponent<Inventory>();
+            needs = GetComponent<PlayerNeeds>();
+            if (needs == null) needs = gameObject.AddComponent<PlayerNeeds>();
             health = maxHealth;
+            cap = maxStamina;
             stamina = maxStamina;
         }
 
@@ -89,15 +104,19 @@ namespace ProjectMayham.Player
             // Lets listeners that subscribed in OnEnable show the starting values.
             HealthChanged?.Invoke(health, maxHealth);
             StaminaChanged?.Invoke(stamina, maxStamina);
+            StaminaCapChanged?.Invoke(cap, maxStamina);
         }
 
         private void Update()
         {
             if (dead) return;
 
+            ApplyCap();
+
             float dt = Time.deltaTime;
             if (controller.IsSprinting)
             {
+                SetRecoveringHealth(false);
                 Drain(sprintDrain * DrainMultiplier() * dt);
                 return;
             }
@@ -105,9 +124,11 @@ namespace ProjectMayham.Player
             if (regenTimer > 0f)
             {
                 regenTimer -= dt;
+                SetRecoveringHealth(false);
                 return;
             }
-            Regenerate(regenRate * dt);
+            RegenerateStamina(regenRate * dt);
+            RegenerateHealth(dt);
         }
 
         Team IDamageable.Team => Team.Player;
@@ -148,6 +169,14 @@ namespace ProjectMayham.Player
             SetHealth(health + amount);
         }
 
+        /// <summary>Gives stamina at once (coffee). It cannot go over the stamina the player can use, and ends being out of breath if it is enough.</summary>
+        public void AddStamina(float amount)
+        {
+            if (dead || amount <= 0f) return;
+            SetStamina(stamina + amount);
+            if (exhausted && stamina >= cap * exhaustedRecoverThreshold) SetExhausted(false);
+        }
+
         /// <summary>Sets health without damage effects (loading a save, sleeping). A dead player stays dead.</summary>
         public void RestoreHealth(float value)
         {
@@ -156,10 +185,12 @@ namespace ProjectMayham.Player
             SetRecoveringHealth(false);
         }
 
-        /// <summary>Health and stamina back to the maximum.</summary>
+        /// <summary>Health, stamina and the needs back to the best.</summary>
         public void RestoreAll()
         {
             if (dead) return;
+            needs.RestoreAll();
+            ApplyCap();
             SetHealth(maxHealth);
             SetStamina(maxStamina);
             SetExhausted(false);
@@ -197,33 +228,66 @@ namespace ProjectMayham.Player
             }
         }
 
-        private void Regenerate(float amount)
+        /// <summary>Hunger moves the top of the scale; what was above it is lost.</summary>
+        private void ApplyCap()
         {
-            // The whole regeneration goes into health until it is back at the threshold.
-            bool lowHealth = health < LowHealth - Epsilon;
-            SetRecoveringHealth(lowHealth);
-            if (lowHealth)
+            float newCap = NeedsMath.StaminaCap(maxStamina, needs.Hunger, hungerStaminaLoss);
+            if (Mathf.Abs(newCap - cap) >= Epsilon)
             {
-                SetHealth(Mathf.Min(health + amount * healthPerStamina, LowHealth));
+                cap = newCap;
+                StaminaCapChanged?.Invoke(cap, maxStamina);
+            }
+            if (stamina > cap) SetStamina(cap);
+        }
+
+        private void RegenerateStamina(float amount)
+        {
+            amount *= NeedsMath.StaminaRegenFactor(HealthFraction, needs.Thirst, minRegenShare);
+            SetStamina(Mathf.Min(stamina + amount, cap));
+            if (exhausted && stamina >= cap * exhaustedRecoverThreshold) SetExhausted(false);
+        }
+
+        /// <summary>Health heals slowly and the stamina pays for it: when the stamina is out, the healing stops.</summary>
+        private void RegenerateHealth(float dt)
+        {
+            if (health >= maxHealth - Epsilon || exhausted || stamina <= 0f)
+            {
+                SetRecoveringHealth(false);
                 return;
             }
 
-            SetStamina(stamina + amount);
-            if (exhausted && stamina >= maxStamina * exhaustedRecoverThreshold) SetExhausted(false);
+            float gain = healthRegen * needs.HealthRegenMultiplier * NeedsMath.HealthRegenThirstFactor(needs.Thirst) * dt;
+            gain = Mathf.Min(gain, maxHealth - health);
+            float price = NeedsMath.StaminaPerHealth(staminaPerHealth, needs.Thirst);
+            float cost = gain * price;
+            if (cost > stamina)
+            {
+                gain *= stamina / cost;
+                cost = stamina;
+            }
+            if (gain <= 0f)
+            {
+                SetRecoveringHealth(false);
+                return;
+            }
+
+            SetHealth(health + gain);
+            SetStamina(stamina - cost);
+            SetRecoveringHealth(true);
         }
 
         private void SetHealth(float value)
         {
             value = Mathf.Clamp(value, 0f, maxHealth);
-            if (Mathf.Abs(value - health) < Epsilon) return;
+            if (Mathf.Approximately(value, health)) return;
             health = value;
             HealthChanged?.Invoke(health, maxHealth);
         }
 
         private void SetStamina(float value)
         {
-            value = Mathf.Clamp(value, 0f, maxStamina);
-            if (Mathf.Abs(value - stamina) < Epsilon) return;
+            value = Mathf.Clamp(value, 0f, cap);
+            if (Mathf.Approximately(value, stamina)) return;
             stamina = value;
             StaminaChanged?.Invoke(stamina, maxStamina);
         }

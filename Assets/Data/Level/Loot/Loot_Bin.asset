@@ -29,3 +29,7 @@ MonoBehaviour:
     weight: 1
     minCount: 1
     maxCount: 1
+  - item: {fileID: 11400000, guid: 70df99506542deb4794bdbbab2abefca, type: 2}
+    weight: 0.3
+    minCount: 1
+    maxCount: 1

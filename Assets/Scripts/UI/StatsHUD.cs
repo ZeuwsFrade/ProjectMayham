@@ -28,11 +28,15 @@ namespace ProjectMayham.UI
         [Tooltip("How fast the bars catch up with the real value, in bar widths per second.")]
         [SerializeField, Min(0.01f)] private float fillSpeed = 2f;
 
+        private Image locked;
+
         private void OnEnable()
         {
             if (stats == null) return;
             stats.HealthChanged += OnHealthChanged;
             stats.StaminaChanged += OnStaminaChanged;
+            stats.StaminaCapChanged += OnStaminaCapChanged;
+            ShowCap(stats.StaminaCapFraction);
             stats.ExhaustedChanged += OnExhaustedChanged;
             stats.HealthRecoveryChanged += OnHealthRecoveryChanged;
 
@@ -49,8 +53,27 @@ namespace ProjectMayham.UI
             if (stats == null) return;
             stats.HealthChanged -= OnHealthChanged;
             stats.StaminaChanged -= OnStaminaChanged;
+            stats.StaminaCapChanged -= OnStaminaCapChanged;
             stats.ExhaustedChanged -= OnExhaustedChanged;
             stats.HealthRecoveryChanged -= OnHealthRecoveryChanged;
+        }
+
+        private void OnStaminaCapChanged(float usable, float max) => ShowCap(usable / max);
+
+        /// <summary>Hunger takes the right part of the stamina bar away: it is covered with a dark strip.</summary>
+        private void ShowCap(float fraction)
+        {
+            if (stamina.fill == null || stamina.fill.parent == null) return;
+            if (locked == null)
+            {
+                locked = UIKit.Panel(stamina.fill.parent, "HungerLock", new Color(0.32f, 0.16f, 0.04f, 0.9f));
+                locked.raycastTarget = false;
+            }
+            var rect = locked.rectTransform;
+            rect.anchorMin = new Vector2(Mathf.Clamp01(fraction), 0f);
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = rect.offsetMax = Vector2.zero;
+            locked.enabled = fraction < 0.999f;
         }
 
         private void Update()

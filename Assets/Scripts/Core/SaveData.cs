@@ -42,13 +42,19 @@ namespace ProjectMayham.Core
         // 2: the player wears things, and the backpack sets the size of the inventory.
         // 3: Tyler sells the weapons of the fight.
         // 4: the NPCs brought home are in the shelter or away, and the save says which.
-        public const int CurrentVersion = 4;
+        // 5: hunger, thirst and the call of nature (an older save has none: the player is fed).
+        public const int CurrentVersion = 5;
         /// <summary>The backpack of a new game.</summary>
         public const string StartBackpack = "Briefcase";
         /// <summary>The backpack as big as the inventory was before version 2 (8x5), given to older saves.</summary>
         public const string OldInventoryBackpack = "Backpack";
         /// <summary>The weapons Tyler sells since version 3, one of each.</summary>
         public static readonly string[] TylerWeapons = { "Pipe", "Sledgehammer" };
+        /// <summary>The food, drink and medicine Tyler sells since version 5, with the stock of each.</summary>
+        public static readonly (string item, int count)[] TylerConsumables =
+        {
+            ("Bar", 6), ("Noodles", 3), ("Sandwich", 4), ("Water", 8), ("CheeseFoam", 3), ("Coffee", 4), ("DripCoffee", 2), ("Bandage", 4),
+        };
         public const string DefaultPlayerName = "Тайлер";
 
         public int version = CurrentVersion;
@@ -56,6 +62,8 @@ namespace ProjectMayham.Core
         public int money = 25;
         /// <summary>Health the player returns with; negative means "full" (a new game, or after death).</summary>
         public float health = -1f;
+        /// <summary>Hunger, thirst and the call of nature the player returns with. See <see cref="Player.PlayerNeeds"/>.</summary>
+        public NeedsData needs = new NeedsData();
         public InventoryData player = new InventoryData { back = StartBackpack };
         public InventoryData stash = new InventoryData();
         /// <summary>Trader id to what is left of his stock. A trader that is not listed starts with the stock of his definition.</summary>
@@ -110,6 +118,11 @@ namespace ProjectMayham.Core
                     if (!shelterNpcs.Any(n => n.npc == id)) shelterNpcs.Add(new ShelterNpcData { npc = id, present = true });
                 }
             }
+            if (version < 5)
+            {
+                if (needs == null) needs = new NeedsData();
+                foreach (var (item, count) in TylerConsumables) AddToStock(tyler, item, count);
+            }
             version = CurrentVersion;
         }
 
@@ -119,6 +132,15 @@ namespace ProjectMayham.Core
             if (trader == null || trader.stock.Any(s => s.item == item)) return;
             trader.stock.Add(new StockData { item = item, count = count });
         }
+    }
+
+    /// <summary>The needs of the player, each 0..1 (0 = fine).</summary>
+    [Serializable]
+    public class NeedsData
+    {
+        public float hunger;
+        public float thirst;
+        public float nature;
     }
 
     /// <summary>Whether one NPC brought home is in the shelter (true) or away (false).</summary>

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 936374377421848712}
   - component: {fileID: 5618157298058508657}
   - component: {fileID: 5785634081309120483}
+  - component: {fileID: 4915192925793853352}
   m_Layer: 9
   m_Name: Toilet-Open
   m_TagString: Untagged
@@ -151,3 +152,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f14bffb571259fe40958201e3038305c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.World.WrapEntity
+--- !u!114 &4915192925793853352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8657451388478664441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5ae4c3f805d6e84a82164ed25c8f67e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.Toilet
+  seconds: 4
+  minNeed: 0.05

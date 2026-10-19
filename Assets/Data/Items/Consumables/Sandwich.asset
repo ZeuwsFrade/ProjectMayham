@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad579eb7da4c8c94cbbd956fd3540e7e, type: 3}
+  m_Name: Sandwich
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Items.ConsumableDefinition
+  displayName: "\u0411\u0443\u0442\u0435\u0440\u0431\u0440\u043E\u0434"
+  icon: {fileID: 21300000, guid: ea49281dbc30a974eaba078d8610d4fa, type: 3}
+  maxStack: 3
+  gridSize: {x: 2, y: 1}
+  canRotate: 1
+  weight: 0.25
+  value: 9
+  holdable: 1
+  heldSprite: {fileID: 0}
+  heldOffset: {x: 0.4, y: 0.45}
+  heldAngle: 0
+  heldMatchesWorld: 1
+  heldScale: 1
+  equipSlot: 0
+  backpackGrid: {x: 8, y: 5}
+  isPerson: 0
+  worldPrefab: {fileID: 8217352054659401380, guid: e7fec61795f1e624f8e1cc24482dcd7d, type: 3}
+  verb: "\u0421\u044A\u0435\u0441\u0442\u044C"
+  useSeconds: 1.8
+  satiety: 0.25
+  hydration: 0
+  natureCall: 0.06
+  heal: 0
+  stamina: 0
+  regenMultiplier: 2
+  regenSeconds: 40

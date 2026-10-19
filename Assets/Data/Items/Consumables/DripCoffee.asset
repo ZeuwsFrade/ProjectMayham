@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad579eb7da4c8c94cbbd956fd3540e7e, type: 3}
+  m_Name: DripCoffee
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Items.ConsumableDefinition
+  displayName: "\u0414\u0440\u0438\u043F-\u043A\u043E\u0444\u0435"
+  icon: {fileID: 21300000, guid: cfaab78d98859b744a3b16c185f78548, type: 3}
+  maxStack: 3
+  gridSize: {x: 1, y: 1}
+  canRotate: 1
+  weight: 0.2
+  value: 14
+  holdable: 1
+  heldSprite: {fileID: 0}
+  heldOffset: {x: 0.4, y: 0.45}
+  heldAngle: 0
+  heldMatchesWorld: 1
+  heldScale: 1
+  equipSlot: 0
+  backpackGrid: {x: 8, y: 5}
+  isPerson: 0
+  worldPrefab: {fileID: 8217352054659401380, guid: 233f9c76d7cae4d4d92c34f268231c0c, type: 3}
+  verb: "\u0412\u044B\u043F\u0438\u0442\u044C"
+  useSeconds: 2
+  satiety: 0
+  hydration: 0.1
+  natureCall: 0.35
+  heal: 0
+  stamina: 60
+  regenMultiplier: 1
+  regenSeconds: 0

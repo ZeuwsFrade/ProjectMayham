@@ -3,6 +3,7 @@ using System.Linq;
 using ProjectMayham.Core;
 using ProjectMayham.Interaction;
 using ProjectMayham.Items;
+using ProjectMayham.Player;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -194,6 +195,7 @@ namespace ProjectMayham.UI
                 bool ctrl = keyboard != null && keyboard.ctrlKey.isPressed;
                 if (mouse.leftButton.wasPressedThisFrame) OnPress(screen, shift, ctrl);
                 else if (mouse.rightButton.wasPressedThisFrame) OnRightPress(screen);
+                else if (keyboard != null && keyboard.fKey.wasPressedThisFrame) UseUnderCursor(screen);
                 return;
             }
 
@@ -265,6 +267,7 @@ namespace ProjectMayham.UI
         private static string HintFor(GridInventory.Stack stack)
         {
             string hint = string.Empty;
+            if (stack.Item is ConsumableDefinition consumable) hint += $". F — {consumable.Verb.ToLowerInvariant()} (3 с)";
             if (stack.Item.Holdable) hint += ". ПКМ — взять в руки";
             if (stack.Item.Wearable) hint += $"{GridNote(stack.Item)}. ПКМ — надеть";
             if (stack.Count > 1) hint += ". Ctrl+клик — разделить";
@@ -409,6 +412,17 @@ namespace ProjectMayham.UI
             }
             if (!stack.Item.Holdable) infoLabel.text = $"{stack.Item.DisplayName} нельзя взять в руки";
             else if (!inventory.Hold(stack)) infoLabel.text = "Нет места, чтобы убрать то, что в руках";
+        }
+
+        // F over food, drink or medicine uses it from the backpack (the progress shows at the bottom of the screen).
+        private void UseUnderCursor(Vector2 screen)
+        {
+            var stack = StackUnder(screen);
+            if (stack == null || stack.Sealed || !(stack.Item is ConsumableDefinition consumable)) return;
+            if (!inventory.TryGetComponent<PlayerConsumer>(out var consumer)) return;
+
+            if (consumer.TryUseFromInventory(consumable)) infoLabel.text = $"{consumable.Verb}: {consumable.DisplayName}… ({consumer.InventoryUseSeconds:0.#} с)";
+            else if (consumer.Message.Length > 0) infoLabel.text = consumer.Message;
         }
 
         private void Rotate()

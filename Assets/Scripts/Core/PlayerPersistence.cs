@@ -37,6 +37,7 @@ namespace ProjectMayham.Core
             equipment.Import(data.player);
             inventory.Import(data.player);
             if (data.health > 0f) stats.RestoreHealth(data.health);
+            if (data.needs != null) stats.Needs.SetValues(data.needs.hunger, data.needs.thirst, data.needs.nature);
         }
 
         private void Export()
@@ -46,6 +47,11 @@ namespace ProjectMayham.Core
             equipment.Export(data.player);
             // After dying the player comes round in the shelter, healed.
             data.health = stats.IsDead ? -1f : stats.Health;
+            // Likewise the needs: a new life starts fed.
+            var needs = stats.Needs;
+            data.needs = stats.IsDead
+                ? new NeedsData()
+                : new NeedsData { hunger = needs.Hunger, thirst = needs.Thirst, nature = needs.NatureCall };
         }
 
         /// <summary>The player died in a raid: they lose everything they carried.</summary>
