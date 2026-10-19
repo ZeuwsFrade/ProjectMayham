@@ -60,8 +60,9 @@ namespace ProjectMayham.Items
         /// <summary>
         /// Puts on a thing that lies in some grid: the player's own, a container's, the stash. What was worn in its
         /// place takes the place of the new thing in that grid when it can, else goes into the player's grid, else
-        /// falls on the floor, like whatever the grid no longer holds. False when the thing is not worn at all, or
-        /// when coming from elsewhere it would make the player heavier than they can carry.
+        /// falls on the floor. What a smaller backpack no longer holds goes into that other grid first, then on the
+        /// floor. False when the thing is not worn at all, or when coming from elsewhere it would make the player
+        /// heavier than they can carry.
         /// </summary>
         public bool WearFrom(GridInventory source, GridInventory.Stack stack)
         {
@@ -86,8 +87,46 @@ namespace ProjectMayham.Items
                 if (!placed) placed = Inventory.Add(old, 1) == 0;
                 if (!placed) spilled.Insert(0, (old, 1));
             }
+            if (!own) StoreSpilled(source, spilled);
             Drop(spilled);
             return true;
+        }
+
+        /// <summary>
+        /// Takes off what is worn in a slot and puts it into another grid (the stash, a container): at
+        /// <paramref name="origin"/> when that is free, else wherever it fits. Nothing changes when it fits nowhere
+        /// there. Taking the backpack off leaves the pockets; what they do not hold goes into that grid too, then on
+        /// the floor.
+        /// </summary>
+        public bool TakeOffTo(GridInventory target, EquipSlot slot, Vector2Int? origin = null, bool rotated = false)
+        {
+            var item = this[slot];
+            if (item == null || target == null) return false;
+            if (target == Inventory) return TakeOffToGrid(slot, origin, rotated);
+
+            bool atOrigin = origin.HasValue && target.EvaluateItem(item, origin.Value, rotated) != GridInventory.MoveKind.Invalid;
+            if (!atOrigin && !target.CanFit(item, 1)) return false;
+
+            var spilled = new List<(ItemDefinition item, int count)>();
+            Remove(slot, spilled);
+            bool placed = atOrigin && target.PlaceItem(item, 1, origin.Value, rotated) == 1;
+            if (!placed) placed = target.Add(item, 1) == 0;
+            if (!placed) spilled.Insert(0, (item, 1));
+            StoreSpilled(target, spilled);
+            Drop(spilled);
+            return true;
+        }
+
+        // What falls out of a backpack goes into the grid at hand (the stash, a container) when it fits there.
+        private static void StoreSpilled(GridInventory storage, List<(ItemDefinition item, int count)> spilled)
+        {
+            for (int i = spilled.Count - 1; i >= 0; i--)
+            {
+                var (item, count) = spilled[i];
+                int left = storage.Add(item, count);
+                if (left <= 0) spilled.RemoveAt(i);
+                else spilled[i] = (item, left);
+            }
         }
 
         /// <summary>Puts on a thing picked up from the floor when nothing is worn in its place. False otherwise.</summary>

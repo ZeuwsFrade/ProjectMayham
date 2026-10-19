@@ -40,6 +40,8 @@ namespace ProjectMayham.Quests
         [SerializeField] private List<ItemAmount> rewardItems = new List<ItemAmount>();
         [Tooltip("Loyalty points of the giver for handing it in. Hidden from the player: not shown in the reward.")]
         [SerializeField, Min(0)] private int rewardLoyalty;
+        [Tooltip("A skill the player learns by handing it in (an id, for example \"vending_shake\": shaking vending machines). Empty: none.")]
+        [SerializeField] private string rewardSkill;
 
         [Header("Daily and refusal")]
         [Tooltip("A daily: offered again after it is turned in or refused. Every day (a day is a raid) the giver offers a few of his dailies, picked at random.")]
@@ -67,6 +69,7 @@ namespace ProjectMayham.Quests
         public string CompletedText => completedText;
         public int RewardMoney => Mathf.Max(0, rewardMoney);
         public IReadOnlyList<ItemAmount> RewardItems => rewardItems;
+        public string RewardSkill => rewardSkill != null ? rewardSkill.Trim() : string.Empty;
         /// <summary>A daily: offered again some raids after it was turned in or refused.</summary>
         public bool Repeatable => repeatable && !IsRescue;
         public int RepeatAfterRaids => Mathf.Max(1, repeatAfterRaids);

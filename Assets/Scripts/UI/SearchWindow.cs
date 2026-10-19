@@ -22,8 +22,8 @@ namespace ProjectMayham.UI
         private const float MaxDistance = 2.5f;
 
         private const string LookingHint = "Осматриваю… E или шаг в сторону — закрыть.";
-        private const string SearchingHint = "Идёт обыск: вещи находятся по одной. Правый клик — забрать. E или шаг в сторону — закрыть.";
-        private const string SearchedHint = "Обыскано. Правый клик — забрать или положить. E или шаг в сторону — закрыть.";
+        private const string SearchingHint = "Идёт обыск: вещи находятся по одной. ПКМ — забрать, Ctrl+клик — разделить. E или шаг в сторону — закрыть.";
+        private const string SearchedHint = "Обыскано. ПКМ — забрать или положить, Ctrl+клик — разделить, руки и одежда — в колонке. E или шаг в сторону — закрыть.";
         // As wide as the largest container, so the window is the same for every one of them.
         private const float StorageWidth = 224f;
 

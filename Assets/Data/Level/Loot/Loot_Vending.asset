@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 272f4a2fa420ad7408765b0043e68184, type: 3}
+  m_Name: Loot_Vending
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.LootTable
+  entries:
+  - item: {fileID: 11400000, guid: 70df99506542deb4794bdbbab2abefca, type: 2}
+    weight: 3
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: d4248042b1a0d6741bd737075bb03ba0, type: 2}
+    weight: 3
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: 6c6b3703272ff4c4f98ee4245a89583b, type: 2}
+    weight: 2
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: 3e71592c8af4dc949a060fe0bd928dd9, type: 2}
+    weight: 1
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: 0327d8b2eb32f814c8e91590a9edb8b9, type: 2}
+    weight: 1
+    minCount: 1
+    maxCount: 1
+  - item: {fileID: 11400000, guid: bb7af638f8a48e441aecf2740155f61e, type: 2}
+    weight: 1
+    minCount: 1
+    maxCount: 1

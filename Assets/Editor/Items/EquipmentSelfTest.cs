@@ -32,6 +32,7 @@ namespace ProjectMayham.EditorTools
             {
                 Group(t, "resize", () => ResizeTests(t));
                 Group(t, "wear", () => WearTests(t));
+                Group(t, "stash", () => StashTests(t));
                 Group(t, "save", () => SaveTests(t));
                 Group(t, "assets", () => AssetTests(t));
             }
@@ -250,6 +251,69 @@ namespace ProjectMayham.EditorTools
             box.Clear();
             box.PlaceItem(papers, 3, Vector2Int.zero, false);
             t.Ok(!worn4.WearFrom(box, box.Stacks[0]), "papers are not worn");
+        }
+
+        // ---- the stash window: taking off into it, swapping out of it ----
+
+        private static void StashTests(QuestSelfTest.Checks t)
+        {
+            var papers = Item("Papers");
+            var books = Item("Books");
+            var small = Wearable("TestSmallPack", EquipSlot.Back, new Vector2Int(2, 2), new Vector2Int(6, 3), 1f);
+            var big = Wearable("TestBigPack", EquipSlot.Back, new Vector2Int(2, 3), new Vector2Int(8, 5), 2f);
+            var hat = Wearable("TestHat", EquipSlot.Head, new Vector2Int(1, 1), Vector2Int.one, 0.5f);
+            var none = new List<(ItemDefinition item, int count)>();
+
+            var stash = MakeObject("self-test stash").AddComponent<GridInventory>();
+            stash.Configure(new Vector2Int(10, 10), 100000f);
+
+            // A hat goes into the stash where it is dropped.
+            var (grid, worn) = Player();
+            worn.Put(hat, none);
+            t.Ok(worn.TakeOffTo(stash, EquipSlot.Head, new Vector2Int(3, 4)), "a hat comes off into the stash");
+            t.Ok(worn[EquipSlot.Head] == null, "the head is free then");
+            t.Ok(stash.Stacks.Any(s => s.Item == hat && s.Origin == new Vector2Int(3, 4)), "and the hat lies where it was dropped");
+            t.Ok(!worn.TakeOffTo(stash, EquipSlot.Head), "nothing comes off a free head");
+
+            // A place that is taken: it goes wherever it fits.
+            worn.Put(hat, none);
+            t.Ok(worn.TakeOffTo(stash, EquipSlot.Head, new Vector2Int(3, 4)), "a hat dropped on a taken place still comes off");
+            t.Eq(stash.CountOf(hat), 2, "and finds a place of its own");
+
+            // The backpack with things in it: they stay with the player as far as the pockets hold, the rest goes
+            // into the stash, nothing onto the floor.
+            stash.Clear();
+            worn.Put(big, none);
+            grid.Add(books, 6);
+            grid.Add(papers, 4);
+            int booksBefore = grid.CountOf(books), papersBefore = grid.CountOf(papers);
+            t.Ok(worn.TakeOffTo(stash, EquipSlot.Back, Vector2Int.zero), "a backpack full of things comes off into the stash");
+            t.Ok(worn[EquipSlot.Back] == null && grid.GridSize == worn.Pockets, "the player has the pockets left");
+            t.Ok(stash.Stacks.Any(s => s.Item == big && s.Origin == Vector2Int.zero), "the backpack lies where it was dropped");
+            t.Eq(grid.CountOf(books) + stash.CountOf(books), booksBefore, "no book is lost: the pockets and the stash hold them all");
+            t.Eq(grid.CountOf(papers) + stash.CountOf(papers), papersBefore, "no paper either");
+
+            // No room in a box: nothing changes.
+            var box = MakeObject("self-test box").AddComponent<GridInventory>();
+            box.Configure(new Vector2Int(1, 1), 100000f);
+            box.Add(papers, 1);
+            worn.Put(hat, none);
+            t.Ok(!worn.TakeOffTo(box, EquipSlot.Head), "a hat does not come off into a full box");
+            t.Ok(worn[EquipSlot.Head] == hat, "it stays on");
+
+            // A smaller backpack out of the stash: what it does not hold goes into the stash, not on the floor.
+            var (grid2, worn2) = Player();
+            worn2.Put(big, none);
+            stash.Clear();
+            stash.PlaceItem(small, 1, Vector2Int.zero, false);
+            var mug = Item("Mug");
+            grid2.Add(mug, 30);
+            int carried = grid2.CountOf(mug);
+            t.Ok(carried > 18, $"the big backpack holds more mugs than the small one has cells ({carried})");
+            t.Ok(worn2.WearFrom(stash, stash.Stacks[0]), "a smaller backpack is put on out of the stash");
+            t.Ok(worn2[EquipSlot.Back] == small && stash.CountOf(big) == 1, "the big one goes into the stash in its place");
+            t.Ok(stash.CountOf(mug) > 0, "what the small one does not hold goes into the stash");
+            t.Eq(grid2.CountOf(mug) + stash.CountOf(mug), carried, "and nothing is lost");
         }
 
         // ---- the save file ----

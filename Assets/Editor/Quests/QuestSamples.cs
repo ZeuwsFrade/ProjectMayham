@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using ProjectMayham.Items;
 using ProjectMayham.Level;
+using ProjectMayham.Player;
 using ProjectMayham.Quests;
 using UnityEditor;
 using UnityEngine;
@@ -77,6 +78,22 @@ namespace ProjectMayham.EditorTools
                     "Целые. Отлично. Вот твои деньги.",
                     20);
                 AddObjective(so, QuestObjectiveKind.Deliver, mug, 2, RoomKind.Office);
+            });
+
+            // A skill for a quest: Tyler shows how to shake a vending machine.
+            var coin = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/Data/Items/Coin.asset");
+            Ensure<QuestDefinition>($"{Root}/Tyler/Tyler_Vending.asset", ref created, so =>
+            {
+                Fill(so, tyler, 12, "Автоматы-жулики",
+                    "Автоматы в комнатах отдыха жрут монеты и половину не отдают. Но есть способ с ними договориться.\n\n" +
+                    "Принеси мне пять монет — покажу.",
+                    "Пять монет, [ИГРОК]. Тогда и поговорим.",
+                    "Смотри: бьёшь сбоку, вот сюда, и трясёшь. Только недолго и не на весь этаж — сбегутся.",
+                    0);
+                Require(so, first);
+                AddObjective(so, QuestObjectiveKind.Deliver, coin, 5, RoomKind.Office);
+                so.FindProperty("rewardSkill").stringValue = PlayerSkills.VendingShake;
+                so.FindProperty("rewardLoyalty").intValue = 3;
             });
 
             // Dailies: Tyler offers two of them a day, at random; each may be refused for the loyalty it gives.

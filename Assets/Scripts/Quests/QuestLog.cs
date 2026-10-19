@@ -216,7 +216,7 @@ namespace ProjectMayham.Quests
         public static int Carried(GridInventory backpack, ItemDefinition item)
         {
             if (backpack == null || item == null) return 0;
-            return backpack.CountOf(item) + (backpack.HeldItem == item ? 1 : 0);
+            return backpack.CountOf(item) + backpack.HeldCount(item);
         }
 
         /// <summary>
@@ -268,7 +268,7 @@ namespace ProjectMayham.Quests
                 if (!objective.NeedsItem) continue;
 
                 int left = objective.Count - backpack.RemoveItems(objective.Item, objective.Count);
-                if (left > 0 && backpack.HeldItem == objective.Item && backpack.TakeHeld(out _)) left--;
+                while (left > 0 && backpack.TakeFromHands(objective.Item)) left--;
                 if (left <= 0) continue;
 
                 // Two objectives of one quest asked for the same item (the validator forbids it).
@@ -288,6 +288,7 @@ namespace ProjectMayham.Quests
 
             GameSession.AddMoney(quest.RewardMoney);
             if (quest.Giver != null) Loyalty.Add(quest.Giver.Id, quest.RewardLoyalty);
+            Player.PlayerSkills.Learn(quest.RewardSkill);
             record.state = StateTurnedIn;
             record.done++;
             if (quest.Repeatable) record.again = Day + quest.RepeatAfterRaids;
@@ -349,13 +350,14 @@ namespace ProjectMayham.Quests
             return demands;
         }
 
-        private static int Owned(SaveData data, ItemDefinition item) => CountIn(data.player, item) + CountIn(data.stash, item);
+        /// <summary>How many pieces of an item a save holds: carried (the hands too) and in the stash.</summary>
+        public static int Owned(SaveData data, ItemDefinition item) => CountIn(data.player, item) + CountIn(data.stash, item);
 
         private static int CountIn(InventoryData inventory, ItemDefinition item)
         {
             if (inventory == null) return 0;
 
-            int total = inventory.held == item.Id ? 1 : 0;
+            int total = (inventory.held == item.Id ? 1 : 0) + (inventory.heldLeft == item.Id ? 1 : 0);
             if (inventory.stacks == null) return total;
             foreach (var stack in inventory.stacks)
             {

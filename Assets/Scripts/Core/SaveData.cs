@@ -15,12 +15,15 @@ namespace ProjectMayham.Core
         public bool rotated;
     }
 
-    /// <summary>Saved contents of a grid inventory (the item in the hands is a plain id).</summary>
+    /// <summary>Saved contents of a grid inventory (the items in the hands are plain ids).</summary>
     [Serializable]
     public class InventoryData
     {
         public List<StackData> stacks = new List<StackData>();
+        // The right hand (a two-handed thing is kept here), the left hand, and which of them is used (0 right, 1 left).
         public string held;
+        public string heldLeft;
+        public int activeHand;
         // What is worn (item ids, empty when nothing). Only the player's inventory uses them.
         public string head;
         public string back;
@@ -74,6 +77,8 @@ namespace ProjectMayham.Core
         public List<QuestProgressData> quests = new List<QuestProgressData>();
         /// <summary>Raids the player has set out on: the days of the dailies.</summary>
         public int raids;
+        /// <summary>Skills the player has learned. See <see cref="Player.PlayerSkills"/>.</summary>
+        public List<string> skills = new List<string>();
         /// <summary>The dailies each giver offers today. See <see cref="Quests.QuestLog"/>.</summary>
         public List<DailyOfferData> dailies = new List<DailyOfferData>();
         /// <summary>How worn the weapons are. See <see cref="Combat.WeaponWear"/>.</summary>

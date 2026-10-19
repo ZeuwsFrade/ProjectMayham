@@ -72,8 +72,9 @@ namespace ProjectMayham.Npcs
         }
 
         /// <summary>
-        /// Puts a person into the grid when there is room and the weight allows it, else into empty hands. Returns
-        /// null when it is done, or what keeps the player from taking them.
+        /// Puts a person into the grid when there is room and the weight allows it, else into both hands (what they
+        /// hold goes into the grid, else on the floor). Returns null when it is done, or what keeps the player from
+        /// taking them.
         /// </summary>
         public static string TryCarry(GridInventory backpack, ItemDefinition person)
         {

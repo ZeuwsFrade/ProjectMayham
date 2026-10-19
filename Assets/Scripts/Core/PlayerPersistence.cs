@@ -62,7 +62,7 @@ namespace ProjectMayham.Core
 
             // What was lost took its wear with it. Weapons lying in the stash keep theirs.
             var stash = GameSession.Data.stash;
-            var owned = stash.stacks.Select(s => s.item).Append(stash.held).Where(id => !string.IsNullOrEmpty(id));
+            var owned = stash.stacks.Select(s => s.item).Append(stash.held).Append(stash.heldLeft).Where(id => !string.IsNullOrEmpty(id));
             Combat.WeaponWear.ForgetExcept(owned);
         }
     }

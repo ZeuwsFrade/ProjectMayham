@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4864967753089769510}
   - component: {fileID: 8119857531779721399}
   - component: {fileID: 2511634786470421102}
+  - component: {fileID: 3677053072990882228}
   m_Layer: 9
   m_Name: Vending-Machine
   m_TagString: Untagged
@@ -167,3 +168,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f14bffb571259fe40958201e3038305c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.World.WrapEntity
+--- !u!114 &3677053072990882228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6677118383265087429}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3abdcbbfd15e054489951d5c31d3810f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.VendingMachine
+  stock: {fileID: 11400000, guid: ee914cef9badd9d4eae2b46e517b5340, type: 2}
+  minItems: 3
+  maxItems: 6
+  emptyChance: 0.15
+  coin: {fileID: 11400000, guid: 2a31e6a5d4fd3df4ab452becb0a1220a, type: 2}
+  dropDelay: {x: 2, y: 3}
+  reach: 2.5
+  dropNoise: 3.5
+  shakeStamina: 20
+  shakeChance: 0.3
+  shakeNoise: 7
+  jamAfter: 3
