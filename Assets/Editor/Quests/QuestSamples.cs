@@ -129,6 +129,25 @@ namespace ProjectMayham.EditorTools
                 Daily(so, 2);
             });
 
+            // A blueprint for a quest: Tyler draws how to put a paper press together.
+            var press = ModuleSetup.EnsurePress();
+            if (press != null)
+            {
+                Ensure<QuestDefinition>($"{Root}/Tyler/Tyler_Press.asset", ref created, so =>
+                {
+                    Fill(so, tyler, 13, "Пресс для макулатуры",
+                        "Бумага нужна всем, а книги никто не читает. Видел я в одной типографии пресс: книги туда, бумага оттуда.\n\n" +
+                        "Принеси три стопки книг — на пробу. А я нарисую, как такой собрать.",
+                        "Три стопки книг, [ИГРОК]. Без них и рисовать нечего.",
+                        "Держи чертёж. Соберёшь в убежище из папок, швабры и пары монет. Как — не спрашивай, просто собери.",
+                        0);
+                    Require(so, first);
+                    AddObjective(so, QuestObjectiveKind.Deliver, books, 3, RoomKind.Office);
+                    so.FindProperty("rewardBlueprint").objectReferenceValue = press;
+                    so.FindProperty("rewardLoyalty").intValue = 2;
+                });
+            }
+
             AssetDatabase.SaveAssets();
             QuestCatalog.Reset();
             return $"{created} quest assets created; quest item: {folder.name}";

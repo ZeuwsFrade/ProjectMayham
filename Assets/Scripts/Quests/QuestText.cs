@@ -102,6 +102,7 @@ namespace ProjectMayham.Quests
                 parts.Add(reward.count > 1 ? $"{reward.item.DisplayName} ×{reward.count}" : reward.item.DisplayName);
             }
             if (quest.RewardSkill.Length > 0) parts.Add($"навык «{Player.PlayerSkills.Title(quest.RewardSkill)}»");
+            if (quest.RewardBlueprint != null) parts.Add($"чертёж «{quest.RewardBlueprint.DisplayName}»");
             return string.Join(", ", parts);
         }
 

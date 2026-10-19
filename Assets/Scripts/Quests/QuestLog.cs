@@ -289,6 +289,7 @@ namespace ProjectMayham.Quests
             GameSession.AddMoney(quest.RewardMoney);
             if (quest.Giver != null) Loyalty.Add(quest.Giver.Id, quest.RewardLoyalty);
             Player.PlayerSkills.Learn(quest.RewardSkill);
+            Shelter.Blueprints.Learn(quest.RewardBlueprint);
             record.state = StateTurnedIn;
             record.done++;
             if (quest.Repeatable) record.again = Day + quest.RepeatAfterRaids;

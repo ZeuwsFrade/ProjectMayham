@@ -118,6 +118,8 @@ namespace ProjectMayham.EditorTools
 
                 if (quest.RewardSkill.Length > 0 && !Player.PlayerSkills.Known.ContainsKey(quest.RewardSkill))
                     Error(quest, $"навыка «{quest.RewardSkill}» нет — есть: {string.Join(", ", Player.PlayerSkills.Known.Keys)}");
+                if (quest.RewardBlueprint != null && !AssetDatabase.GetAssetPath(quest.RewardBlueprint).Contains("/Resources/Modules/"))
+                    Error(quest, $"модуль «{quest.RewardBlueprint.name}» лежит вне Assets/Resources/Modules — игра его не найдёт");
                 if (quest.IsRescue && quest.CanAbandon) Error(quest, "от спасения отказаться нельзя — снимите «Can Abandon»");
                 if (quest.IsRescue && new SerializedObject(quest).FindProperty("repeatable").boolValue)
                     Error(quest, "спасение не может быть дейликом — снимите «Repeatable»");
@@ -255,7 +257,8 @@ namespace ProjectMayham.EditorTools
             Action<QuestDefinition, string> error, Action<QuestDefinition, string> warning)
         {
             // A skill is a reward too; the hidden loyalty is not one the player sees.
-            if (quest.RewardMoney == 0 && quest.RewardItems.Count == 0 && quest.RewardSkill.Length == 0) warning(quest, "нет награды");
+            if (quest.RewardMoney == 0 && quest.RewardItems.Count == 0 && quest.RewardSkill.Length == 0 && quest.RewardBlueprint == null)
+                warning(quest, "нет награды");
             foreach (var reward in quest.RewardItems)
             {
                 if (reward == null || reward.item == null)

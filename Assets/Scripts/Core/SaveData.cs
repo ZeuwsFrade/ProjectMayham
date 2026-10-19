@@ -30,6 +30,17 @@ namespace ProjectMayham.Core
         public string feet;
     }
 
+    /// <summary>What a module on a slot of the shelter holds: things loaded on a day, things ready to take.</summary>
+    [Serializable]
+    public class ModuleStateData
+    {
+        public string slot;
+        public int loaded;
+        public int ready;
+        /// <summary>The day (<see cref="SaveData.raids"/>) the loaded things were put in.</summary>
+        public int day;
+    }
+
     /// <summary>How many pieces of an item a trader has left.</summary>
     [Serializable]
     public class StockData
@@ -71,8 +82,12 @@ namespace ProjectMayham.Core
         public InventoryData stash = new InventoryData();
         /// <summary>Trader id to what is left of his stock. A trader that is not listed starts with the stock of his definition.</summary>
         public List<TraderStockData> traders = new List<TraderStockData>();
-        /// <summary>Ids of the shelter modules that have been built.</summary>
+        /// <summary>The shelter modules that have been built, as "slot=module". See <see cref="Shelter.ShelterModuleSlot"/>.</summary>
         public List<string> builtModules = new List<string>();
+        /// <summary>Ids of the modules whose blueprints the player knows. See <see cref="Shelter.Blueprints"/>.</summary>
+        public List<string> blueprints = new List<string>();
+        /// <summary>What the built modules are busy with, slot by slot. See <see cref="Shelter.ModuleConverter"/>.</summary>
+        public List<ModuleStateData> modules = new List<ModuleStateData>();
         /// <summary>Quests the player has taken or turned in, in the order they were taken. See <see cref="Quests.QuestLog"/>.</summary>
         public List<QuestProgressData> quests = new List<QuestProgressData>();
         /// <summary>Raids the player has set out on: the days of the dailies.</summary>

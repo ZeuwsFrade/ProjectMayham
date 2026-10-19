@@ -16,6 +16,7 @@ namespace ProjectMayham.Npcs
     /// After the player's things are loaded it takes out the NPCs the player carried home, marks them rescued and
     /// hands in their rescue quests (the NPC then thanks the player), then puts every rescued NPC at their
     /// <see cref="NpcSpot"/>. A shelter without such a spot gets none of them, with a warning in the console.
+    /// The blueprints the player brought home are learned here too (<see cref="Blueprints.LearnCarried"/>).
     /// </summary>
     [DefaultExecutionOrder(100)]
     public class ShelterResidents : MonoBehaviour
@@ -49,6 +50,10 @@ namespace ProjectMayham.Npcs
                 foreach (var (quest, result) in NpcRescue.FinishRescue(npc.Id, inventory)) outcomes.Add((npc, quest, result));
             }
 
+            // Blueprints found in the raid are learned at home.
+            var learned = Blueprints.LearnCarried(inventory);
+            if (learned.Count > 0) StartCoroutine(Announce(learned));
+
             var spots = FindObjectsByType<NpcSpot>(FindObjectsSortMode.None).OrderBy(s => s.name).ToList();
             var taken = new HashSet<NpcSpot>();
             foreach (var npc in NpcCatalog.All.Where(n => NpcRescue.IsInShelter(n.Id) && n.ShelterPrefab != null).OrderBy(n => n.Id))
@@ -66,6 +71,14 @@ namespace ProjectMayham.Npcs
             }
 
             if (outcomes.Count > 0) StartCoroutine(Thank(outcomes[0]));
+        }
+
+        private static IEnumerator Announce(List<ShelterModuleDefinition> learned)
+        {
+            while (SceneLoader.IsLoading) yield return null;
+            yield return null;
+            string names = string.Join(", ", learned.Select(m => $"«{m.DisplayName}»"));
+            UI.ScreenNote.Show((learned.Count == 1 ? "Изучен чертёж: " : "Изучены чертежи: ") + names, 6f);
         }
 
         // The rescued NPC thanks the player once the shelter is on screen.
