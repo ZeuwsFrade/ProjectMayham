@@ -44,7 +44,7 @@ namespace ProjectMayham.Dialogue
     {
         /// <summary>The story remembers that the player gave this answer: quests and other answers can depend on it.</summary>
         RememberChoice = 0,
-        /// <summary>The talk about work: the list of quests of this NPC to take and to hand in.</summary>
+        /// <summary>The talk about work: the new quests this NPC offers. The answer shows only when there are some.</summary>
         OpenWork = 1,
         /// <summary>The trade window of this NPC.</summary>
         OpenTrade = 2,
@@ -52,6 +52,8 @@ namespace ProjectMayham.Dialogue
         AddLoyalty = 3,
         /// <summary>The NPC goes with the player (a lost NPC in the raid).</summary>
         TakeAlong = 4,
+        /// <summary>The talk about the quests the player has taken from this NPC: hand in, how far, refuse.</summary>
+        OpenTaken = 5,
     }
 
     [Serializable]

@@ -84,56 +84,136 @@ MonoBehaviour:
         choice: intern_saw
         amount: 0
   - id: go
-    text: "\u0423\u0445\u043E\u0434\u0438\u043C?.. \u0414\u0430. \u0414\u0430! \u0412\u044B\u0432\u0435\u0434\u0438
-      \u043C\u0435\u043D\u044F, \u043F\u043E\u0436\u0430\u043B\u0443\u0439\u0441\u0442\u0430.
-      \u0421\u0430\u043C \u044F \u043D\u0435 \u0434\u043E\u0439\u0434\u0443 \u2014
-      \u043D\u043E\u0433\u0438 \u043D\u0435 \u0434\u0435\u0440\u0436\u0430\u0442."
+    text: "\u0423\u0445\u043E\u0434\u0438\u043C?.. \u041D\u0435 \u043C\u043E\u0433\u0443.
+      \u042F \u0442\u0430\u043A \u043E\u0441\u043B\u0430\u0431, \u0447\u0442\u043E
+      \u0438 \u0448\u0430\u0433\u0443 \u043D\u0435 \u0441\u0434\u0435\u043B\u0430\u044E.
+      \u041F\u043E\u043C\u043E\u0433\u0438 \u043C\u043D\u0435 \u0441\u043D\u0430\u0447\u0430\u043B\u0430
+      \u043F\u0440\u0438\u0439\u0442\u0438 \u0432 \u0441\u0435\u0431\u044F."
     start: 0
     conditions: []
     answers:
+    - text: "\u0427\u0435\u043C \u0442\u0435\u0431\u0435 \u043F\u043E\u043C\u043E\u0447\u044C?"
+      next: 
+      conditions: []
+      actions:
+      - kind: 1
+        choice: 
+        amount: 0
+    - text: "\u041F\u043E \u043F\u043E\u0432\u043E\u0434\u0443 \u0442\u0432\u043E\u0435\u0439
+        \u043F\u0440\u043E\u0441\u044C\u0431\u044B"
+      next: 
+      conditions: []
+      actions:
+      - kind: 5
+        choice: 
+        amount: 0
     - text: "\u041F\u043E\u0439\u0434\u0451\u043C \u0441\u043E \u043C\u043D\u043E\u0439"
       next: 
       conditions:
-      - kind: 2
+      - kind: 1
         level: 1
-        quest: {fileID: 0}
-        stage: 0
-        choice: intern_heard
+        quest: {fileID: 11400000, guid: 925d6f41c433f2345839a779cd4c7910, type: 2}
+        stage: 1
+        choice: 
         item: {fileID: 0}
         count: 0
       actions:
       - kind: 4
         choice: 
         amount: 0
-    - text: "\u041F\u043E\u0434\u043E\u0436\u0434\u0438 \u0437\u0434\u0435\u0441\u044C"
+    - text: "\u041F\u043E\u0439\u0434\u0451\u043C \u0441\u043E \u043C\u043D\u043E\u0439"
+      next: 
+      conditions:
+      - kind: 1
+        level: 1
+        quest: {fileID: 11400000, guid: 925d6f41c433f2345839a779cd4c7910, type: 2}
+        stage: 2
+        choice: 
+        item: {fileID: 0}
+        count: 0
+      actions:
+      - kind: 4
+        choice: 
+        amount: 0
+    - text: "\u041F\u043E\u0447\u0435\u043C\u0443 \u0442\u044B \u0448\u0435\u043F\u0447\u0435\u0448\u044C?"
+      next: hiding
+      conditions:
+      - kind: 3
+        level: 1
+        quest: {fileID: 0}
+        stage: 0
+        choice: intern_heard
+        item: {fileID: 0}
+        count: 0
+      actions: []
+    - text: "\u0414\u0435\u0440\u0436\u0438\u0441\u044C \u0442\u0443\u0442"
       next: 
       conditions: []
       actions: []
   - id: saw
     text: "\u041D\u0435 \u0437\u043D\u0430\u044E. \u0412\u044B\u0441\u043E\u043A\u043E\u0435.
       \u0421\u0442\u043E\u0438\u0442 \u0438 \u043D\u0435 \u0434\u0432\u0438\u0433\u0430\u0435\u0442\u0441\u044F,
-      \u043F\u043E\u043A\u0430 \u043D\u0430 \u043D\u0435\u0433\u043E \u0441\u043C\u043E\u0442\u0440\u0438\u0448\u044C.\n\n\u0412\u044B\u0432\u0435\u0434\u0438
-      \u043C\u0435\u043D\u044F \u2014 \u0432 \u0443\u0431\u0435\u0436\u0438\u0449\u0435
-      \u0440\u0430\u0441\u0441\u043A\u0430\u0436\u0443 \u0432\u0441\u0451, \u0447\u0442\u043E
-      \u043F\u043E\u043C\u043D\u044E."
+      \u043F\u043E\u043A\u0430 \u043D\u0430 \u043D\u0435\u0433\u043E \u0441\u043C\u043E\u0442\u0440\u0438\u0448\u044C.\n\n\u041F\u043E\u043C\u043E\u0433\u0438
+      \u043C\u043D\u0435 \u043F\u0440\u0438\u0439\u0442\u0438 \u0432 \u0441\u0435\u0431\u044F
+      \u2014 \u0430 \u0442\u0430\u043C \u0432\u0438\u0434\u043D\u043E \u0431\u0443\u0434\u0435\u0442."
     start: 0
     conditions: []
     answers:
+    - text: "\u0427\u0435\u043C \u0442\u0435\u0431\u0435 \u043F\u043E\u043C\u043E\u0447\u044C?"
+      next: 
+      conditions: []
+      actions:
+      - kind: 1
+        choice: 
+        amount: 0
+    - text: "\u041F\u043E \u043F\u043E\u0432\u043E\u0434\u0443 \u0442\u0432\u043E\u0435\u0439
+        \u043F\u0440\u043E\u0441\u044C\u0431\u044B"
+      next: 
+      conditions: []
+      actions:
+      - kind: 5
+        choice: 
+        amount: 0
     - text: "\u041F\u043E\u0439\u0434\u0451\u043C \u0441\u043E \u043C\u043D\u043E\u0439"
       next: 
       conditions:
-      - kind: 2
+      - kind: 1
         level: 1
-        quest: {fileID: 0}
-        stage: 0
-        choice: intern_heard
+        quest: {fileID: 11400000, guid: 925d6f41c433f2345839a779cd4c7910, type: 2}
+        stage: 1
+        choice: 
         item: {fileID: 0}
         count: 0
       actions:
       - kind: 4
         choice: 
         amount: 0
-    - text: "\u041F\u043E\u0434\u043E\u0436\u0434\u0438 \u0437\u0434\u0435\u0441\u044C"
+    - text: "\u041F\u043E\u0439\u0434\u0451\u043C \u0441\u043E \u043C\u043D\u043E\u0439"
+      next: 
+      conditions:
+      - kind: 1
+        level: 1
+        quest: {fileID: 11400000, guid: 925d6f41c433f2345839a779cd4c7910, type: 2}
+        stage: 2
+        choice: 
+        item: {fileID: 0}
+        count: 0
+      actions:
+      - kind: 4
+        choice: 
+        amount: 0
+    - text: "\u041F\u043E\u0447\u0435\u043C\u0443 \u0442\u044B \u0448\u0435\u043F\u0447\u0435\u0448\u044C?"
+      next: hiding
+      conditions:
+      - kind: 3
+        level: 1
+        quest: {fileID: 0}
+        stage: 0
+        choice: intern_heard
+        item: {fileID: 0}
+        count: 0
+      actions: []
+    - text: "\u0414\u0435\u0440\u0436\u0438\u0441\u044C \u0442\u0443\u0442"
       next: 
       conditions: []
       actions: []
@@ -151,14 +231,43 @@ MonoBehaviour:
       item: {fileID: 0}
       count: 0
     answers:
+    - text: "\u0427\u0435\u043C \u0442\u0435\u0431\u0435 \u043F\u043E\u043C\u043E\u0447\u044C?"
+      next: 
+      conditions: []
+      actions:
+      - kind: 1
+        choice: 
+        amount: 0
+    - text: "\u041F\u043E \u043F\u043E\u0432\u043E\u0434\u0443 \u0442\u0432\u043E\u0435\u0439
+        \u043F\u0440\u043E\u0441\u044C\u0431\u044B"
+      next: 
+      conditions: []
+      actions:
+      - kind: 5
+        choice: 
+        amount: 0
     - text: "\u041F\u043E\u0439\u0434\u0451\u043C \u0441\u043E \u043C\u043D\u043E\u0439"
       next: 
       conditions:
-      - kind: 2
+      - kind: 1
         level: 1
-        quest: {fileID: 0}
-        stage: 0
-        choice: intern_heard
+        quest: {fileID: 11400000, guid: 925d6f41c433f2345839a779cd4c7910, type: 2}
+        stage: 1
+        choice: 
+        item: {fileID: 0}
+        count: 0
+      actions:
+      - kind: 4
+        choice: 
+        amount: 0
+    - text: "\u041F\u043E\u0439\u0434\u0451\u043C \u0441\u043E \u043C\u043D\u043E\u0439"
+      next: 
+      conditions:
+      - kind: 1
+        level: 1
+        quest: {fileID: 11400000, guid: 925d6f41c433f2345839a779cd4c7910, type: 2}
+        stage: 2
+        choice: 
         item: {fileID: 0}
         count: 0
       actions:
@@ -209,6 +318,14 @@ MonoBehaviour:
       conditions: []
       actions:
       - kind: 1
+        choice: 
+        amount: 0
+    - text: "\u041F\u043E \u043F\u043E\u0432\u043E\u0434\u0443 \u0442\u0432\u043E\u0435\u0433\u043E
+        \u0437\u0430\u0434\u0430\u043D\u0438\u044F"
+      next: 
+      conditions: []
+      actions:
+      - kind: 5
         choice: 
         amount: 0
     - text: "\u041A\u0430\u043A \u0442\u0435\u0431\u0435 \u0442\u0443\u0442?"

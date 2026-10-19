@@ -55,6 +55,17 @@ namespace ProjectMayham.World
         private void Awake()
         {
             Active = this;
+            if (anchor == null)
+            {
+                // A scene whose player was swapped for another (a prefab) loses the reference: without an anchor
+                // nothing wraps and the player walks out of the level. The player is the anchor.
+                var player = FindFirstObjectByType<Player.PlayerController>();
+                if (player != null)
+                {
+                    anchor = player.transform;
+                    Debug.LogWarning("WrapWorld: no anchor was set, the player is used. Set it in the scene.", this);
+                }
+            }
             if (anchor != null) anchorBody = anchor.GetComponent<Rigidbody2D>();
             PadTilemaps();
         }

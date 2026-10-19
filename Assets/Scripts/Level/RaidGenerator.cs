@@ -37,6 +37,8 @@ namespace ProjectMayham.Level
         private const int ContainerSalt = 0x2C0FFEE;
         // And for the places of the lost NPCs.
         private const int NpcSalt = 0x51A7E;
+        // The exit and the wall maps throw dice of their own too.
+        private const int ExitSalt = 0xE817;
         // No lost NPC closer than this to the start or the exit, and none moved closer than this to the player.
         private const float NpcClearance = 12f;
 
@@ -80,6 +82,17 @@ namespace ProjectMayham.Level
         [Header("Start and exit")]
         [Tooltip("No loot within a few tiles of these points and no barricades or holes near them (player spawn, exit).")]
         [SerializeField] private Transform[] keepClear;
+
+        [Header("Exit and wall maps")]
+        [Tooltip("The way out of the raid: a prefab with RaidExit, put on corridor floor far from the start. Empty: no exit, Esc leaves the raid.")]
+        [SerializeField] private GameObject exitPrefab;
+        [Tooltip("How far the exit lies from the keep-clear points (the start) at least, in tiles, the short way round. When no floor is that far, the farthest floor.")]
+        [SerializeField, Min(0f)] private float exitDistance = 50f;
+        [Tooltip("A plan of the floor on corridor walls that tells which way the exit is: a prefab with WallMap.")]
+        [SerializeField] private GameObject wallMapPrefab;
+        [SerializeField, Min(0)] private int wallMapCount = 3;
+        [Tooltip("Tiles between two wall maps at least.")]
+        [SerializeField, Min(1f)] private float wallMapSpacing = 25f;
         [Tooltip("Distance from the points above that stays free of barricades, in world units.")]
         [SerializeField, Min(0f)] private float barricadeClearance = 9f;
         [Tooltip("Distance from the points above that stays free of holes, in world units.")]
@@ -108,6 +121,8 @@ namespace ProjectMayham.Level
         private readonly List<Npcs.LostNpc> lostNpcs = new List<Npcs.LostNpc>();
         // Tiles a lost NPC can sit on: floor with no wall, window or furniture on it or next to it. Made once a raid.
         private List<Vector2> npcSpots;
+        private GameObject exit;
+        private readonly List<GameObject> wallMaps = new List<GameObject>();
         // The containers have dice of their own: what lies in them changes nothing about the rooms, the loot on
         // the floor, the barricades and the holes of a seed.
         private System.Random containerRng;
@@ -124,6 +139,9 @@ namespace ProjectMayham.Level
         public IReadOnlyList<LootContainer> QuestContainers => questContainers;
         /// <summary>The lost NPCs sitting somewhere in this raid.</summary>
         public IReadOnlyList<Npcs.LostNpc> LostNpcs => lostNpcs;
+        /// <summary>The exit of the raid, or null without an exit prefab or free floor.</summary>
+        public GameObject Exit => exit;
+        public IReadOnlyList<GameObject> WallMaps => wallMaps;
         /// <summary>Kinds of rooms that were asked for and found no slot in this raid.</summary>
         public IReadOnlyList<RoomKind> MissingKinds => missingKinds;
 
@@ -133,7 +151,9 @@ namespace ProjectMayham.Level
         {
             if (!Application.isPlaying) return;
 
-            // What the quests the player has taken need from this raid; the tracker reports back what was reached.
+            // A raid is a new day for the dailies. What the quests the player has taken need from this raid; the
+            // tracker reports back what was reached.
+            QuestLog.CountRaid();
             var demands = QuestLog.BuildRaidDemands();
             Generate(useFixedSeed ? fixedSeed : Random.Range(1, int.MaxValue), demands);
             gameObject.AddComponent<RaidQuestTracker>().Begin(this, demands);
@@ -170,6 +190,10 @@ namespace ProjectMayham.Level
             PlaceHoles(root.transform, slots, rng);
             // With dice of their own: whoever is lost changes nothing else about the raid.
             PlaceLostNpcs(root.transform, new System.Random(seed ^ NpcSalt));
+            // So do the exit and the maps that tell the way to it.
+            var exitDice = new System.Random(seed ^ ExitSalt);
+            PlaceExit(root.transform, slots, exitDice);
+            PlaceWallMaps(root.transform, slots, exitDice);
 
             string summary = string.Join(", ", rooms.Select(r => $"{r.Slot.name}={RoomSizes.Title(r.Kind)}"));
             Debug.Log($"Raid seed {seed}: {summary}; barricades: {barricades.Count}; holes: {holes.Count}; "
@@ -199,6 +223,8 @@ namespace ProjectMayham.Level
             containers.Clear();
             questContainers.Clear();
             lostNpcs.Clear();
+            exit = null;
+            wallMaps.Clear();
             npcSpots = null;
 
             for (int i = transform.childCount - 1; i >= 0; i--)
@@ -647,45 +673,117 @@ namespace ProjectMayham.Level
 
         // ---- lost NPCs ----
 
-        private void PlaceLostNpcs(Transform root, System.Random dice)
+        // ---- the exit and the wall maps ----
+
+        private static Vector3Int CellOf(Vector2 point) => new Vector3Int(Mathf.FloorToInt(point.x), Mathf.FloorToInt(point.y), 0);
+
+        // How far a point is from the nearest keep-clear point (the start); far when there are none.
+        private float ClearanceOf(Vector2 point)
         {
-            foreach (var npc in Npcs.NpcCatalog.All.Where(n => n.LostInMaze && n.RaidPrefab != null && !Npcs.NpcRescue.IsRescued(n.Id)).OrderBy(n => n.Id, System.StringComparer.Ordinal))
+            float nearest = float.MaxValue;
+            if (keepClear == null) return nearest;
+            foreach (var mark in keepClear)
             {
-                var spots = NpcSpots().Where(s => !NearKeepClear(s, NpcClearance)).ToList();
-                if (spots.Count == 0)
+                if (mark != null) nearest = Mathf.Min(nearest, WrappedDistance(mark.position, point));
+            }
+            return nearest;
+        }
+
+        // The exit: on corridor floor with room on all sides, away from barricades and the lost NPC, as far from the
+        // start as asked (or as far as there is).
+        private void PlaceExit(Transform root, List<RoomSlot> slots, System.Random dice)
+        {
+            if (exitPrefab == null) return;
+            var spots = NpcSpots()
+                .Where(s => !slots.Any(slot => slot.Covers(CellOf(s))))
+                .Where(s => barricades.All(b => b == null || WrappedDistance(b.transform.position, s) > 3f))
+                .Where(s => lostNpcs.All(n => n == null || WrappedDistance(n.transform.position, s) > 3f))
+                .ToList();
+            if (spots.Count == 0)
+            {
+                Debug.LogWarning("RaidGenerator: no corridor floor for the exit.", this);
+                return;
+            }
+
+            var far = spots.Where(s => ClearanceOf(s) >= exitDistance).ToList();
+            if (far.Count == 0)
+            {
+                float best = spots.Max(ClearanceOf);
+                far = spots.Where(s => ClearanceOf(s) >= best - 1f).ToList();
+            }
+            var spot = far[dice.Next(far.Count)];
+            exit = Instantiate(exitPrefab, new Vector3(spot.x, spot.y, 0f), Quaternion.identity, root);
+            exit.name = "Exit";
+        }
+
+        // Maps hang on straight corridor walls (not at corners, doors, holes or windows), apart from each other.
+        private void PlaceWallMaps(Transform root, List<RoomSlot> slots, System.Random dice)
+        {
+            if (wallMapPrefab == null || wallMapCount <= 0) return;
+
+            var sides = new[] { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+            var candidates = new List<(Vector2 spot, Vector2Int wall)>();
+            foreach (var cell in floorMap.cellBounds.allPositionsWithin)
+            {
+                if (!floorMap.HasTile(cell) || wallMap.HasTile(cell)) continue;
+                if (windowMap != null && windowMap.HasTile(cell)) continue;
+                if (slots.Any(s => s.Covers(cell))) continue;
+
+                // A wall on exactly one side: the map hangs on it, the corridor in front.
+                int walls = 0;
+                var side = Vector2Int.zero;
+                foreach (var direction in sides)
                 {
-                    Debug.LogWarning($"RaidGenerator: no free floor for {npc.Id}.", this);
-                    continue;
+                    if (!wallMap.HasTile(cell + (Vector3Int)direction)) continue;
+                    walls++;
+                    side = direction;
                 }
-                var spot = spots[dice.Next(spots.Count)];
-                var instance = Instantiate(npc.RaidPrefab, new Vector3(spot.x, spot.y, 0f), Quaternion.identity, root);
-                instance.name = npc.Id;
-                if (instance.TryGetComponent<Npcs.LostNpc>(out var lost)) lostNpcs.Add(lost);
+                if (walls != 1) continue;
+                var wallCell = cell + (Vector3Int)side;
+                var along = new Vector3Int(side.y, side.x, 0);
+                if (!wallMap.HasTile(wallCell + along) || !wallMap.HasTile(wallCell - along)) continue;
+                if (windowMap != null && (windowMap.HasTile(wallCell) || windowMap.HasTile(wallCell + along) || windowMap.HasTile(wallCell - along))) continue;
+
+                var center = new Vector2(cell.x + 0.5f, cell.y + 0.5f);
+                if (NearKeepClear(center, 3f)) continue;
+                if (barricades.Any(b => b != null && WrappedDistance(b.transform.position, center) < 2.5f)) continue;
+                if (exit != null && WrappedDistance(exit.transform.position, center) < 4f) continue;
+                candidates.Add((center, side));
+            }
+
+            for (int i = 0; i < wallMapCount && candidates.Count > 0; i++)
+            {
+                var (spot, wall) = candidates[dice.Next(candidates.Count)];
+                // On the wall's face, the picture upright for someone standing in the corridor.
+                var position = spot + (Vector2)wall * 0.42f;
+                float angle = Mathf.Atan2(wall.y, wall.x) * Mathf.Rad2Deg - 90f;
+                var map = Instantiate(wallMapPrefab, new Vector3(position.x, position.y, 0f), Quaternion.Euler(0f, 0f, angle), root);
+                map.name = "WallMap";
+                wallMaps.Add(map);
+                candidates.RemoveAll(c => WrappedDistance(c.spot, spot) < wallMapSpacing);
             }
         }
 
-        /// <summary>
-        /// Moves a lost NPC to another free place: out of the player's sight, away from the player and from every
-        /// enemy. False when there is no such place (the NPC stays).
-        /// </summary>
-        public bool Relocate(Npcs.LostNpc npc)
+        // One lost NPC a raid at most: picked at random among those not brought home yet, put on free floor.
+        private void PlaceLostNpcs(Transform root, System.Random dice)
         {
-            if (npc == null) return false;
-            var wrap = World.WrapWorld.Active;
-            var cone = Vision.VisionCone.Active;
-            Vector2 Delta(Vector2 a, Vector2 b) => wrap != null ? wrap.Delta(a, b) : b - a;
+            var candidates = Npcs.NpcCatalog.All
+                .Where(n => n.LostInMaze && n.RaidPrefab != null && !Npcs.NpcRescue.IsRescued(n.Id))
+                .OrderBy(n => n.Id, System.StringComparer.Ordinal).ToList();
+            if (candidates.Count == 0) return;
+            // With one candidate no dice is thrown for the choice: the raids of one lost NPC stay as they were.
+            var npc = candidates.Count == 1 ? candidates[0] : candidates[dice.Next(candidates.Count)];
 
-            var player = cone != null ? (Vector2)cone.transform.position : (Vector2?)null;
-            var enemies = AI.EnemyAI.All.Where(e => e != null && e.isActiveAndEnabled).Select(e => (Vector2)e.transform.position).ToList();
-            float keepAway = npc.Npc != null ? npc.Npc.FleeDistance * 2f : 12f;
-            var spots = NpcSpots().Where(s =>
-                (!player.HasValue || (Delta(player.Value, s).magnitude > NpcClearance && !cone.IsPointVisible(player.Value + Delta(player.Value, s))))
-                && enemies.All(e => Delta(e, s).magnitude > keepAway)).ToList();
-            if (spots.Count == 0) return false;
-
-            var spot = spots[UnityEngine.Random.Range(0, spots.Count)];
-            npc.transform.position = new Vector3(spot.x, spot.y, npc.transform.position.z);
-            return true;
+            var spots = NpcSpots().Where(s => !NearKeepClear(s, NpcClearance)).ToList();
+            if (spots.Count == 0)
+            {
+                Debug.LogWarning($"RaidGenerator: no free floor for {npc.Id}.", this);
+                return;
+            }
+            var spot = spots[dice.Next(spots.Count)];
+            var instance = Instantiate(npc.RaidPrefab, new Vector3(spot.x, spot.y, 0f), Quaternion.identity, root);
+            instance.name = npc.Id;
+            if (instance.TryGetComponent<Npcs.LostNpc>(out var lost)) lostNpcs.Add(lost);
         }
 
         private List<Vector2> NpcSpots()

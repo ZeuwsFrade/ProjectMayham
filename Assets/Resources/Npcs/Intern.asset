@@ -21,5 +21,6 @@ MonoBehaviour:
   raidPrefab: {fileID: 8217352054659401380, guid: 34708291a10be874b8e0b8be3a636b77, type: 3}
   carryItem: {fileID: 11400000, guid: 3f6f86f1c35010a469bc6f14b7ef8326, type: 2}
   takeAlongLevel: 1
-  fleeDistance: 6
+  hideDistance: 6
+  hideFor: 8
   shelterPrefab: {fileID: 8217352054659401380, guid: 799d7c05fdca4cb4a99dadc02ee85e3b, type: 3}

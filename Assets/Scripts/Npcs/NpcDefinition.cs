@@ -26,7 +26,7 @@ namespace ProjectMayham.Npcs
         [SerializeField] private int[] loyaltyLevels = { 10, 25, 50 };
 
         [Header("Lost in the maze")]
-        [Tooltip("The NPC sits somewhere in every raid until the player brings them home.")]
+        [Tooltip("The NPC sits somewhere in the maze until the player brings them home. One lost NPC a raid: when several are still lost, the raid picks one at random.")]
         [SerializeField] private bool lostInMaze;
         [Tooltip("What sits in the maze: a prefab with LostNpc.")]
         [SerializeField] private GameObject raidPrefab;
@@ -34,8 +34,11 @@ namespace ProjectMayham.Npcs
         [SerializeField] private ItemDefinition carryItem;
         [Tooltip("The loyalty level from which the NPC goes with the player. 1: at the first meeting (their rescue is their first quest).")]
         [SerializeField, Range(1, 4)] private int takeAlongLevel = 1;
-        [Tooltip("An enemy closer than this (world units, a tile is one) makes the NPC slip away to another place.")]
-        [SerializeField, Min(1f)] private float fleeDistance = 6f;
+        [Tooltip("An enemy closer than this (world units, a tile is one) makes the NPC hide where they sit.")]
+        [UnityEngine.Serialization.FormerlySerializedAs("fleeDistance")]
+        [SerializeField, Min(1f)] private float hideDistance = 6f;
+        [Tooltip("Seconds without an enemy near before the hidden NPC comes back.")]
+        [SerializeField, Min(0.5f)] private float hideFor = 8f;
 
         [Header("At the base")]
         [Tooltip("What stands in the shelter once the NPC is brought home: a prefab with NpcResident.")]
@@ -51,7 +54,8 @@ namespace ProjectMayham.Npcs
         public GameObject RaidPrefab => raidPrefab;
         public ItemDefinition CarryItem => carryItem;
         public int TakeAlongLevel => Mathf.Clamp(takeAlongLevel, 1, 4);
-        public float FleeDistance => Mathf.Max(1f, fleeDistance);
+        public float HideDistance => Mathf.Max(1f, hideDistance);
+        public float HideFor => Mathf.Max(0.5f, hideFor);
         public GameObject ShelterPrefab => shelterPrefab;
     }
 }

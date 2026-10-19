@@ -40,6 +40,7 @@ namespace ProjectMayham.EditorTools
         static partial void TrackerTests(Checks t);
         static partial void ValidatorTests(Checks t);
         static partial void NpcTests(Checks t);
+        static partial void DailyTests(Checks t);
 
         [MenuItem("Mayham/Quests/Run Self-Test")]
         public static void RunMenu() => Debug.Log(Run());
@@ -63,6 +64,7 @@ namespace ProjectMayham.EditorTools
                 Group(t, "tracker", () => TrackerTests(t));
                 Group(t, "validator", () => ValidatorTests(t));
                 Group(t, "npcs", () => NpcTests(t));
+                Group(t, "daily", () => DailyTests(t));
             }
             finally
             {

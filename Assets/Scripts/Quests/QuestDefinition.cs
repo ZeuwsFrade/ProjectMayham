@@ -41,6 +41,16 @@ namespace ProjectMayham.Quests
         [Tooltip("Loyalty points of the giver for handing it in. Hidden from the player: not shown in the reward.")]
         [SerializeField, Min(0)] private int rewardLoyalty;
 
+        [Header("Daily and refusal")]
+        [Tooltip("A daily: offered again after it is turned in or refused. Every day (a day is a raid) the giver offers a few of his dailies, picked at random.")]
+        [SerializeField] private bool repeatable;
+        [Tooltip("Raids after turning in or refusing before a daily can be offered again.")]
+        [SerializeField, Min(1)] private int repeatAfterRaids = 1;
+        [Tooltip("The player may refuse the quest after taking it; the giver trusts them less then. Never for a rescue. A refused quest is offered again the next day.")]
+        [SerializeField] private bool canAbandon;
+        [Tooltip("Loyalty points the giver takes off for a refusal (hidden from the player). 0: as many as the quest gives.")]
+        [SerializeField, Min(0)] private int abandonPenalty;
+
         /// <summary>Stable key used in the save file: the name of the asset.</summary>
         public string Id => name;
         public QuestGiverDefinition Giver => giver;
@@ -57,6 +67,14 @@ namespace ProjectMayham.Quests
         public string CompletedText => completedText;
         public int RewardMoney => Mathf.Max(0, rewardMoney);
         public IReadOnlyList<ItemAmount> RewardItems => rewardItems;
+        /// <summary>A daily: offered again some raids after it was turned in or refused.</summary>
+        public bool Repeatable => repeatable && !IsRescue;
+        public int RepeatAfterRaids => Mathf.Max(1, repeatAfterRaids);
+        /// <summary>The flag as set in the Inspector; whether the player can refuse is <see cref="QuestLog.CanAbandon"/>.</summary>
+        public bool CanAbandon => canAbandon;
+        public int AbandonPenalty => abandonPenalty > 0 ? abandonPenalty : RewardLoyalty;
+        /// <summary>Asks to bring the giver, lost in the maze, home: never repeated, never refused.</summary>
+        public bool IsRescue => objectives.Exists(o => o != null && o.Kind == QuestObjectiveKind.Rescue);
 
         /// <summary>False when the quest cannot be offered or checked; <paramref name="reason"/> says why.</summary>
         public bool IsUsable(out string reason)

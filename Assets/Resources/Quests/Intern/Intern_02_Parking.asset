@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Quests.QuestDefinition
   giver: {fileID: 11400000, guid: cca81ec7558d74e4db68b1bf5ffbf38b, type: 2}
   requires:
-  - {fileID: 11400000, guid: dccc41e98dcd0b942b1e380cfd3e8a66, type: 2}
+  - {fileID: 11400000, guid: 925d6f41c433f2345839a779cd4c7910, type: 2}
   order: 2
   minLoyalty: 1
   requiredChoices:
@@ -41,3 +41,7 @@ MonoBehaviour:
   rewardMoney: 15
   rewardItems: []
   rewardLoyalty: 6
+  repeatable: 0
+  repeatAfterRaids: 1
+  canAbandon: 0
+  abandonPenalty: 0

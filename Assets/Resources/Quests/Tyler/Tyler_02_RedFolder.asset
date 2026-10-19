@@ -36,6 +36,12 @@ MonoBehaviour:
     room: 2
     hidden: 0
     text: 
+  - kind: 1
+    item: {fileID: 11400000, guid: b1bb28b04a992814cb3748895d4c76a7, type: 2}
+    count: 1
+    room: 3
+    hidden: 0
+    text: 
   reminderText: "\u041A\u0440\u0430\u0441\u043D\u0430\u044F \u043F\u0430\u043F\u043A\u0430
     \u0438\u0437 \u043A\u0430\u0431\u0438\u043D\u0435\u0442\u0430 \u0431\u043E\u0441\u0441\u0430.
     \u041E\u043D\u0430 \u0442\u0430\u043C \u043E\u0434\u043D\u0430 \u0442\u0430\u043A\u0430\u044F."
