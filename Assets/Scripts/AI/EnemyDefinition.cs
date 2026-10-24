@@ -38,6 +38,9 @@ namespace ProjectMayham.AI
         [SerializeField, Min(0f)] private float senseRange = 2.2f;
         [Tooltip("Multiplies how far the noise carries to it. 0 = deaf.")]
         [SerializeField, Min(0f)] private float hearing = 1f;
+        [Tooltip("Whether it also goes to the noise other enemies make (a crash, a fight). Every enemy hears the player " +
+                 "and things that fall.")]
+        [SerializeField] private bool hearsEnemies;
         [Tooltip("Seconds of looking at the player from close by before it is sure what it sees.")]
         [SerializeField, Min(0.05f)] private float noticeSeconds = 1f;
         [Tooltip("Seconds without a sign of the player before the suspicion is forgotten.")]
@@ -88,6 +91,7 @@ namespace ProjectMayham.AI
         public float SightAngle => sightAngle;
         public float SenseRange => senseRange;
         public float Hearing => hearing;
+        public bool HearsEnemies => hearsEnemies;
         public float NoticeSeconds => noticeSeconds;
         public float ForgetSeconds => forgetSeconds;
         public float LoseTargetSeconds => loseTargetSeconds;

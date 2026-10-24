@@ -41,6 +41,8 @@ namespace ProjectMayham.AI
         private const float SenseInterval = 0.1f;
         // The last share of the wind-up, in which the aim of the blow is no longer corrected.
         private const float LockAimShare = 0.25f;
+        // How far a landed blow of an enemy is heard.
+        private const float FightNoise = 6f;
 
         [SerializeField] private EnemyDefinition definition;
         [Tooltip("Child that holds the sprite. It is what pulls back and lunges in an attack. The root when empty.")]
@@ -53,6 +55,7 @@ namespace ProjectMayham.AI
         private Health health;
         private EnemyMotor motor;
         private PlayerStats player;
+        private PlayerController playerBody;
         private LayerMask wallMask;
 
         private EnemyState state = EnemyState.Patrol;
@@ -77,6 +80,11 @@ namespace ProjectMayham.AI
         private bool searching;
         private float searchTime;
         private float searchBaseAngle;
+        // Points it walks between, in turn, instead of wandering at random.
+        private readonly List<Vector2> route = new List<Vector2>();
+        private int routeIndex;
+        // Where it looks while standing at its post (a route of one point); zero: wherever it last turned.
+        private Vector2 postFacing;
 
         // Attack.
         private float attackCooldown;
@@ -84,6 +92,11 @@ namespace ProjectMayham.AI
         private bool striking;
         private Vector2 strikeDirection;
         private float staggerLeft;
+        // Whom the blow is for: the player, or anything else a kind of enemy chose to hit.
+        private IDamageable victim;
+        private Transform victimTransform;
+        private bool victimIsPlayer;
+        private EnemyState stateBeforeAttack;
 
         // A shout from an ally that has not arrived yet.
         private float alertDelay = -1f;
@@ -112,6 +125,11 @@ namespace ProjectMayham.AI
         protected bool HasLastKnown => hasLastKnown;
         protected Vector2 LastKnown => lastKnown;
         protected float DistanceToPlayer => distanceToPlayer;
+        protected float StateTime => stateTime;
+        /// <summary>The last blow is far enough behind for a new one.</summary>
+        protected bool AttackReady => attackCooldown <= 0f;
+        /// <summary>Whom the current (or last) attack is for.</summary>
+        protected Transform VictimTransform => victimTransform;
 
         // ---- setup ----
 
@@ -180,6 +198,8 @@ namespace ProjectMayham.AI
 
             ResolvePlayer();
             Sense(dt);
+            Think(dt);
+            if (state == EnemyState.Dead) return;
 
             switch (state)
             {
@@ -191,12 +211,19 @@ namespace ProjectMayham.AI
             }
         }
 
+        /// <summary>
+        /// Called every frame after the senses and before the state is run. For a kind of enemy that wants to decide
+        /// something on its own (go for whatever it bumps into, say).
+        /// </summary>
+        protected virtual void Think(float dt) { }
+
         private void ResolvePlayer()
         {
             if (player == null)
             {
                 if (cachedPlayer == null) cachedPlayer = FindFirstObjectByType<PlayerStats>();
                 player = cachedPlayer;
+                playerBody = player != null ? player.GetComponent<PlayerController>() : null;
             }
         }
 
@@ -242,16 +269,20 @@ namespace ProjectMayham.AI
         {
             Vector2 to = target - me;
             float distance = to.magnitude;
-            if (distance > definition.SightRange) return false;
+            // A crouching player is noticed only from nearer; one already hunted is not shaken off that way.
+            float visibility = playerBody != null && !IsHunting ? playerBody.Visibility : 1f;
+            if (distance > definition.SightRange * visibility) return false;
 
-            bool near = distance <= definition.SenseRange;
+            bool near = distance <= definition.SenseRange * visibility;
             if (!near && Vector2.Angle(transform.up, to) > definition.SightAngle * 0.5f) return false;
             return !Physics2D.Linecast(me, target, sightMask);
         }
 
         private void OnNoise(NoiseEvent noise)
         {
-            if (state == EnemyState.Dead || noise.Team != Team.Player || definition.Hearing <= 0f) return;
+            if (state == EnemyState.Dead || definition.Hearing <= 0f || noise.Source == gameObject) return;
+            // The player and what falls is heard by all; the din of the others only by those that listen for it.
+            if (noise.Team == Team.Enemy && !definition.HearsEnemies) return;
 
             Vector2 me = motor.Position;
             Vector2 at = EnemyMotor.Near(noise.Position, me);
@@ -326,13 +357,26 @@ namespace ProjectMayham.AI
                 return;
             }
 
+            // A guard at its post: it stands there looking the way it was told.
+            if (route.Count == 1 && postFacing != Vector2.zero
+                && Vector2.Distance(motor.Position, EnemyMotor.Near(route[0], motor.Position)) < 0.6f)
+            {
+                motor.LookAt(motor.Position + postFacing);
+                return;
+            }
+
             patrolWait -= dt;
             if (patrolWait > 0f) return;
 
             Vector2 here = motor.Position;
             Vector2 anchor = EnemyMotor.Near(home, here);
             var grid = NavGrid.Active;
-            if (grid != null && grid.IsReady)
+            if (route.Count > 0)
+            {
+                patrolTarget = route[routeIndex % route.Count];
+                routeIndex = (routeIndex + 1) % route.Count;
+            }
+            else if (grid != null && grid.IsReady)
             {
                 if (!grid.TryRandomPoint(anchor, definition.PatrolRadius, out patrolTarget))
                 {
@@ -345,9 +389,33 @@ namespace ProjectMayham.AI
             stateTime = 0f;
         }
 
+        /// <summary>
+        /// Gives it a beat: on patrol it walks from one point to the next and round again (standing a while at each)
+        /// instead of wandering around its post. Empty: wanders again.
+        /// </summary>
+        public void SetPatrolRoute(IEnumerable<Vector2> points)
+        {
+            route.Clear();
+            if (points != null) route.AddRange(points);
+            routeIndex = 0;
+            postFacing = Vector2.zero;
+        }
+
+        /// <summary>
+        /// Makes it a guard: on patrol it goes back to <paramref name="point"/> and stands there looking along
+        /// <paramref name="facing"/>. What it sees or hears still draws it away, as from any patrol.
+        /// </summary>
+        public void SetPost(Vector2 point, Vector2 facing)
+        {
+            SetPatrolRoute(new[] { point });
+            postFacing = facing.normalized;
+        }
+
+        public IReadOnlyList<Vector2> PatrolRoute => route;
+
         // ---- suspicion ----
 
-        private void EnterSuspicious(Vector2 point)
+        protected void EnterSuspicious(Vector2 point)
         {
             investigate = point;
             searching = false;
@@ -405,7 +473,7 @@ namespace ProjectMayham.AI
 
             if (canSee && distanceToPlayer <= definition.AttackRange && attackCooldown <= 0f)
             {
-                SetState(EnemyState.Attack);
+                BeginAttack(player);
                 return;
             }
 
@@ -464,7 +532,8 @@ namespace ProjectMayham.AI
         /// </summary>
         public void Alert(Vector2 point, float delay = 0f)
         {
-            if (state == EnemyState.Dead) return;
+            // A cry is a sound: the deaf do not answer it.
+            if (state == EnemyState.Dead || definition.Hearing <= 0f) return;
             alertPoint = point;
             alertDelay = Mathf.Max(0f, delay);
         }
@@ -486,28 +555,62 @@ namespace ProjectMayham.AI
 
         // ---- attack ----
 
-        private void EnterAttack()
+        /// <summary>
+        /// Starts a blow at <paramref name="target"/> (something with an <see cref="IDamageable"/>): the player, or
+        /// whatever else a kind of enemy decided to hit. Nothing happens while it is already attacking.
+        /// </summary>
+        protected void BeginAttack(Component target)
+        {
+            if (target == null || state == EnemyState.Attack || state == EnemyState.Dead) return;
+
+            victim = target as IDamageable ?? target.GetComponent<IDamageable>();
+            victimTransform = target.transform;
+            victimIsPlayer = player != null && target.transform == player.transform;
+            stateBeforeAttack = state;
+            SetState(EnemyState.Attack);
+        }
+
+        /// <summary>
+        /// The attack is over: the cooldown starts, and it goes back to hunting the player, or to what it was doing
+        /// when the blow was for somebody else.
+        /// </summary>
+        protected void FinishAttack()
+        {
+            attackCooldown = definition.CooldownSeconds;
+            if (victimIsPlayer || stateBeforeAttack == EnemyState.Chase) SetState(EnemyState.Chase);
+            else if (stateBeforeAttack == EnemyState.Suspicious) EnterSuspicious(motor.Position);
+            else SetState(EnemyState.Patrol);
+        }
+
+        private bool VictimAlive => victimTransform != null && victim != null && victim.IsAlive;
+
+        private Vector2 VictimPoint(Vector2 from) =>
+            victimTransform != null ? EnemyMotor.Near(victimTransform.position, from) : from + (Vector2)transform.up;
+
+        /// <summary>The attack state was entered (by <see cref="BeginAttack"/>). A kind with an attack of its own overrides it.</summary>
+        protected virtual void EnterAttack()
         {
             attackTime = 0f;
             striking = false;
             motor.Stop();
 
-            Vector2 to = EnemyMotor.Near(player.transform.position, motor.Position) - motor.Position;
+            Vector2 to = VictimPoint(motor.Position) - motor.Position;
             strikeDirection = to.sqrMagnitude > 0.0001f ? to.normalized : (Vector2)transform.up;
             CombatEvents.RaiseSwingStarted(new SwingEvent { Attacker = gameObject, Position = motor.Position, Direction = strikeDirection });
         }
 
-        private void TickAttack(float dt)
+        /// <summary>Every frame of the attack state. Has to end in <see cref="FinishAttack"/> (or another state).</summary>
+        protected virtual void TickAttack(float dt)
         {
             attackTime += dt;
             float windup = definition.WindupSeconds;
 
             if (attackTime < windup)
             {
-                // Follows the player until the last moment, then commits: a quick player steps out of the blow.
-                if (attackTime < windup * (1f - LockAimShare) && player != null && !player.IsDead)
+                // Follows the victim until the last moment, then commits: a quick player steps out of the blow.
+                if (attackTime < windup * (1f - LockAimShare) && VictimAlive)
                 {
-                    Vector2 to = EnemyMotor.Near(player.transform.position, motor.Position) - motor.Position;
+                    Vector2 to = VictimPoint(motor.Position) - motor.Position;
                     if (to.sqrMagnitude > 0.0001f) strikeDirection = to.normalized;
                 }
                 motor.LookAt(motor.Position + strikeDirection * 3f);
@@ -524,25 +627,21 @@ namespace ProjectMayham.AI
                 motor.Dash(strikeDirection, definition.Lunge, 0.15f);
             }
 
-            if (attackTime >= windup + definition.RecoverSeconds)
-            {
-                attackCooldown = definition.CooldownSeconds;
-                SetState(EnemyState.Chase);
-            }
+            if (attackTime >= windup + definition.RecoverSeconds) FinishAttack();
         }
 
         private void Strike()
         {
             Vector2 me = motor.Position;
-            var damageable = player as IDamageable;
+            var damageable = victim;
             var swing = new SwingEvent { Attacker = gameObject, Position = me, Direction = strikeDirection };
-            if (damageable == null || !damageable.IsAlive)
+            if (!VictimAlive)
             {
                 CombatEvents.RaiseSwingMissed(swing);
                 return;
             }
 
-            Vector2 target = EnemyMotor.Near(player.transform.position, me);
+            Vector2 target = VictimPoint(me);
             Vector2 to = target - me;
             bool inReach = to.magnitude <= definition.AttackRange + 0.3f
                            && Vector2.Angle(strikeDirection, to) <= definition.AttackArc * 0.5f
@@ -568,10 +667,12 @@ namespace ProjectMayham.AI
                 Attacker = gameObject, Target = damageable, Point = target, Direction = direction,
                 Damage = info.Amount, Killed = !damageable.IsAlive
             });
+            // A fight is loud: those that listen for it come.
+            Noise.Emit(target, FightNoise, gameObject, Team.Enemy);
         }
 
         /// <summary>The body pulls back and swells as the blow gathers, so the player can read it.</summary>
-        private void ShowWindup(float progress)
+        protected void ShowWindup(float progress)
         {
             if (body == null) return;
 
@@ -582,7 +683,8 @@ namespace ProjectMayham.AI
 
         // ---- stagger ----
 
-        private void EnterStagger(float seconds)
+        /// <summary>Stands dazed for a while (or longer, when it already is), then hunts whoever it knows of.</summary>
+        protected void EnterStagger(float seconds)
         {
             if (state == EnemyState.Stagger)
             {
@@ -608,22 +710,36 @@ namespace ProjectMayham.AI
 
         // ---- reaction to blows ----
 
+        /// <summary>While true, blows hurt but neither shove nor stagger it, and it does not turn to look.</summary>
+        protected virtual bool Unstoppable => false;
+
         private void OnDamaged(DamageInfo info)
         {
             if (state == EnemyState.Dead) return;
 
-            // Hit from the dark: it knows where from.
-            if (info.Attacker != null)
+            // In the middle of something nothing stops (a charge): it takes the damage and goes on.
+            if (Unstoppable) return;
+
+            motor.Shove(info.Direction * info.Knockback * (1f - definition.KnockbackResistance));
+            float stagger = info.StaggerSeconds * (1f - definition.StaggerResistance);
+
+            bool byPlayer = info.Attacker != null && info.Attacker.GetComponent<PlayerStats>() != null;
+            if (!byPlayer)
             {
-                lastKnown = EnemyMotor.Near(info.Attacker.transform.position, motor.Position);
-                hasLastKnown = true;
+                // Run down by a ram or struck by another of its kind: it hurts, but it says nothing of the player.
+                // It turns to see what that was.
+                if (stagger > 0.05f) EnterStagger(stagger);
+                else if (info.Attacker != null && (state == EnemyState.Patrol || state == EnemyState.Suspicious))
+                    EnterSuspicious(EnemyMotor.Near(info.Attacker.transform.position, motor.Position));
+                return;
             }
+
+            // Hit from the dark: it knows where from.
+            lastKnown = EnemyMotor.Near(info.Attacker.transform.position, motor.Position);
+            hasLastKnown = true;
             awareness = 1f;
             lostTimer = 0f;
 
-            motor.Shove(info.Direction * info.Knockback * (1f - definition.KnockbackResistance));
-
-            float stagger = info.StaggerSeconds * (1f - definition.StaggerResistance);
             if (stagger > 0.05f) EnterStagger(stagger);
             else if (state == EnemyState.Patrol || state == EnemyState.Suspicious) EnterChase(true);
         }

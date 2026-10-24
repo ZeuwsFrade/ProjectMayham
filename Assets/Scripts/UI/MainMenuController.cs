@@ -24,11 +24,19 @@ namespace ProjectMayham.UI
             if (quitButton != null) quitButton.onClick.AddListener(OnQuitClicked);
         }
 
-        // A new game starts in the shelter with a fresh save.
+        // A new game starts with a fresh save, in the tutorial or (skipping it) straight in the shelter.
         public void OnNewGameClicked()
         {
-            GameSession.NewGame();
-            SceneLoader.Load(SceneLoader.Shelter, "Убежище", save: false);
+            ConfirmDialog.Ask(
+                "Новая игра",
+                "Пройти обучение? Оно займёт несколько минут и закончится в убежище.",
+                Tutorial.TutorialRun.Begin,
+                () =>
+                {
+                    GameSession.NewGame();
+                    SceneLoader.Load(SceneLoader.Shelter, "Убежище", save: false);
+                },
+                yesText: "Пройти", noText: "Пропустить");
         }
 
         public void OnLoadGameClicked()

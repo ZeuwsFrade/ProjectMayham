@@ -9,6 +9,7 @@ namespace ProjectMayham.Core
         public const string MainMenu = "MainMenu";
         public const string Shelter = "Shelter";
         public const string Raid = "MainScene";
+        public const string Tutorial = "Tutorial";
 
         public static bool IsLoading => LoadingScreen.IsBusy;
 

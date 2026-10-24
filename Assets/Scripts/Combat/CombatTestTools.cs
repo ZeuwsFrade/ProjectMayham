@@ -24,6 +24,10 @@ namespace ProjectMayham.Combat
         [Tooltip("Enemies of a pack made with F1.")]
         [SerializeField, Min(1)] private int packSize = 4;
         [SerializeField] private bool giveWeaponsOnStart = true;
+        [Tooltip("Put ahead of the player on F7.")]
+        [SerializeField] private GameObject ramPrefab;
+        [Tooltip("Put ahead of the player on F8.")]
+        [SerializeField] private GameObject justicePrefab;
 
         private readonly List<string> log = new List<string>();
         private PlayerStats stats;
@@ -86,6 +90,8 @@ namespace ProjectMayham.Combat
             if (keyboard.f4Key.wasPressedThisFrame) ClearEnemies();
             if (keyboard.f5Key.wasPressedThisFrame) Repair();
             if (keyboard.f6Key.wasPressedThisFrame) ToggleVision();
+            if (keyboard.f7Key.wasPressedThisFrame) SpawnAhead(ramPrefab, "таран");
+            if (keyboard.f8Key.wasPressedThisFrame) SpawnAhead(justicePrefab, "правосудие");
             if (keyboard.rKey.wasPressedThisFrame && keyboard.leftCtrlKey.isPressed) SceneManager.LoadScene(gameObject.scene.name);
         }
 
@@ -119,6 +125,13 @@ namespace ProjectMayham.Combat
             Vector2 at = (Vector2)stats.transform.position + (Vector2)stats.transform.up * 10f;
             int made = spawner.SpawnPack(at, packSize);
             Add($"стая: {made} доходяг");
+        }
+
+        private void SpawnAhead(GameObject prefab, string title)
+        {
+            if (spawner == null || prefab == null) return;
+            Vector2 at = (Vector2)stats.transform.position + (Vector2)stats.transform.up * 10f;
+            Add(spawner.SpawnOne(prefab, at) != null ? $"{title} появился впереди" : $"{title}: нет места впереди");
         }
 
         private void ClearEnemies()
@@ -198,7 +211,8 @@ namespace ProjectMayham.Combat
             string state = stats == null ? string.Empty
                 : $"здоровье {stats.Health:0}/{stats.MaxHealth:0}   выносливость {stats.Stamina:0}   врагов {EnemyAI.All.Count}   тревога {alert}"
                   + (melee != null ? $"   фаза {melee.Phase}" : string.Empty);
-            string help = "F1 стая впереди · F2 оружие · F3 вылечить · F4 убрать врагов · F5 починить · F6 туман · Ctrl+R перезапуск";
+            string help = "F1 стая впереди · F7 таран · F8 правосудие · F2 оружие · F3 вылечить · F4 убрать врагов · F5 починить · F6 туман · "
+                          + "G зажать: бросить · Ctrl+R перезапуск";
 
             var rect = new Rect(24f * scale, 130f * scale, Screen.width * 0.7f, 400f * scale);
             GUI.Label(rect, $"<color=#ffd24d>{help}</color>\n{state}\n\n{string.Join("\n", log)}", style);

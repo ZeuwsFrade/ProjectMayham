@@ -30,6 +30,7 @@ namespace ProjectMayham.EditorTools
 
             var t = new QuestSelfTest.Checks();
             Group(t, "assets", () => AssetTests(t));
+            Group(t, "loners", () => LonerTests(t));
             Group(t, "wear", () => WearTests(t));
             Group(t, "health", () => HealthTests(t));
             Group(t, "alert", () => AlertTests(t));
@@ -107,6 +108,70 @@ namespace ProjectMayham.EditorTools
                      && prefab.GetComponent<EnemyMotor>() != null && prefab.GetComponent<WrapEntity>() != null, "the Dokhodyaga has its parts");
                 t.Ok(prefab.GetComponent<CircleCollider2D>() != null && !prefab.GetComponent<CircleCollider2D>().isTrigger, "the Dokhodyaga has a body that blocks");
             }
+        }
+
+        // ---- the Ram and Justice ----
+
+        private static void LonerTests(QuestSelfTest.Checks t)
+        {
+            var pipe = AssetDatabase.LoadAssetAtPath<WeaponDefinition>("Assets/Data/Items/Weapons/Pipe.asset");
+            var ram = AssetDatabase.LoadAssetAtPath<RamDefinition>("Assets/Data/Enemies/Ram.asset");
+            var justice = AssetDatabase.LoadAssetAtPath<EnemyDefinition>("Assets/Data/Enemies/Justice.asset");
+            t.Ok(ram != null, "the Ram definition exists and is a RamDefinition (Mayham/Combat/1b)");
+            t.Ok(justice != null, "the Justice definition exists");
+
+            if (ram != null)
+            {
+                t.Ok(ram.Hearing <= 0f && !ram.HearsEnemies, "the Ram is deaf");
+                t.Ok(!ram.Shouts, "the Ram calls nobody");
+                t.Ok(ram.SightRange >= 8f && ram.SightAngle < 120f, "the Ram sees far down a narrow cone");
+                t.Ok(ram.AttackRange <= ram.SightRange, "the Ram aims only at what it can see");
+                t.Ok(ram.ChargeSpeed > 6f, "a charging Ram is faster than a sprinting player (6)");
+                t.Ok(ram.WindupSeconds >= 0.6f, "the Ram aims long enough to be dodged");
+                t.Ok(ram.TurnSpeed < 180f, "the Ram turns slowly while aiming: a quick player leaves its view");
+                t.Ok(ram.StunSeconds >= 1.5f, "a Ram that hits a wall stands dazed long enough to be hit");
+                t.Ok(ram.ChargeDamage > 0f && ram.ChargeDamage < 50f, "being run down hurts but does not kill outright");
+                t.Ok(ram.TrampleDamage > 0f && ram.ChargeKnockback > 0f, "the Ram tramples the enemies in its way");
+            }
+
+            if (justice != null && pipe != null)
+            {
+                t.Ok(justice.SightRange <= justice.SenseRange + 0.01f && justice.SightRange <= 2.5f, "Justice is blind: it finds by touch only");
+                t.Ok(justice.Hearing >= 1f && justice.HearsEnemies, "Justice hears well, the din of the other enemies too");
+                t.Ok(justice.PatrolSpeed < 1f && justice.ChaseSpeed < 3.5f, "Justice is slower than a walking player");
+                t.Ok(justice.MaxHealth >= pipe.Damage * 10f, "Justice takes more than ten blows of the pipe");
+                t.Ok(justice.StaggerResistance >= 0.8f && justice.KnockbackResistance >= 0.8f, "Justice hardly staggers or moves under blows");
+                t.Ok(justice.Damage >= 25f && justice.WindupSeconds >= 0.9f, "Justice strikes hard and slowly");
+                t.Ok(justice.AttackRange <= justice.SightRange, "Justice strikes whatever it can feel");
+                t.Ok(!justice.Shouts, "Justice calls nobody");
+            }
+
+            var dokhodyaga = AssetDatabase.LoadAssetAtPath<EnemyDefinition>("Assets/Data/Enemies/Dokhodyaga.asset");
+            if (dokhodyaga != null) t.Ok(!dokhodyaga.HearsEnemies, "the Dokhodyaga does not go to the din of the other enemies");
+
+            foreach (var (path, mind) in new[] { ("Assets/Prefabs/Enemies/Ram.prefab", typeof(Ram)), ("Assets/Prefabs/Enemies/Justice.prefab", typeof(Justice)) })
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                t.Ok(prefab != null, $"{path} exists");
+                if (prefab == null) continue;
+                var ai = prefab.GetComponent(mind) as EnemyAI;
+                t.Ok(ai != null && ai.Definition != null, $"{prefab.name} has its mind and definition");
+                t.Ok(prefab.layer == LayerMask.NameToLayer("Enemy") && prefab.GetComponent<Health>() != null
+                     && prefab.GetComponent<EnemyMotor>() != null && prefab.GetComponent<WrapEntity>() != null, $"{prefab.name} has its parts");
+                var body = prefab.GetComponent<Rigidbody2D>();
+                t.Ok(body != null && body.mass > 1.2f, $"{prefab.name} is heavier than a Dokhodyaga");
+            }
+
+            // A thrown thing is heard; a heavier one farther.
+            var light = ScriptableObject.CreateInstance<ItemDefinition>();
+            var heavy = ScriptableObject.CreateInstance<ItemDefinition>();
+            var hso = new SerializedObject(heavy);
+            hso.FindProperty("weight").floatValue = 5f;
+            hso.ApplyModifiedPropertiesWithoutUndo();
+            t.Ok(Interaction.ThrownItem.NoiseOf(light) >= 4f, "a thrown thing is heard at least four units away");
+            t.Ok(Interaction.ThrownItem.NoiseOf(heavy) > Interaction.ThrownItem.NoiseOf(light), "a heavier thing lands louder");
+            UnityEngine.Object.DestroyImmediate(light);
+            UnityEngine.Object.DestroyImmediate(heavy);
         }
 
         // ---- wear ----

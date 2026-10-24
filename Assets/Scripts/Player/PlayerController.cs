@@ -5,9 +5,10 @@ using UnityEngine.InputSystem;
 namespace ProjectMayham.Player
 {
     /// <summary>
-    /// Top-down controller: WASD movement with inertia, Shift to sprint, body turns toward the mouse cursor.
-    /// Sprinting needs stamina (<see cref="PlayerStats"/>); carried weight above the comfortable limit slows the
-    /// player down and forbids sprinting.
+    /// Top-down controller: WASD movement with inertia, Shift to sprint, Ctrl held to crouch, body turns toward the
+    /// mouse cursor. Sprinting needs stamina (<see cref="PlayerStats"/>); carried weight above the comfortable limit
+    /// slows the player down and forbids sprinting. A crouching player walks slowly, makes no sound and is seen
+    /// from nearer (<see cref="Visibility"/>).
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerController : MonoBehaviour
@@ -25,6 +26,14 @@ namespace ProjectMayham.Player
         [Tooltip("Speed multiplier at the inventory's max weight. Between the comfortable and max weight speed drops linearly to it.")]
         [SerializeField, Range(0f, 1f)] private float speedAtMaxWeight = 0.35f;
 
+        [Header("Crouch (hold Ctrl)")]
+        [Tooltip("Walking speed while crouching, a share of the normal one.")]
+        [SerializeField, Range(0.1f, 1f)] private float crouchSpeed = 0.5f;
+        [Tooltip("Enemies see a crouching player from this share of their sight range.")]
+        [SerializeField, Range(0.1f, 1f)] private float crouchVisibility = 0.5f;
+        [Tooltip("Size of the character while crouching, a share of the normal one.")]
+        [SerializeField, Range(0.5f, 1f)] private float crouchScale = 0.85f;
+
         [Header("Rotation")]
         [Tooltip("Degrees added to the aim angle. -90 for a sprite that looks up (+Y), 0 for one that looks right (+X).")]
         [SerializeField] private float rotationOffset = -90f;
@@ -39,14 +48,22 @@ namespace ProjectMayham.Player
         private InputAction moveAction;
         private InputAction sprintAction;
         private InputAction lookAction;
+        private InputAction crouchAction;
 
         private Vector2 moveInput;
         private bool sprintHeld;
+        private Vector3 standingScale;
 
         public Vector2 Velocity => body.linearVelocity;
         /// <summary>Cursor position in world space, refreshed every frame.</summary>
         public Vector2 AimPoint { get; private set; }
-        public bool IsSprinting => !MovementLocked && !SprintBlocked && sprintHeld && moveInput.sqrMagnitude > 0.01f && CanSprint;
+        public bool IsSprinting => !MovementLocked && !SprintBlocked && !IsCrouching && sprintHeld && moveInput.sqrMagnitude > 0.01f && CanSprint;
+        /// <summary>True while Ctrl is held: slow, silent and harder to see.</summary>
+        public bool IsCrouching { get; private set; }
+        /// <summary>Share of an enemy's sight range from which the player can be seen: 1 standing, less crouching.</summary>
+        public float Visibility => IsCrouching ? crouchVisibility : 1f;
+        /// <summary>Raised when the player crouches (true) or stands up (false).</summary>
+        public event System.Action<bool> CrouchChanged;
         /// <summary>
         /// The hidden speed of the character, 1 = full: what the carried weight and the call of nature leave of it.
         /// Running, walking and (when there are real animations) the animations follow it.
@@ -94,16 +111,34 @@ namespace ProjectMayham.Player
             moveAction = playerMap.FindAction("Move", true);
             sprintAction = playerMap.FindAction("Sprint", true);
             lookAction = playerMap.FindAction("Look", true);
+            crouchAction = playerMap.FindAction("Crouch", true);
+            standingScale = transform.localScale;
         }
 
         private void OnEnable() => playerMap.Enable();
-        private void OnDisable() => playerMap.Disable();
+
+        private void OnDisable()
+        {
+            playerMap.Disable();
+            SetCrouching(false);
+        }
 
         private void Update()
         {
             moveInput = Vector2.ClampMagnitude(moveAction.ReadValue<Vector2>(), 1f);
             sprintHeld = sprintAction.IsPressed();
+            // Not while climbing: the crossing goes at its own pace.
+            SetCrouching(crouchAction.IsPressed() && !MovementLocked);
             UpdateAimPoint();
+        }
+
+        private void SetCrouching(bool value)
+        {
+            if (IsCrouching == value) return;
+            IsCrouching = value;
+            // A placeholder for a real crouching sprite: the character gets a little smaller.
+            transform.localScale = value ? standingScale * crouchScale : standingScale;
+            CrouchChanged?.Invoke(value);
         }
 
         private void UpdateAimPoint()
@@ -133,6 +168,7 @@ namespace ProjectMayham.Player
             if (MovementLocked) return;
 
             float speed = IsSprinting ? sprintSpeed : walkSpeed;
+            if (IsCrouching) speed *= crouchSpeed;
             speed *= Speed * SpeedMultiplier;
             Vector2 target = moveInput * speed;
             float rate = moveInput.sqrMagnitude > 0.01f ? acceleration : deceleration;

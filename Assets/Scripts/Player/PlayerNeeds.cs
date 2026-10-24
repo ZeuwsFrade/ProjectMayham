@@ -91,6 +91,11 @@ namespace ProjectMayham.Player
             }
             set { inShelter = value; shelterKnown = true; }
         }
+        /// <summary>
+        /// While true the needs neither grow nor go down by themselves; food, drink and fixtures still work.
+        /// For the tutorial, where the player has to deal with them without being hurried.
+        /// </summary>
+        public bool Paused { get; set; }
 
         private void Awake()
         {
@@ -111,8 +116,11 @@ namespace ProjectMayham.Player
             if (boostTimer > 0f) boostTimer = Mathf.Max(0f, boostTimer - dt);
             if (accidentTimer > 0f) accidentTimer = Mathf.Max(0f, accidentTimer - dt);
 
-            if (InShelter) RecoverInShelter(dt);
-            else Grow(dt);
+            if (!Paused)
+            {
+                if (InShelter) RecoverInShelter(dt);
+                else Grow(dt);
+            }
 
             if (nature >= 1f - Epsilon && !InShelter) Accident();
             Smell(dt);

@@ -37,6 +37,8 @@ namespace ProjectMayham.Player
         private float messageTimer;
         private bool leftWasHeld;
 
+        /// <summary>An item has been eaten, drunk or applied.</summary>
+        public event System.Action<ConsumableDefinition> Used;
         /// <summary>True while an item is being used.</summary>
         public bool IsUsing => item != null;
         /// <summary>0..1 while an item is being used.</summary>
@@ -150,6 +152,7 @@ namespace ProjectMayham.Player
             if (!taken) return;
 
             Needs.Apply(used);
+            Used?.Invoke(used);
             if (hands) TakeNextInHands(used);
         }
 

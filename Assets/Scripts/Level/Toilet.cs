@@ -11,6 +11,9 @@ namespace ProjectMayham.Level
         [Tooltip("Below this share of the scale there is nothing to do here.")]
         [SerializeField, Range(0f, 0.5f)] private float minNeed = 0.05f;
 
+        /// <summary>Someone has used a toilet.</summary>
+        public static event System.Action<GameObject> Used;
+
         public string Prompt => "Справить нужду (удерживать)";
         public float HoldSeconds => seconds;
         public string HoldLabel => "Справляю нужду";
@@ -28,7 +31,9 @@ namespace ProjectMayham.Level
         public void Interact(GameObject actor)
         {
             var stats = actor.GetComponent<PlayerStats>();
-            if (stats != null && stats.Needs != null) stats.Needs.Relieve();
+            if (stats == null || stats.Needs == null) return;
+            stats.Needs.Relieve();
+            Used?.Invoke(actor);
         }
     }
 }

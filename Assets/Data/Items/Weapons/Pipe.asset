@@ -25,10 +25,13 @@ MonoBehaviour:
   heldAngle: 0
   heldMatchesWorld: 1
   heldScale: 1
+  equipSlot: 0
+  backpackGrid: {x: 8, y: 5}
+  isPerson: 0
   worldPrefab: {fileID: 8217352054659401380, guid: 01947701a937e734ebeb22beaac88228, type: 3}
   damage: 18
   heavyDamageMultiplier: 2
-  range: 1.55
+  range: 1.35
   arc: 95
   heavyArcMultiplier: 1.15
   swingSeconds: 0.18

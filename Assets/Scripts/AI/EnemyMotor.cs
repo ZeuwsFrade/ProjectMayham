@@ -46,6 +46,9 @@ namespace ProjectMayham.AI
         private float separationRadius = 0.9f;
         private bool hasLook;
         private Vector2 lookAt;
+        private bool driving;
+        private Vector2 driveVelocity;
+        private float driveAcceleration;
 
         public Vector2 Position => body.position;
         public Vector2 Velocity => body.linearVelocity;
@@ -56,6 +59,9 @@ namespace ProjectMayham.AI
         /// <summary>The goal cannot be reached: no path was found.</summary>
         public bool Unreachable { get; private set; }
         public IReadOnlyList<Vector2> Path => path;
+        /// <summary>True while it runs in a straight line (<see cref="Drive"/>).</summary>
+        public bool IsDriving => driving;
+        public float BodyRadius => bodyRadius;
 
         private void Awake()
         {
@@ -85,6 +91,7 @@ namespace ProjectMayham.AI
         public void MoveTo(Vector2 point, float moveSpeed, float stopWithin = 0.15f)
         {
             hasGoal = true;
+            driving = false;
             speed = moveSpeed;
             stopDistance = stopWithin;
             goal = point;
@@ -94,6 +101,7 @@ namespace ProjectMayham.AI
         public void Stop()
         {
             hasGoal = false;
+            driving = false;
             Unreachable = false;
             pathValid = false;
             hasPathGoal = false;
@@ -119,6 +127,19 @@ namespace ProjectMayham.AI
             body.linearVelocity += direction.normalized * (distance / seconds);
         }
 
+        /// <summary>
+        /// Run at a velocity, getting up to it at <paramref name="accelerationValue"/>: no path, no keeping off the
+        /// others, no stopping for anything. The charge of a ram. Ends with <see cref="Stop"/> (or a <see cref="MoveTo"/>).
+        /// </summary>
+        public void Drive(Vector2 velocity, float accelerationValue)
+        {
+            driving = true;
+            driveVelocity = velocity;
+            driveAcceleration = accelerationValue;
+            hasGoal = false;
+            hasLook = false;
+        }
+
         // ---- movement ----
 
         private void FixedUpdate()
@@ -131,6 +152,14 @@ namespace ProjectMayham.AI
                 hasPathGoal = false;
             }
             lastPosition = position;
+
+            if (driving)
+            {
+                Vector2 run = Vector2.MoveTowards(body.linearVelocity, driveVelocity, driveAcceleration * Time.fixedDeltaTime);
+                body.linearVelocity = run;
+                Turn(run);
+                return;
+            }
 
             Vector2 desired = Vector2.zero;
             if (hasGoal) desired = Steer(position);

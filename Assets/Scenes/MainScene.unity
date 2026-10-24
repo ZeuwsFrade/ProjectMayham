@@ -72671,6 +72671,64 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 637930681}
   m_CullTransparentMesh: 1
+--- !u!1 &645947594
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 645947596}
+  - component: {fileID: 645947595}
+  m_Layer: 0
+  m_Name: EnemySpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &645947595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 645947594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a9f0c65eeca8c94ab9d46c9c3c03751, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.AI.EnemySpawner
+  prefabs:
+  - {fileID: 811892609437014573, guid: ada5dd7e69934c747a9b8e8b062ff86b, type: 3}
+  packs: 18
+  packSize: {x: 2, y: 5}
+  spread: 2.2
+  loners:
+  - prefab: {fileID: 5108946162219207663, guid: 14f1421f82c8e194a988a827342b1732, type: 3}
+    count: {x: 10, y: 12}
+    haunt: 0
+  - prefab: {fileID: 2146629824727343173, guid: 51011ace39f959247844c52c7665eee4, type: 3}
+    count: {x: 4, y: 5}
+    haunt: 1
+  minPlayerDistance: 22
+  parent: {fileID: 994197010}
+--- !u!4 &645947596
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 645947594}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &670424533
 GameObject:
   m_ObjectHideFlags: 0
@@ -73945,6 +74003,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RoomSlot
   size: 1
   interiorOrigin: {x: 11, y: 19}
+--- !u!1 &994197009
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 994197010}
+  m_Layer: 0
+  m_Name: Raid Enemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &994197010
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 994197009}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &998343363
 GameObject:
   m_ObjectHideFlags: 0
@@ -76777,6 +76866,59 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RoomSlot
   size: 2
   interiorOrigin: {x: 11, y: -49}
+--- !u!1 &1702546561
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1702546563}
+  - component: {fileID: 1702546562}
+  m_Layer: 0
+  m_Name: NavGrid
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1702546562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702546561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 686fef5d61ee7b14c959da25c0269a70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.AI.NavGrid
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 1600
+  manualMin: {x: 0, y: 0}
+  manualSize: {x: 0, y: 0}
+  agentRadius: 0.38
+  refreshPerFrame: 250
+  searchesPerFrame: 4
+  maxExpansions: 40000
+--- !u!4 &1702546563
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702546561}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1742559755
 GameObject:
   m_ObjectHideFlags: 0
@@ -76791,6 +76933,7 @@ GameObject:
   - component: {fileID: 1742559758}
   - component: {fileID: 1742559757}
   - component: {fileID: 1742559756}
+  - component: {fileID: 1742559762}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -76946,6 +77089,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1742559762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1742559755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9534b3116ffaef648b796245322c6ce1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Combat.CameraShake
+  maxOffset: 0.45
+  decay: 2.2
+  frequency: 28
 --- !u!1 &1753568192
 GameObject:
   m_ObjectHideFlags: 0
@@ -77128,7 +77286,7 @@ MonoBehaviour:
   stats: {fileID: 1640463109}
   persistence: {fileID: 1640463112}
   inventoryWindow: {fileID: 1051227576}
-  shelterScene: ShelterTest
+  shelterScene: Shelter
   leaveAnywhere: 1
 --- !u!4 &1770529060
 Transform:
@@ -330017,6 +330175,7 @@ GameObject:
   - component: {fileID: 1924228178}
   - component: {fileID: 1924228177}
   - component: {fileID: 1924228176}
+  - component: {fileID: 1924228180}
   m_Layer: 5
   m_Name: HUD
   m_TagString: Untagged
@@ -330105,6 +330264,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1924228180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1924228175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa598f76ba6efe14d9d533d276754479, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.UI.CombatHUD
+  combat: {fileID: 0}
+  bottomOffset: 190
 --- !u!1 &1996993659
 GameObject:
   m_ObjectHideFlags: 0
@@ -330341,3 +330514,6 @@ SceneRoots:
   - {fileID: 327694636}
   - {fileID: 1742559761}
   - {fileID: 1924228179}
+  - {fileID: 1702546563}
+  - {fileID: 645947596}
+  - {fileID: 994197010}

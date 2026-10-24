@@ -79,8 +79,9 @@ namespace ProjectMayham.EditorTools
 
             var spawner = Object.FindFirstObjectByType<EnemySpawner>();
             var so = new SerializedObject(spawner);
-            // Packs come when asked (F1), not at the start.
+            // Packs come when asked (F1), not at the start; so do the loners (F7, F8).
             so.FindProperty("packs").intValue = 0;
+            so.FindProperty("loners").arraySize = 0;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -216,6 +217,9 @@ namespace ProjectMayham.EditorTools
         {
             PlacePickup("Assets/Prefabs/Weapons/Pipe.prefab", new Vector2(-2f, -10f));
             PlacePickup("Assets/Prefabs/Weapons/Sledgehammer.prefab", new Vector2(2f, -10f));
+            // Something for a ram to smash, standing free in the hall.
+            PlacePickup("Assets/Prefabs/Barricades/Barricade-Crates.prefab", new Vector2(0f, 2.5f));
+            PlacePickup("Assets/Prefabs/Barricades/Barricade-Tables.prefab", new Vector2(13f, 2.5f));
         }
 
         private static void PlacePickup(string path, Vector2 position)
@@ -235,6 +239,8 @@ namespace ProjectMayham.EditorTools
             list.GetArrayElementAtIndex(0).objectReferenceValue = AssetDatabase.LoadAssetAtPath<WeaponDefinition>("Assets/Data/Items/Weapons/Pipe.asset");
             list.GetArrayElementAtIndex(1).objectReferenceValue = AssetDatabase.LoadAssetAtPath<WeaponDefinition>("Assets/Data/Items/Weapons/Sledgehammer.asset");
             so.FindProperty("spawner").objectReferenceValue = Object.FindFirstObjectByType<EnemySpawner>();
+            so.FindProperty("ramPrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<GameObject>(CombatSetup.RamPrefabPath);
+            so.FindProperty("justicePrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<GameObject>(CombatSetup.JusticePrefabPath);
             so.ApplyModifiedPropertiesWithoutUndo();
         }
     }

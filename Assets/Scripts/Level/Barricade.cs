@@ -90,5 +90,15 @@ namespace ProjectMayham.Level
             if (!canDismantle) return;
             Destroy(gameObject);
         }
+
+        /// <summary>Something heavy ran into it at speed (a ram): the pile flies apart and the way is open, whatever its settings.</summary>
+        public void Smash()
+        {
+            if (!enabled) return;
+            enabled = false;
+            // Out of the way at once, not at the end of the frame: the ram goes on through.
+            box.enabled = false;
+            Destroy(gameObject);
+        }
     }
 }

@@ -19,6 +19,9 @@ namespace ProjectMayham.Level
         [Tooltip("Below this thirst there is no need to drink.")]
         [SerializeField, Range(0f, 0.5f)] private float minThirst = 0.03f;
 
+        /// <summary>Someone has drunk at a cooler or a tap.</summary>
+        public static event System.Action<GameObject> Used;
+
         public string Prompt => prompt;
         public float HoldSeconds => seconds;
         public string HoldLabel => "Пью";
@@ -36,7 +39,9 @@ namespace ProjectMayham.Level
         public void Interact(GameObject actor)
         {
             var stats = actor.GetComponent<PlayerStats>();
-            if (stats != null && stats.Needs != null) stats.Needs.Drink(hydration, natureCall);
+            if (stats == null || stats.Needs == null) return;
+            stats.Needs.Drink(hydration, natureCall);
+            Used?.Invoke(actor);
         }
     }
 }

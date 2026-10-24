@@ -265,6 +265,68 @@ namespace ProjectMayham.Level
             return assigned;
         }
 
+        /// <summary>A gap in the outer walls of a room.</summary>
+        public struct RoomDoor
+        {
+            /// <summary>Middle of the gap, in the line of the wall.</summary>
+            public Vector2 Position;
+            /// <summary>Unit direction from the gap into the room.</summary>
+            public Vector2 Inward;
+        }
+
+        /// <summary>
+        /// The doors of a placed room, read from the walls painted for this raid: runs of ring tiles with neither wall
+        /// nor window on them.
+        /// </summary>
+        public List<RoomDoor> DoorsOf(PlacedRoom room)
+        {
+            var doors = new List<RoomDoor>();
+            if (room == null || room.Slot == null) return doors;
+
+            var origin = room.Slot.InteriorOrigin;
+            var size = room.Slot.Interior;
+            // Each side: the first ring tile, the step along it, its length and the way in.
+            AddDoors(doors, new Vector2Int(origin.x, origin.y - 1), Vector2Int.right, size.x, Vector2.up);
+            AddDoors(doors, new Vector2Int(origin.x, origin.y + size.y), Vector2Int.right, size.x, Vector2.down);
+            AddDoors(doors, new Vector2Int(origin.x - 1, origin.y), Vector2Int.up, size.y, Vector2.right);
+            AddDoors(doors, new Vector2Int(origin.x + size.x, origin.y), Vector2Int.up, size.y, Vector2.left);
+            return doors;
+        }
+
+        private void AddDoors(List<RoomDoor> doors, Vector2Int start, Vector2Int along, int length, Vector2 inward)
+        {
+            int runStart = -1;
+            for (int i = 0; i <= length; i++)
+            {
+                bool open = false;
+                if (i < length)
+                {
+                    var tile = new Vector3Int(start.x + along.x * i, start.y + along.y * i, 0);
+                    open = !wallMap.HasTile(tile) && (windowMap == null || !windowMap.HasTile(tile));
+                }
+                if (open && runStart < 0) runStart = i;
+                if (open || runStart < 0) continue;
+
+                // The run of open tiles [runStart, i) is one door.
+                // The centre of tile k is start + along * k + 0.5; the middle of the run is the mean of its first and last.
+                float middle = (runStart + i - 1) * 0.5f;
+                var position = new Vector2(start.x + 0.5f + along.x * middle, start.y + 0.5f + along.y * middle);
+                doors.Add(new RoomDoor { Position = position, Inward = inward });
+                runStart = -1;
+            }
+        }
+
+        /// <summary>True when the point lies inside one of the rooms of the raid (or on its outer walls).</summary>
+        public bool IsInsideRoom(Vector2 point)
+        {
+            var cell = new Vector3Int(Mathf.FloorToInt(point.x), Mathf.FloorToInt(point.y), 0);
+            foreach (var room in rooms)
+            {
+                if (room.Slot != null && room.Slot.Covers(cell)) return true;
+            }
+            return false;
+        }
+
         private PlacedRoom PlaceRoom(RoomSlot slot, Transform root, System.Random rng, RoomKind? forcedKind = null, RaidDemands demands = null)
         {
             var info = forcedKind.HasValue ? library.Info(forcedKind.Value) : library.PickKind(slot.Size, rng);

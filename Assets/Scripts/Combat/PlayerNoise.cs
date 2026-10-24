@@ -5,7 +5,8 @@ namespace ProjectMayham.Combat
 {
     /// <summary>
     /// The noise the player makes by moving: nothing when standing, a little when walking, a lot when sprinting.
-    /// Enemies that hear it come to look. A raised weapon slows the steps, which is also quieter.
+    /// Enemies that hear it come to look. A raised weapon slows the steps, which is also quieter; crouching
+    /// makes no sound at all.
     /// </summary>
     [RequireComponent(typeof(PlayerController))]
     public class PlayerNoise : MonoBehaviour
@@ -29,7 +30,7 @@ namespace ProjectMayham.Combat
             timer -= Time.deltaTime;
             if (timer > 0f) return;
 
-            if (controller.Velocity.magnitude < minSpeed) return;
+            if (controller.IsCrouching || controller.Velocity.magnitude < minSpeed) return;
             timer = interval;
             Noise.Emit(transform.position, controller.IsSprinting ? sprintRadius : walkRadius, gameObject);
         }

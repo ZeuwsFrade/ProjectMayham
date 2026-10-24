@@ -27,6 +27,8 @@ namespace ProjectMayham.EditorTools
         private const string EnemyDir = "Assets/Data/Enemies";
         private const string WeaponPrefabDir = "Assets/Prefabs/Weapons";
         private const string EnemyPrefabPath = "Assets/Prefabs/Enemies/Dokhodyaga.prefab";
+        public const string RamPrefabPath = "Assets/Prefabs/Enemies/Ram.prefab";
+        public const string JusticePrefabPath = "Assets/Prefabs/Enemies/Justice.prefab";
         private const string PickupTemplate = "Assets/Prefabs/Interactable/Mop.prefab";
         private const string LitMaterialPrefab = "Assets/Prefabs/TestEnemy.prefab";
         private const string TraderPath = "Assets/Data/Traders/Tyler.asset";
@@ -86,13 +88,120 @@ namespace ProjectMayham.EditorTools
             });
 
             EnsureDokhodyaga(enemySprite);
+            CreateLoners();
 
             ShelterSetup.RefreshItemDatabase();
             AddToTrader(pipe, 1);
             AddToTrader(hammer, 1);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("CombatSetup: weapons Pipe and Sledgehammer, enemy Dokhodyaga and their prefabs are ready.");
+            Debug.Log("CombatSetup: weapons Pipe and Sledgehammer, enemies Dokhodyaga, Ram and Justice and their prefabs are ready.");
+        }
+
+        /// <summary>The two enemies that live alone: the Ram and Justice, their definitions and prefabs.</summary>
+        [MenuItem("Mayham/Combat/1b. Ram and Justice")]
+        public static void CreateLoners()
+        {
+            Directory.CreateDirectory(SpriteDir);
+            Directory.CreateDirectory(EnemyDir);
+            Directory.CreateDirectory(Path.GetDirectoryName(RamPrefabPath));
+
+            var ramSprite = MakeSprite(SpriteDir + "/Ram.png", 20, 20, DrawRam);
+            var justiceSprite = MakeSprite(SpriteDir + "/Justice.png", 22, 22, DrawJustice);
+
+            // Sees far down a narrow cone and hears nothing; the danger is the run.
+            var ram = EnsureDefinition<RamDefinition>("Ram", new Dictionary<string, object>
+            {
+                { "displayName", "Таран" },
+                { "maxHealth", 110f }, { "staggerResistance", 0.5f }, { "knockbackResistance", 0.8f },
+                { "patrolSpeed", 1f }, { "investigateSpeed", 1.6f }, { "chaseSpeed", 2.4f },
+                { "acceleration", 8f }, { "turnSpeed", 120f }, { "patrolRadius", 8f }, { "patrolPause", new Vector2(2f, 5f) },
+                { "sightRange", 10f }, { "sightAngle", 80f }, { "senseRange", 1f }, { "hearing", 0f }, { "hearsEnemies", false },
+                { "noticeSeconds", 0.6f }, { "forgetSeconds", 6f },
+                { "loseTargetSeconds", 3f }, { "searchSeconds", 3f },
+                // The "attack" is the charge: it aims at whoever it sees this near, for the wind-up.
+                { "attackRange", 9.5f }, { "attackArc", 60f }, { "damage", 0f }, { "attackKnockback", 0f },
+                { "windupSeconds", 0.9f }, { "recoverSeconds", 0.6f }, { "cooldownSeconds", 1.2f }, { "lunge", 0f },
+                { "shouts", false }, { "shoutRadius", 0f }, { "surroundRange", 0f }, { "separationRadius", 1f },
+                { "chargeSpeed", 9f }, { "chargeAcceleration", 26f }, { "chargeDistance", 16f },
+                { "chargeDamage", 30f }, { "trampleDamage", 30f }, { "chargeKnockback", 10f }, { "chargeStagger", 0.9f },
+                { "stunSeconds", 2.5f }, { "crashNoise", 11f }, { "chargeNoise", 5f }
+            });
+            BuildEnemyPrefab<Ram>("Ram", RamPrefabPath, ramSprite, ram, 0.42f, 6f);
+
+            // Blind: its "sight" is the reach of its arms, all round. Keen ears, slow feet, a crushing blow.
+            var justice = EnsureDefinition<EnemyDefinition>("Justice", new Dictionary<string, object>
+            {
+                { "displayName", "Правосудие" },
+                { "maxHealth", 260f }, { "staggerResistance", 0.9f }, { "knockbackResistance", 0.9f },
+                { "patrolSpeed", 0.6f }, { "investigateSpeed", 1.7f }, { "chaseSpeed", 2.1f },
+                { "acceleration", 6f }, { "turnSpeed", 160f }, { "patrolRadius", 4f }, { "patrolPause", new Vector2(2.5f, 5f) },
+                { "sightRange", 1.7f }, { "sightAngle", 360f }, { "senseRange", 1.7f }, { "hearing", 1.2f }, { "hearsEnemies", true },
+                { "noticeSeconds", 0.15f }, { "forgetSeconds", 10f },
+                { "loseTargetSeconds", 3f }, { "searchSeconds", 6f },
+                { "attackRange", 1.5f }, { "attackArc", 150f }, { "damage", 32f }, { "attackKnockback", 8f },
+                { "windupSeconds", 1.1f }, { "recoverSeconds", 0.9f }, { "cooldownSeconds", 1.2f }, { "lunge", 0.5f },
+                { "shouts", false }, { "shoutRadius", 0f }, { "surroundRange", 0f }, { "separationRadius", 1.1f }
+            });
+            BuildEnemyPrefab<Justice>("Justice", JusticePrefabPath, justiceSprite, justice, 0.45f, 10f);
+
+            AssetDatabase.SaveAssets();
+            Debug.Log("CombatSetup: Ram and Justice are ready.");
+        }
+
+        private static T EnsureDefinition<T>(string id, Dictionary<string, object> values) where T : EnemyDefinition
+        {
+            string path = $"{EnemyDir}/{id}.asset";
+            var definition = AssetDatabase.LoadAssetAtPath<T>(path);
+            if (definition == null)
+            {
+                AssetDatabase.DeleteAsset(path);
+                definition = ScriptableObject.CreateInstance<T>();
+                AssetDatabase.CreateAsset(definition, path);
+            }
+            Apply(definition, values);
+            EditorUtility.SetDirty(definition);
+            return definition;
+        }
+
+        // The prefab is rebuilt from scratch every time, so a change to the recipe reaches it.
+        private static void BuildEnemyPrefab<TMind>(string id, string path, Sprite sprite, EnemyDefinition definition, float radius, float mass)
+            where TMind : EnemyAI
+        {
+            var litMaterial = AssetDatabase.LoadAssetAtPath<GameObject>(LitMaterialPrefab).GetComponent<SpriteRenderer>().sharedMaterial;
+
+            var root = new GameObject(id) { layer = LayerMask.NameToLayer("Enemy") };
+            var rb = root.AddComponent<Rigidbody2D>();
+            rb.gravityScale = 0f;
+            rb.freezeRotation = true;
+            rb.mass = mass;
+            root.AddComponent<CircleCollider2D>().radius = radius;
+
+            var body = new GameObject("Body") { layer = root.layer };
+            body.transform.SetParent(root.transform, false);
+            var renderer = body.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+            renderer.sharedMaterial = litMaterial;
+            renderer.sortingOrder = 8;
+
+            root.AddComponent<Health>();
+            var motor = root.AddComponent<EnemyMotor>();
+            var ai = root.AddComponent<TMind>();
+            root.AddComponent<HitFlash>();
+            root.AddComponent<VisionTarget>();
+            root.AddComponent<WrapEntity>();
+
+            var mso = new SerializedObject(motor);
+            mso.FindProperty("bodyRadius").floatValue = radius;
+            mso.ApplyModifiedPropertiesWithoutUndo();
+
+            var so = new SerializedObject(ai);
+            so.FindProperty("definition").objectReferenceValue = definition;
+            so.FindProperty("body").objectReferenceValue = body.transform;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            PrefabUtility.SaveAsPrefabAsset(root, path);
+            Object.DestroyImmediate(root);
         }
 
         private static WeaponDefinition EnsureWeapon(string id, string title, Sprite sprite, Vector2Int grid, float weight, int value,
@@ -302,7 +411,20 @@ namespace ProjectMayham.EditorTools
             list.arraySize = 1;
             list.GetArrayElementAtIndex(0).objectReferenceValue = prefab;
             so.FindProperty("parent").objectReferenceValue = parent.transform;
+
+            // The ones that live alone: rams in the corridors between the offices, Justice at the doors of the rooms.
+            var loners = so.FindProperty("loners");
+            loners.arraySize = 2;
+            SetLoner(loners.GetArrayElementAtIndex(0), RamPrefabPath, new Vector2Int(5, 8), EnemySpawner.Haunt.Corridor);
+            SetLoner(loners.GetArrayElementAtIndex(1), JusticePrefabPath, new Vector2Int(2, 3), EnemySpawner.Haunt.Doorways);
             so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static void SetLoner(SerializedProperty entry, string prefabPath, Vector2Int count, EnemySpawner.Haunt haunt)
+        {
+            entry.FindPropertyRelative("prefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            entry.FindPropertyRelative("count").vector2IntValue = count;
+            entry.FindPropertyRelative("haunt").enumValueIndex = (int)haunt;
         }
 
         // ================= test helpers (play mode) =================
@@ -449,6 +571,53 @@ namespace ProjectMayham.EditorTools
             Rect(p, w, w - 5, 10, w - 4, 14, shade); // right arm
             Rect(p, w, 3, 14, 4, 15, skin);
             Rect(p, w, w - 5, 14, w - 4, 15, skin);
+        }
+
+        private static void Ellipse(Color[] p, int w, int h, float cx, float cy, float rx, float ry, Color c)
+        {
+            for (int y = 0; y < h; y++)
+                for (int x = 0; x < w; x++)
+                {
+                    float dx = (x - cx) / rx, dy = (y - cy) / ry;
+                    if (dx * dx + dy * dy <= 1f) p[y * w + x] = c;
+                }
+        }
+
+        // A broad hunched hulk seen from above, a heavy head lowered forward (up) between two horn-like plates.
+        private static void DrawRam(Color[] p, int w, int h)
+        {
+            var hide = new Color(0.52f, 0.36f, 0.3f);
+            var dark = new Color(0.34f, 0.22f, 0.19f);
+            var horn = new Color(0.82f, 0.78f, 0.66f);
+
+            Ellipse(p, w, h, (w - 1) * 0.5f, 8f, 9f, 7f, dark);
+            Ellipse(p, w, h, (w - 1) * 0.5f, 8.5f, 8f, 6f, hide);
+            // The lowered head.
+            Ellipse(p, w, h, (w - 1) * 0.5f, 14.5f, 4f, 3.5f, dark);
+            // The plates it rams with.
+            Rect(p, w, 3, 15, 6, 18, horn);
+            Rect(p, w, w - 7, 15, w - 4, 18, horn);
+            Rect(p, w, 4, 18, 5, 19, horn);
+            Rect(p, w, w - 6, 18, w - 5, 19, horn);
+        }
+
+        // A tall robed figure seen from above, the head bound with a white blindfold, a heavy staff held forward (up).
+        private static void DrawJustice(Color[] p, int w, int h)
+        {
+            var robe = new Color(0.16f, 0.17f, 0.24f);
+            var trim = new Color(0.62f, 0.52f, 0.25f);
+            var skin = new Color(0.78f, 0.7f, 0.6f);
+            var band = new Color(0.95f, 0.95f, 0.92f);
+
+            float cx = (w - 1) * 0.5f;
+            Ellipse(p, w, h, cx, 9f, 10f, 8f, trim);
+            Ellipse(p, w, h, cx, 9f, 9f, 7f, robe);
+            // The head and the blindfold across it.
+            Ellipse(p, w, h, cx, 11f, 3.4f, 3.4f, skin);
+            Rect(p, w, Mathf.RoundToInt(cx - 3.4f), 11, Mathf.RoundToInt(cx + 3.4f), 12, band);
+            // The staff in front.
+            Rect(p, w, w - 6, 12, w - 5, h - 1, trim);
+            Rect(p, w, w - 7, h - 3, w - 4, h - 1, new Color(0.8f, 0.7f, 0.35f));
         }
     }
 }
