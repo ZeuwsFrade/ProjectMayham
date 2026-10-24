@@ -6,6 +6,17 @@ namespace ProjectMayham.Items
     [CreateAssetMenu(menuName = "Mayham/Item", fileName = "NewItem")]
     public class ItemDefinition : ScriptableObject
     {
+        /// <summary>How many hands an item takes.</summary>
+        public enum HandUse
+        {
+            [InspectorName("По весу")] ByWeight,
+            [InspectorName("Одна рука")] One,
+            [InspectorName("Две руки")] Two,
+        }
+
+        /// <summary>From this weight on an item set to "by weight" takes both hands.</summary>
+        public const float TwoHandedWeight = 5f;
+
         [SerializeField] private string displayName = "Item";
         [SerializeField] private Sprite icon;
         [Min(1)]
@@ -23,6 +34,8 @@ namespace ProjectMayham.Items
         [Header("Hands")]
         [Tooltip("Whether the player can take the item in their hands (it is then shown next to the player).")]
         [SerializeField] private bool holdable;
+        [Tooltip("How many hands it takes. By weight: both from 5 kg on. A person always takes both.")]
+        [SerializeField] private HandUse hands = HandUse.ByWeight;
         [Tooltip("Sprite shown in the hands. The inventory icon is used when empty.")]
         [SerializeField] private Sprite heldSprite;
         [Tooltip("Where the item is held, relative to the player facing forward (+Y).")]
@@ -59,6 +72,9 @@ namespace ProjectMayham.Items
         public bool CanRotate => canRotate;
         public float Weight => Mathf.Max(0f, weight);
         public bool Holdable => holdable;
+        public HandUse Hands => hands;
+        /// <summary>True for a thing that takes both hands: set so, a person, or heavy enough when it goes by weight.</summary>
+        public bool TwoHanded => isPerson || hands == HandUse.Two || (hands == HandUse.ByWeight && Weight >= TwoHandedWeight);
         public Sprite HeldSprite => heldSprite != null ? heldSprite : icon;
         public Vector2 HeldOffset => heldOffset;
         public float HeldAngle => heldAngle;

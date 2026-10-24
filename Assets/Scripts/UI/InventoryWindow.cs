@@ -16,9 +16,11 @@ namespace ProjectMayham.UI
     /// press R while dragging to turn it, drop it on a stack of the same item to merge, or release it outside of
     /// the window to throw it on the floor. Shift+click adds a stack to the selection or removes it; a selected
     /// group is moved or thrown away together, and G drops it as well. Dragging a frame over empty cells selects
-    /// everything the frame touches (with Shift it is added to the selection). Ctrl+click splits a stack. Right click
-    /// (or dropping on the hands slot) takes one piece of a holdable item in the hands; dragging it out of the
-    /// slot puts it back. Next to the hands are the slots of what is worn (<see cref="PlayerEquipment"/>): right
+    /// everything the frame touches (with Shift it is added to the selection). Ctrl+click splits a stack. There are
+    /// two hands, the right one and the left one below it; the active one is lit (Q or a click on a hand changes
+    /// it). Right click takes one piece of a holdable item in the active hand, dropping it on a hand takes it in that
+    /// one; a two-handed thing takes both. Dragging a thing out of a hand puts it back, onto the other hand moves it
+    /// there. Next to the hands are the slots of what is worn (<see cref="PlayerEquipment"/>): right
     /// click or dropping a thing on its slot puts it on, right click on a slot or dragging out of it takes it off.
     /// The backpack sets the size of the grid, so the grid and the window are laid out from code for whatever
     /// size it has. Esc closes the window (or the split panel). Also keeps the always-visible weight label
@@ -33,6 +35,8 @@ namespace ProjectMayham.UI
         private static readonly Color InvalidColor = new Color(0.95f, 0.3f, 0.3f, 0.4f);
         private static readonly Color OverloadedColor = new Color(1f, 0.7f, 0.25f, 1f);
         private static readonly Color HandsIdle = new Color(0f, 0f, 0f, 0.6f);
+        private static readonly Color ActiveHandIdle = new Color(0.42f, 0.33f, 0.1f, 0.8f);
+        private static readonly Color SecondHandIcon = new Color(1f, 1f, 1f, 0.4f);
 
         [Header("References")]
         [SerializeField] private GridInventory inventory;
@@ -51,7 +55,7 @@ namespace ProjectMayham.UI
         [SerializeField] private TMP_Text weightHud;
 
         [Header("Hands")]
-        [Tooltip("Slot for the item held in the hands.")]
+        [Tooltip("Slot for the item held in the right hand; the left hand gets a copy of it.")]
         [SerializeField] private RectTransform handsSlot;
         [Tooltip("Frame behind the slot; it lights up when a holdable item is dragged over it.")]
         [SerializeField] private Image handsFrame;
@@ -74,7 +78,7 @@ namespace ProjectMayham.UI
         private readonly List<GridInventory.Stack> dragSet = new List<GridInventory.Stack>();
         private GridInventory.Stack dragged;
         private bool draggedRotated;
-        private bool draggingHeld;
+        private Hand? draggingHand;     // dragging out of a hand
         private Vector2 grabOffset;
         private GridInventory.Stack splitTarget;
         private int splitAmount;
@@ -98,6 +102,19 @@ namespace ProjectMayham.UI
         }
 
         private readonly Dictionary<EquipSlot, SlotView> slotViews = new Dictionary<EquipSlot, SlotView>();
+
+        private class HandView
+        {
+            public Hand Hand;
+            public RectTransform Label;
+            public TMP_Text Title;
+            public RectTransform Rect;
+            public Image Frame;
+            public Image Icon;
+        }
+
+        private readonly List<HandView> handViews = new List<HandView>();
+        private Color titleColor = Color.white;
         private PlayerEquipment equipment;
         private RectTransform cellsRoot;
         private RectTransform handsLabel;
@@ -250,29 +267,39 @@ namespace ProjectMayham.UI
             }
 
             var selected = inventory.SelectedStacks;
-            if (Hit(handsSlot, screen))
+            var hand = HandUnder(screen);
+            if (hand.HasValue)
             {
-                infoLabel.text = inventory.HeldItem != null
-                    ? $"В руках: {inventory.HeldItem.DisplayName}. ПКМ или перетащите в сетку — убрать, H — убрать, G — выбросить"
-                    : "Руки пусты. Правый клик по предмету или перетаскивание сюда — взять в руки";
+                infoLabel.text = HandInfo(hand.Value);
                 return;
             }
 
             var stack = StackUnder(screen);
             if (stack != null) infoLabel.text = Describe(stack) + HintFor(stack);
             else if (selected.Count > 1) infoLabel.text = DescribeSelection();
-            else infoLabel.text = "Мышь — перетаскивать, R — повернуть, Shift+клик или рамка — выделить несколько, Ctrl+клик — разделить, ПКМ — взять в руки или надеть";
+            else infoLabel.text = "Мышь — перетаскивать, R — повернуть, Shift+клик или рамка — выделить несколько, Ctrl+клик — разделить, ПКМ — взять в руку или надеть, Q — сменить руку";
         }
 
         private static string HintFor(GridInventory.Stack stack)
         {
             string hint = string.Empty;
             if (stack.Item is ConsumableDefinition consumable) hint += $". F — {consumable.Verb.ToLowerInvariant()} (3 с)";
-            if (stack.Item.Holdable) hint += ". ПКМ — взять в руки";
+            if (stack.Item.Holdable) hint += stack.Item.TwoHanded ? ". ПКМ — взять в обе руки" : ". ПКМ — взять в руку";
             if (stack.Item.Wearable) hint += $"{GridNote(stack.Item)}. ПКМ — надеть";
             if (stack.Count > 1) hint += ". Ctrl+клик — разделить";
             return hint;
         }
+
+        private string HandInfo(Hand hand)
+        {
+            var item = inventory.InHand(hand);
+            string title = HandTitle(hand) + (hand == inventory.ActiveHand && !inventory.HoldsTwoHanded ? " (активная)" : string.Empty);
+            if (item == null) return $"{title}: пусто. Перетащите сюда предмет — взять в эту руку, клик — сделать её активной, Q — сменить руку";
+            string both = inventory.HoldsTwoHanded ? ", в обеих руках" : string.Empty;
+            return $"{title}: {item.DisplayName}{both}. ПКМ или перетащите в сетку — убрать, на другую руку — переложить, H — убрать всё, G — выбросить";
+        }
+
+        private static string HandTitle(Hand hand) => hand == Hand.Right ? "Правая рука" : "Левая рука";
 
         // A backpack tells how big the grid is with it on.
         private static string GridNote(ItemDefinition item) =>
@@ -308,10 +335,14 @@ namespace ProjectMayham.UI
                 return;
             }
 
-            // Pressing the item in the hands drags it out of the slot.
-            if (!shift && !ctrl && inventory.HeldItem != null && Hit(handsSlot, screen))
+            // Pressing a hand makes it the active one, and drags out what it holds.
+            var hand = HandUnder(screen);
+            if (hand.HasValue)
             {
-                BeginHeldDrag();
+                if (shift || ctrl) return;
+                inventory.SetActiveHand(hand.Value);
+                if (inventory.InHand(hand.Value) == null) return;
+                BeginHeldDrag(hand.Value);
                 UpdateDrag(screen);
                 return;
             }
@@ -347,7 +378,7 @@ namespace ProjectMayham.UI
             dragSet.AddRange(inventory.SelectedStacks);
             dragged = stack;
             draggedRotated = stack.Rotated;
-            draggingHeld = false;
+            draggingHand = null;
             grabOffset = local - TopLeftOf(stack.Origin);
 
             BuildGhost();
@@ -356,14 +387,14 @@ namespace ProjectMayham.UI
             UpdateDrag(screen);
         }
 
-        private void BeginHeldDrag()
+        private void BeginHeldDrag(Hand hand)
         {
             // A stand-in stack (not in the grid) lets the held item share the code of the other drags.
-            dragged = new GridInventory.Stack { Item = inventory.HeldItem, Count = 1 };
+            dragged = new GridInventory.Stack { Item = inventory.InHand(hand), Count = 1 };
             dragSet.Clear();
             dragSet.Add(dragged);
             draggedRotated = false;
-            draggingHeld = true;
+            draggingHand = hand;
             grabOffset = FootprintOf(dragged.Item, false) * 0.5f;
             grabOffset.y = -grabOffset.y;
 
@@ -378,7 +409,7 @@ namespace ProjectMayham.UI
             dragSet.Clear();
             dragSet.Add(dragged);
             draggedRotated = false;
-            draggingHeld = false;
+            draggingHand = null;
             draggingSlot = slot;
             grabOffset = FootprintOf(dragged.Item, false) * 0.5f;
             grabOffset.y = -grabOffset.y;
@@ -397,9 +428,10 @@ namespace ProjectMayham.UI
                 return;
             }
 
-            if (Hit(handsSlot, screen))
+            var hand = HandUnder(screen);
+            if (hand.HasValue)
             {
-                if (inventory.HeldItem != null && !inventory.Unhold()) infoLabel.text = "Нет места в инвентаре";
+                if (inventory.InHand(hand.Value) != null && !inventory.Unhold(hand.Value)) infoLabel.text = "Нет места в инвентаре";
                 return;
             }
 
@@ -411,7 +443,7 @@ namespace ProjectMayham.UI
                 return;
             }
             if (!stack.Item.Holdable) infoLabel.text = $"{stack.Item.DisplayName} нельзя взять в руки";
-            else if (!inventory.Hold(stack)) infoLabel.text = "Нет места, чтобы убрать то, что в руках";
+            else if (!inventory.Hold(stack)) infoLabel.text = "Некуда убрать то, что в руках";
         }
 
         // F over food, drink or medicine uses it from the backpack (the progress shows at the bottom of the screen).
@@ -443,14 +475,17 @@ namespace ProjectMayham.UI
             ghost.anchoredPosition = topLeft;
 
             bool overWindow = Hit(window, screen);
-            bool overHands = Hit(handsSlot, screen);
+            var overHand = HandUnder(screen);
             var slot = SlotUnder(screen);
             var origin = OriginFor(topLeft);
-            ShowHighlights(overWindow && !overHands && slot == EquipSlot.None, origin);
+            ShowHighlights(overWindow && !overHand.HasValue && slot == EquipSlot.None, origin);
 
-            // The slot lights up when a holdable item would be taken in the hands.
-            bool canHold = overHands && !draggingHeld && draggingSlot == EquipSlot.None && !IsGroupDrag && dragged.Item.Holdable;
-            handsFrame.color = canHold ? ValidColor : HandsIdle;
+            // A hand lights up green when what is dragged would be taken in it.
+            bool canHold = overHand.HasValue && CanDropOnHand(overHand.Value);
+            foreach (var view in handViews)
+            {
+                view.Frame.color = overHand != view.Hand || draggingHand == view.Hand ? IdleFor(view.Hand) : canHold ? ValidColor : InvalidColor;
+            }
             // A slot of what is worn lights up green for a thing that goes on there, red for any other.
             foreach (var pair in slotViews)
             {
@@ -468,9 +503,12 @@ namespace ProjectMayham.UI
                     ? $"Отпустите, чтобы выбросить выделенное ({dragSet.Count} шт.)"
                     : $"Отпустите, чтобы выбросить: {Describe(dragged)}";
             }
-            else if (overHands)
+            else if (overHand.HasValue)
             {
-                infoLabel.text = canHold ? "Отпустите, чтобы взять в руки" : "Сюда кладётся только предмет, который берётся в руки";
+                infoLabel.text = !canHold ? (draggingHand == overHand ? Describe(dragged) : "Сюда кладётся только предмет, который берётся в руки")
+                    : draggingHand.HasValue ? "Отпустите, чтобы переложить в другую руку"
+                    : dragged.Item.TwoHanded ? "Отпустите, чтобы взять в обе руки"
+                    : $"Отпустите, чтобы взять: {HandTitle(overHand.Value).ToLowerInvariant()}";
             }
             else infoLabel.text = IsGroupDrag ? DescribeSelection() : Describe(dragged);
         }
@@ -491,7 +529,7 @@ namespace ProjectMayham.UI
                 }
                 else
                 {
-                    var kind = draggingHeld ? inventory.EvaluateHeld(origin, draggedRotated)
+                    var kind = draggingHand.HasValue ? inventory.EvaluateHeld(draggingHand.Value, origin, draggedRotated)
                         : draggingSlot != EquipSlot.None ? inventory.EvaluateItem(dragged.Item, origin, draggedRotated)
                         : inventory.Evaluate(dragged, origin, draggedRotated);
                     var color = kind == GridInventory.MoveKind.Move ? ValidColor
@@ -524,22 +562,23 @@ namespace ProjectMayham.UI
             var stack = dragged;
             bool rotated = draggedRotated;
             bool wasGroup = IsGroupDrag;
-            bool wasHeld = draggingHeld;
+            var fromHand = draggingHand;
             var fromSlot = draggingSlot;
             bool overWindow = Hit(window, screen);
-            bool overHands = Hit(handsSlot, screen);
+            var overHand = HandUnder(screen);
+            bool canHold = overHand.HasValue && CanDropOnHand(overHand.Value);
             var slot = SlotUnder(screen);
             bool canWear = slot != EquipSlot.None && CanWear(slot);
             CancelDrag();
 
             if (fromSlot != EquipSlot.None)
             {
-                EndSlotDrag(fromSlot, screen, rotated, overWindow, overHands || slot != EquipSlot.None);
+                EndSlotDrag(fromSlot, screen, rotated, overWindow, overHand.HasValue || slot != EquipSlot.None);
                 return;
             }
-            if (wasHeld)
+            if (fromHand.HasValue)
             {
-                if (slot == EquipSlot.None) EndHeldDrag(screen, rotated, overWindow, overHands);
+                if (slot == EquipSlot.None) EndHeldDrag(fromHand.Value, screen, rotated, overWindow, overHand, canHold);
                 return;
             }
             if (!overWindow)
@@ -552,9 +591,9 @@ namespace ProjectMayham.UI
                 if (canWear && Equipment != null) Equipment.WearFromGrid(stack);
                 return;
             }
-            if (overHands)
+            if (overHand.HasValue)
             {
-                if (!wasGroup && stack.Item.Holdable && !inventory.Hold(stack)) infoLabel.text = "Нет места, чтобы убрать то, что в руках";
+                if (canHold && !inventory.Hold(stack, overHand.Value)) infoLabel.text = "Некуда убрать то, что в руках";
                 return;
             }
             if (!ToGridLocal(screen, out var local)) return;
@@ -587,17 +626,23 @@ namespace ProjectMayham.UI
             Equipment.TakeOffToGrid(slot, origin, rotated);
         }
 
-        private void EndHeldDrag(Vector2 screen, bool rotated, bool overWindow, bool overHands)
+        private void EndHeldDrag(Hand hand, Vector2 screen, bool rotated, bool overWindow, Hand? overHand, bool canHold)
         {
-            var item = inventory.HeldItem;
-            if (item == null || overHands) return;
+            var item = inventory.InHand(hand);
+            if (item == null) return;
+            if (overHand.HasValue)
+            {
+                // Onto the other hand: the hands trade what they hold.
+                if (canHold) inventory.SwapHands();
+                return;
+            }
 
             if (!overWindow)
             {
-                if (item.WorldPrefab != null && inventory.TakeHeld(out var thrown)) interactor.DropToWorld(thrown, 1);
+                if (item.WorldPrefab != null && inventory.TakeHeld(hand, out var thrown)) interactor.DropToWorld(thrown, 1);
                 return;
             }
-            if (ToGridLocal(screen, out var local)) inventory.PlaceHeld(OriginFor(local - grabOffset), rotated);
+            if (ToGridLocal(screen, out var local)) inventory.PlaceHeld(hand, OriginFor(local - grabOffset), rotated);
         }
 
         private void Throw(List<GridInventory.Stack> group)
@@ -621,11 +666,11 @@ namespace ProjectMayham.UI
         {
             if (dragged == null) return;
             dragged = null;
-            draggingHeld = false;
+            draggingHand = null;
             draggingSlot = EquipSlot.None;
             dragSet.Clear();
             ghost.gameObject.SetActive(false);
-            handsFrame.color = HandsIdle;
+            foreach (var view in handViews) view.Frame.color = IdleFor(view.Hand);
             foreach (var view in slotViews.Values) view.Frame.color = HandsIdle;
             ShowHighlights(false, Vector2Int.zero);
             Rebuild();
@@ -871,7 +916,25 @@ namespace ProjectMayham.UI
 
         // What is being dragged out of the grid goes on in that slot.
         private bool CanWear(EquipSlot slot) =>
-            dragged != null && !IsGroupDrag && !draggingHeld && draggingSlot == EquipSlot.None && dragged.Item.EquipSlot == slot;
+            dragged != null && !IsGroupDrag && !draggingHand.HasValue && draggingSlot == EquipSlot.None && dragged.Item.EquipSlot == slot;
+
+        private Hand? HandUnder(Vector2 screen)
+        {
+            foreach (var view in handViews)
+            {
+                if (Hit(view.Rect, screen)) return view.Hand;
+            }
+            return null;
+        }
+
+        // What is dragged can be taken in that hand: a holdable thing out of the grid, or the other hand's thing.
+        private bool CanDropOnHand(Hand hand)
+        {
+            if (dragged == null || IsGroupDrag || draggingSlot != EquipSlot.None || !dragged.Item.Holdable) return false;
+            return !draggingHand.HasValue || (draggingHand.Value != hand && !inventory.HoldsTwoHanded);
+        }
+
+        private Color IdleFor(Hand hand) => hand == inventory.ActiveHand && !inventory.HoldsTwoHanded ? ActiveHandIdle : HandsIdle;
 
         /// <summary>
         /// Sizes the grid and the window for the grid the inventory has now (the backpack decides it) and puts the
@@ -910,10 +973,17 @@ namespace ProjectMayham.UI
             if (handsLabel != null) handsLabel.anchoredPosition = new Vector2(column, top);
             handsSlot.anchoredPosition = new Vector2(column, top - LabelHeight);
 
+            BuildHands();
             BuildSlots();
+            // The left hand under the right one.
+            float leftTop = top - LabelHeight - handsSlot.sizeDelta.y - SlotSpacing;
+            var left = handViews[1];
+            if (left.Label != left.Rect) left.Label.anchoredPosition = new Vector2(column, leftTop);
+            left.Rect.anchoredPosition = new Vector2(column, leftTop - LabelHeight);
+
             float slotsX = column + handsSlot.sizeDelta.x + Gap;
             float y0 = top;
-            float lowest = -handsSlot.anchoredPosition.y + handsSlot.sizeDelta.y;
+            float lowest = -left.Rect.anchoredPosition.y + handsSlot.sizeDelta.y;
             foreach (var slot in PlayerEquipment.Slots)
             {
                 var view = slotViews[slot];
@@ -926,6 +996,48 @@ namespace ProjectMayham.UI
             float gridBottom = -grid.anchoredPosition.y + size.y * cellSize;
             window.sizeDelta = new Vector2(slotsX + SlotSize + Gap, Mathf.Max(gridBottom, lowest) + BottomRoom);
             splitPanel.anchoredPosition = grid.anchoredPosition + new Vector2(size.x * cellSize * 0.5f, -size.y * cellSize * 0.5f);
+        }
+
+        // The right hand is the slot of the scene, the left one a copy of it with its own label. Made once.
+        private void BuildHands()
+        {
+            if (handViews.Count > 0) return;
+
+            TMP_Text rightTitle = null;
+            if (handsLabel != null && handsLabel.TryGetComponent(out rightTitle))
+            {
+                titleColor = rightTitle.color;
+                rightTitle.text = HandTitle(Hand.Right);
+            }
+            handViews.Add(new HandView { Hand = Hand.Right, Label = handsLabel != null ? handsLabel : handsSlot, Title = rightTitle, Rect = handsSlot, Frame = handsFrame, Icon = handsIcon });
+
+            RectTransform label = null;
+            TMP_Text leftTitle = null;
+            if (handsLabel != null)
+            {
+                label = Instantiate(handsLabel, window);
+                label.name = "LeftHandLabel";
+                label.SetSiblingIndex(grid.GetSiblingIndex());
+                if (label.TryGetComponent(out leftTitle)) leftTitle.text = HandTitle(Hand.Left);
+            }
+            var rect = Instantiate(handsSlot, window);
+            rect.name = "LeftHandSlot";
+            rect.SetSiblingIndex(grid.GetSiblingIndex());
+            handViews.Add(new HandView
+            {
+                Hand = Hand.Left, Label = label != null ? label : rect, Title = leftTitle, Rect = rect,
+                Frame = Counterpart(handsFrame, handsSlot, rect), Icon = Counterpart(handsIcon, handsSlot, rect),
+            });
+        }
+
+        // The image of a copy that stands where the given image stands in the original.
+        private static Image Counterpart(Image image, RectTransform original, RectTransform copy)
+        {
+            if (image == null) return copy.GetComponent<Image>();
+            var path = new List<string>();
+            for (var t = image.transform; t != null && t != original; t = t.parent) path.Insert(0, t.name);
+            var found = path.Count == 0 ? copy : copy.Find(string.Join("/", path));
+            return found != null ? found.GetComponent<Image>() : copy.GetComponent<Image>();
         }
 
         // Copies of the hands slot and its label, one for every slot of what is worn. Made once.
@@ -964,9 +1076,22 @@ namespace ProjectMayham.UI
 
         private void RefreshHands()
         {
-            var item = inventory.HeldItem;
-            handsIcon.enabled = item != null && !draggingHeld;
-            handsIcon.sprite = item != null ? item.Icon : null;
+            bool both = inventory.HoldsTwoHanded;
+            foreach (var view in handViews)
+            {
+                var item = inventory.InHand(view.Hand);
+                // What is dragged out of a hand leaves it; a two-handed thing leaves both.
+                bool dragging = draggingHand.HasValue && (draggingHand.Value == view.Hand || both);
+                if (view.Icon != null)
+                {
+                    view.Icon.enabled = item != null && !dragging;
+                    view.Icon.sprite = item != null ? item.Icon : null;
+                    // A two-handed thing shows faded in the left hand: it is the same thing.
+                    view.Icon.color = both && view.Hand == Hand.Left ? SecondHandIcon : Color.white;
+                }
+                if (view.Title != null) view.Title.color = view.Hand == inventory.ActiveHand && !both ? SelectedColor : titleColor;
+                if (dragged == null && view.Frame != null) view.Frame.color = IdleFor(view.Hand);
+            }
         }
 
         private RectTransform CreateWidget(Transform parent, GridInventory.Stack stack, bool rotated, Vector2 topLeft)

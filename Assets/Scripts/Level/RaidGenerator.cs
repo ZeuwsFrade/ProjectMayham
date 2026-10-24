@@ -39,6 +39,8 @@ namespace ProjectMayham.Level
         private const int NpcSalt = 0x51A7E;
         // The exit and the wall maps throw dice of their own too.
         private const int ExitSalt = 0xE817;
+        // And the blueprint a raid may hide.
+        private const int BlueprintSalt = 0xB1E5;
         // No lost NPC closer than this to the start or the exit, and none moved closer than this to the player.
         private const float NpcClearance = 12f;
 
@@ -98,6 +100,11 @@ namespace ProjectMayham.Level
         [Tooltip("Distance from the points above that stays free of holes, in world units.")]
         [SerializeField, Min(0f)] private float holeClearance = 12f;
 
+        [Header("Blueprints")]
+        [Tooltip("Chance that a raid hides the blueprint of a shelter module (one at most) in a container, while there " +
+                 "are blueprints to find that the player does not know.")]
+        [SerializeField, Range(0f, 1f)] private float blueprintChance = 0.5f;
+
         [Header("Seed")]
         [Tooltip("Off: every raid gets a new random seed (printed to the console).")]
         [SerializeField] private bool useFixedSeed;
@@ -122,6 +129,7 @@ namespace ProjectMayham.Level
         // Tiles a lost NPC can sit on: floor with no wall, window or furniture on it or next to it. Made once a raid.
         private List<Vector2> npcSpots;
         private GameObject exit;
+        private LootContainer blueprintContainer;
         private readonly List<GameObject> wallMaps = new List<GameObject>();
         // The containers have dice of their own: what lies in them changes nothing about the rooms, the loot on
         // the floor, the barricades and the holes of a seed.
@@ -142,6 +150,10 @@ namespace ProjectMayham.Level
         /// <summary>The exit of the raid, or null without an exit prefab or free floor.</summary>
         public GameObject Exit => exit;
         public IReadOnlyList<GameObject> WallMaps => wallMaps;
+        /// <summary>The container that hides this raid's blueprint, or null when the raid has none.</summary>
+        public LootContainer BlueprintContainer => blueprintContainer;
+        /// <summary>The chance of a blueprint in a raid; the self-tests set it.</summary>
+        public float BlueprintChance { get => blueprintChance; set => blueprintChance = Mathf.Clamp01(value); }
         /// <summary>Kinds of rooms that were asked for and found no slot in this raid.</summary>
         public IReadOnlyList<RoomKind> MissingKinds => missingKinds;
 
@@ -194,6 +206,8 @@ namespace ProjectMayham.Level
             var exitDice = new System.Random(seed ^ ExitSalt);
             PlaceExit(root.transform, slots, exitDice);
             PlaceWallMaps(root.transform, slots, exitDice);
+            // A blueprint changes nothing else either: it goes into a container that is filled already.
+            PlaceBlueprint(new System.Random(seed ^ BlueprintSalt));
 
             string summary = string.Join(", ", rooms.Select(r => $"{r.Slot.name}={RoomSizes.Title(r.Kind)}"));
             Debug.Log($"Raid seed {seed}: {summary}; barricades: {barricades.Count}; holes: {holes.Count}; "
@@ -224,6 +238,7 @@ namespace ProjectMayham.Level
             questContainers.Clear();
             lostNpcs.Clear();
             exit = null;
+            blueprintContainer = null;
             wallMaps.Clear();
             npcSpots = null;
 
@@ -824,6 +839,23 @@ namespace ProjectMayham.Level
                 wallMaps.Add(map);
                 candidates.RemoveAll(c => WrappedDistance(c.spot, spot) < wallMapSpacing);
             }
+        }
+
+        // One blueprint a raid at most, now and then: hidden in a container it fits, found when searching.
+        private void PlaceBlueprint(System.Random dice)
+        {
+            var module = Shelter.Blueprints.PickForRaid(dice, blueprintChance);
+            if (module == null) return;
+
+            var item = module.BlueprintItem;
+            var fitting = containers.Where(c => c.CanHide(item, 1)).ToList();
+            if (fitting.Count == 0)
+            {
+                Debug.LogWarning($"RaidGenerator: no container takes the blueprint {item.Id}.", this);
+                return;
+            }
+            blueprintContainer = fitting[dice.Next(fitting.Count)];
+            blueprintContainer.Hide(item, 1);
         }
 
         // One lost NPC a raid at most: picked at random among those not brought home yet, put on free floor.

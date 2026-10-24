@@ -96,6 +96,8 @@ namespace ProjectMayham.EditorTools
                     t.Eq(generator.QuestPickups.Count, 1, $"seed {seed}: it is put on the floor instead");
                 }
 
+                BlueprintChecks(t, generator, folder);
+
                 float share = total > 0 ? withLoot / (float)total : 0f;
                 t.Ok(share > 0.24f && share < 0.4f, $"about a third of the containers hold something (got {share:0.00} of {total})");
                 t.Ok(signatures.Count > 1, "different seeds fill the containers differently");
@@ -110,6 +112,56 @@ namespace ProjectMayham.EditorTools
             return t.Failures.Count == 0
                 ? $"PASS: {t.Count} checks"
                 : $"FAIL: {t.Failures.Count} of {t.Count} checks\n - " + string.Join("\n - ", t.Failures.Take(20));
+        }
+
+        // A raid hides one blueprint at most, in a container, and nothing else about the raid changes for it. The
+        // module is made for the check: nobody knows its blueprint.
+        private static void BlueprintChecks(QuestSelfTest.Checks t, RaidGenerator generator, ItemDefinition folder)
+        {
+            var plan = ScriptableObject.CreateInstance<ItemDefinition>();
+            plan.name = "SelfTestPlan";
+            plan.hideFlags = HideFlags.HideAndDontSave;
+            var planSo = new SerializedObject(plan);
+            planSo.FindProperty("worldPrefab").objectReferenceValue = folder.WorldPrefab;
+            planSo.ApplyModifiedPropertiesWithoutUndo();
+            var module = ScriptableObject.CreateInstance<Shelter.ShelterModuleDefinition>();
+            module.name = "SelfTestModule";
+            module.hideFlags = HideFlags.HideAndDontSave;
+            var moduleSo = new SerializedObject(module);
+            moduleSo.FindProperty("blueprintItem").objectReferenceValue = plan;
+            moduleSo.ApplyModifiedPropertiesWithoutUndo();
+
+            float chance = generator.BlueprintChance;
+            Shelter.ModuleCatalog.Override(new[] { module });
+            try
+            {
+                for (int n = 1; n <= 3; n++)
+                {
+                    int seed = n * 7919 + 13;
+                    generator.BlueprintChance = 0f;
+                    generator.Generate(seed);
+                    string rooms = string.Join(",", generator.Rooms.Select(r => r.Kind));
+                    int containers = generator.Containers.Count;
+                    t.Ok(generator.BlueprintContainer == null && CountIn(generator, plan) == 0, $"seed {seed}: no blueprint without the chance");
+
+                    generator.BlueprintChance = 1f;
+                    generator.Generate(seed);
+                    t.Ok(generator.BlueprintContainer != null, $"seed {seed}: with the chance a container hides a blueprint");
+                    t.Eq(CountIn(generator, plan), 1, $"seed {seed}: one, in the whole raid");
+                    t.Ok(generator.BlueprintContainer != null && generator.BlueprintContainer.Inventory.Stacks.Any(s => s.Item == plan && s.Sealed),
+                        $"seed {seed}: waiting to be found");
+                    t.Ok(string.Join(",", generator.Rooms.Select(r => r.Kind)) == rooms && generator.Containers.Count == containers,
+                        $"seed {seed}: the rooms and the containers stay as they were");
+                    t.Eq(generator.QuestContainers.Count, 0, $"seed {seed}: it is not a quest's");
+                }
+            }
+            finally
+            {
+                generator.BlueprintChance = chance;
+                Shelter.ModuleCatalog.Reset();
+                Object.DestroyImmediate(module);
+                Object.DestroyImmediate(plan);
+            }
         }
 
         private static string Signature(RaidGenerator generator) =>

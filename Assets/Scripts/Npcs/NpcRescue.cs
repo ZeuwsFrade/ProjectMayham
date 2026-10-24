@@ -83,8 +83,10 @@ namespace ProjectMayham.Npcs
                 inventory.Remove(stack);
                 if (npc != null) carried.Add(npc);
             }
-            if (inventory.HeldItem != null && inventory.HeldItem.IsPerson && inventory.TakeHeld(out var held))
+            foreach (var hand in new[] { Hand.Right, Hand.Left })
             {
+                var inHand = inventory.InHand(hand);
+                if (inHand == null || !inHand.IsPerson || !inventory.TakeHeld(hand, out var held)) continue;
                 var npc = NpcCatalog.ByCarryItem(held);
                 if (npc != null) carried.Add(npc);
             }

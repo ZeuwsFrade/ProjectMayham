@@ -12,7 +12,7 @@ namespace ProjectMayham.Items
     /// merge. Replaces the slot logic of <see cref="Inventory"/> but keeps its weight rules, so the player, stats and
     /// pickups work with it unchanged. The slot/hotbar members of the base class are empty here.
     /// </summary>
-    public class GridInventory : Inventory
+    public partial class GridInventory : Inventory
     {
         /// <summary>What dropping a stack at a given place would do.</summary>
         public enum MoveKind { Invalid, Move, Merge }
@@ -43,10 +43,6 @@ namespace ProjectMayham.Items
         private readonly List<Stack> selection = new List<Stack>();
         private float weight;
         private float extraWeight;
-        private ItemDefinition held;
-
-        /// <summary>Raised when the item in the hands changes.</summary>
-        public event Action HeldChanged;
 
         /// <summary>Raised whenever the set of selected stacks changes.</summary>
         public event Action SelectedStackChanged;
@@ -60,11 +56,8 @@ namespace ProjectMayham.Items
         public IReadOnlyList<Stack> SelectedStacks => selection;
         public bool IsSelected(Stack stack) => selection.Contains(stack);
 
-        /// <summary>The item in the hands (one piece, outside of the grid), or null.</summary>
-        public ItemDefinition HeldItem => held;
-
         // What is carried in the hands weighs as much as what is in the grid, and so does what is worn.
-        public override float TotalWeight => weight + (held != null ? held.Weight : 0f) + extraWeight;
+        public override float TotalWeight => weight + HeldWeight + extraWeight;
 
         /// <summary>Weight carried outside of the grid and the hands: what the owner wears.</summary>
         public float ExtraWeight
@@ -194,7 +187,7 @@ namespace ProjectMayham.Items
         /// </summary>
         public bool Configure(Vector2Int size, float maxWeight)
         {
-            if (stacks.Count > 0 || held != null) return false;
+            if (stacks.Count > 0 || !HandsEmpty) return false;
 
             gridSize = new Vector2Int(Mathf.Max(1, size.x), Mathf.Max(1, size.y));
             cells = null;
@@ -287,102 +280,6 @@ namespace ProjectMayham.Items
             Remove(stack);
             return true;
         }
-
-        /// <summary>
-        /// Takes one piece out of the stack and puts it into the hands. Whatever was in the hands goes back to
-        /// the grid first; if there is no room for it nothing changes.
-        /// </summary>
-        public bool Hold(Stack stack)
-        {
-            if (stack == null || stack.Sealed || !stacks.Contains(stack) || !stack.Item.Holdable) return false;
-
-            var item = stack.Item;
-            if (held != null && !Unhold()) return false;
-
-            // The stack may have been merged away while the old item was put back.
-            if (!stacks.Contains(stack)) return false;
-            stack.Count -= 1;
-            if (stack.Count <= 0) Remove(stack);
-            else { Recalculate(); NotifyChanged(); }
-
-            held = item;
-            HeldChanged?.Invoke();
-            NotifyChanged();
-            return true;
-        }
-
-        /// <summary>Takes a thing from outside straight into the hands, when they are empty and the weight allows it.</summary>
-        public bool HoldNew(ItemDefinition item)
-        {
-            if (item == null || held != null || !FitsByWeight(item)) return false;
-            held = item;
-            HeldChanged?.Invoke();
-            NotifyChanged();
-            return true;
-        }
-
-        /// <summary>Puts the item in the hands back into the grid. Returns false when there is no room.</summary>
-        public bool Unhold()
-        {
-            if (held == null) return true;
-
-            var item = held;
-            held = null; // not counted while it looks for a place
-            if (Add(item, 1) > 0)
-            {
-                held = item;
-                return false;
-            }
-            HeldChanged?.Invoke();
-            return true;
-        }
-
-        /// <summary>Empties the hands without putting anything back (to drop the item).</summary>
-        public bool TakeHeld(out ItemDefinition item)
-        {
-            item = held;
-            if (held == null) return false;
-            held = null;
-            HeldChanged?.Invoke();
-            NotifyChanged();
-            return true;
-        }
-
-        /// <summary>What dropping the item in the hands at <paramref name="origin"/> would do.</summary>
-        public MoveKind EvaluateHeld(Vector2Int origin, bool rotated)
-        {
-            if (held == null) return MoveKind.Invalid;
-            return EvaluateCells(new Stack { Item = held, Count = 1, Origin = origin, Rotated = rotated }, origin, rotated, false);
-        }
-
-        /// <summary>Puts the item in the hands into the grid at a chosen place (or on a matching stack).</summary>
-        public bool PlaceHeld(Vector2Int origin, bool rotated)
-        {
-            var item = held;
-            var temp = item != null ? new Stack { Item = item, Count = 1, Origin = origin, Rotated = rotated } : null;
-            var kind = EvaluateHeld(origin, rotated);
-            if (kind == MoveKind.Invalid) return false;
-
-            held = null;
-            if (kind == MoveKind.Move)
-            {
-                stacks.Add(temp);
-                Place(temp);
-                SelectStack(temp);
-            }
-            else
-            {
-                var target = FindOverlapped(temp, origin, rotated);
-                target.Count += 1;
-                SelectStack(target);
-            }
-            Recalculate();
-            HeldChanged?.Invoke();
-            NotifyChanged();
-            return true;
-        }
-
-        /// <summary>Splits <paramref name="amount"/> items off a stack into a new stack in the first free spot.</summary>
         public Stack Split(Stack stack, int amount)
         {
             if (stack == null || stack.Sealed || !stacks.Contains(stack)) return null;
@@ -544,7 +441,7 @@ namespace ProjectMayham.Items
         {
             stacks.Clear();
             selection.Clear();
-            held = null;
+            right = left = null;
             cells = null;
             weight = 0f;
             NotifyChanged();
@@ -555,7 +452,10 @@ namespace ProjectMayham.Items
         /// <summary>Copies the contents into a save-friendly form.</summary>
         public InventoryData Export()
         {
-            var data = new InventoryData { held = held != null ? held.Id : null };
+            var data = new InventoryData
+            {
+                held = right != null ? right.Id : null, heldLeft = left != null ? left.Id : null, activeHand = (int)activeHand
+            };
             foreach (var stack in stacks)
             {
                 data.stacks.Add(new StackData
@@ -571,7 +471,7 @@ namespace ProjectMayham.Items
         {
             stacks.Clear();
             selection.Clear();
-            held = null;
+            right = left = null;
             cells = null;
             weight = 0f;
 
@@ -596,8 +496,7 @@ namespace ProjectMayham.Items
                 }
                 Recalculate();
 
-                var heldItem = ItemDatabase.Find(data.held);
-                if (heldItem != null) held = heldItem;
+                ImportHands(ItemDatabase.Find(data.held), ItemDatabase.Find(data.heldLeft), data.activeHand);
             }
 
             NotifyChanged();

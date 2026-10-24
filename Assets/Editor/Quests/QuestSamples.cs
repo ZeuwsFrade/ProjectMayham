@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using ProjectMayham.Items;
 using ProjectMayham.Level;
+using ProjectMayham.Player;
 using ProjectMayham.Quests;
 using UnityEditor;
 using UnityEngine;
@@ -79,6 +80,22 @@ namespace ProjectMayham.EditorTools
                 AddObjective(so, QuestObjectiveKind.Deliver, mug, 2, RoomKind.Office);
             });
 
+            // A skill for a quest: Tyler shows how to shake a vending machine.
+            var coin = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/Data/Items/Coin.asset");
+            Ensure<QuestDefinition>($"{Root}/Tyler/Tyler_Vending.asset", ref created, so =>
+            {
+                Fill(so, tyler, 12, "Автоматы-жулики",
+                    "Автоматы в комнатах отдыха жрут монеты и половину не отдают. Но есть способ с ними договориться.\n\n" +
+                    "Принеси мне пять монет — покажу.",
+                    "Пять монет, [ИГРОК]. Тогда и поговорим.",
+                    "Смотри: бьёшь сбоку, вот сюда, и трясёшь. Только недолго и не на весь этаж — сбегутся.",
+                    0);
+                Require(so, first);
+                AddObjective(so, QuestObjectiveKind.Deliver, coin, 5, RoomKind.Office);
+                so.FindProperty("rewardSkill").stringValue = PlayerSkills.VendingShake;
+                so.FindProperty("rewardLoyalty").intValue = 3;
+            });
+
             // Dailies: Tyler offers two of them a day, at random; each may be refused for the loyalty it gives.
             var books = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/Data/Items/Books.asset");
             Ensure<QuestDefinition>($"{Root}/Tyler/Tyler_Daily_Papers.asset", ref created, so =>
@@ -111,6 +128,25 @@ namespace ProjectMayham.EditorTools
                 AddObjective(so, QuestObjectiveKind.VisitRoom, null, 1, RoomKind.Toilet);
                 Daily(so, 2);
             });
+
+            // A blueprint for a quest: Tyler draws how to put a paper press together.
+            var press = ModuleSetup.EnsurePress();
+            if (press != null)
+            {
+                Ensure<QuestDefinition>($"{Root}/Tyler/Tyler_Press.asset", ref created, so =>
+                {
+                    Fill(so, tyler, 13, "Пресс для макулатуры",
+                        "Бумага нужна всем, а книги никто не читает. Видел я в одной типографии пресс: книги туда, бумага оттуда.\n\n" +
+                        "Принеси три стопки книг — на пробу. А я нарисую, как такой собрать.",
+                        "Три стопки книг, [ИГРОК]. Без них и рисовать нечего.",
+                        "Держи чертёж. Соберёшь в убежище из папок, швабры и пары монет. Как — не спрашивай, просто собери.",
+                        0);
+                    Require(so, first);
+                    AddObjective(so, QuestObjectiveKind.Deliver, books, 3, RoomKind.Office);
+                    so.FindProperty("rewardBlueprint").objectReferenceValue = press;
+                    so.FindProperty("rewardLoyalty").intValue = 2;
+                });
+            }
 
             AssetDatabase.SaveAssets();
             QuestCatalog.Reset();
