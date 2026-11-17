@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectMayham.Core;
@@ -28,8 +29,8 @@ namespace ProjectMayham.Shelter
         [SerializeField] private ItemDefinition blueprintItem;
 
         public string Id => name;
-        public string DisplayName => displayName;
-        public string Description => description;
+        public string DisplayName => GameText.Translate(displayName);
+        public string Description => GameText.Translate(description);
         public GameObject Prefab => prefab;
         public IReadOnlyList<ItemAmount> Cost => cost;
         public ItemDefinition BlueprintItem => blueprintItem;
@@ -55,7 +56,7 @@ namespace ProjectMayham.Shelter
         public ShelterModuleDefinition Module => module;
         /// <summary>The object of the module standing here, or null.</summary>
         public GameObject Built => built;
-        public override string Prompt => "Построить модуль";
+        public override string Prompt => GameText.Translate("Построить модуль");
 
         /// <summary>The modules that can stand here: the listed ones, or every module when none is listed.</summary>
         public IEnumerable<ShelterModuleDefinition> Available =>
@@ -73,11 +74,11 @@ namespace ProjectMayham.Shelter
         /// <summary>Why the module cannot be built here now, or null when it can. <paramref name="stores"/> pay for it.</summary>
         public string CannotBuild(ShelterModuleDefinition candidate, IEnumerable<GridInventory> stores)
         {
-            if (IsBuilt) return "Место занято";
-            if (candidate == null || candidate.Prefab == null) return "Нельзя построить";
-            if (!Blueprints.IsKnown(candidate)) return "Нет чертежа";
-            if (IsBuiltAnywhere(candidate)) return "Уже построен";
-            if (!ModuleCost.CanAfford(candidate.Cost, stores)) return "Не хватает ресурсов";
+            if (IsBuilt) return GameText.Translate("Место занято");
+            if (candidate == null || candidate.Prefab == null) return GameText.Translate("Нельзя построить");
+            if (!Blueprints.IsKnown(candidate)) return GameText.Translate("Нет чертежа");
+            if (IsBuiltAnywhere(candidate)) return GameText.Translate("Уже построен");
+            if (!ModuleCost.CanAfford(candidate.Cost, stores)) return GameText.Translate("Не хватает ресурсов");
             return null;
         }
 

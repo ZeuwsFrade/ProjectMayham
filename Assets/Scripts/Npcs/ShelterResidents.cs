@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -78,7 +79,7 @@ namespace ProjectMayham.Npcs
             while (SceneLoader.IsLoading) yield return null;
             yield return null;
             string names = string.Join(", ", learned.Select(m => $"«{m.DisplayName}»"));
-            UI.ScreenNote.Show((learned.Count == 1 ? "Изучен чертёж: " : "Изучены чертежи: ") + names, 6f);
+            UI.ScreenNote.Show(GameText.Format(learned.Count == 1 ? "Изучен чертёж: {0}" : "Изучены чертежи: {0}", names), 6f);
         }
 
         // The rescued NPC thanks the player once the shelter is on screen.

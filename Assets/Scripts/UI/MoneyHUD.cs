@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Core;
 using TMPro;
 using UnityEngine;
@@ -25,6 +26,6 @@ namespace ProjectMayham.UI
 
         private void OnDisable() => GameSession.MoneyChanged -= Show;
 
-        private void Show(int money) => label.text = $"{money} $";
+        private void Show(int money) => label.text = GameText.Format("{0} $", money);
     }
 }

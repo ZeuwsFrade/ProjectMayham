@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -95,8 +96,8 @@ namespace ProjectMayham.Items
             {
                 inventory.SwitchHand();
                 var item = inventory.HeldItem;
-                string hand = inventory.ActiveHand == Hand.Right ? "Правая рука" : "Левая рука";
-                UI.ScreenNote.Show(item != null ? $"{hand}: {item.DisplayName}" : $"{hand}: пусто", noteSeconds);
+                string hand = inventory.ActiveHand == Hand.Right ? GameText.Translate("Правая рука") : GameText.Translate("Левая рука");
+                UI.ScreenNote.Show(item != null ? $"{hand}: {item.DisplayName}" : GameText.Format("{0}: пусто", hand), noteSeconds);
             }
             if (keyboard[putAwayKey].wasPressedThisFrame && !inventory.HandsEmpty) inventory.PutAwayHands();
         }

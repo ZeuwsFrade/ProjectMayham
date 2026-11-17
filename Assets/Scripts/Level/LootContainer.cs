@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Linq;
 using ProjectMayham.Interaction;
 using ProjectMayham.Items;
@@ -84,8 +85,8 @@ namespace ProjectMayham.Level
             get
             {
                 // Before the first look nobody knows whether there is anything inside.
-                if (!IsSearched) return $"Обыскать: {Title}";
-                return Inventory.Stacks.Count > 0 ? $"Открыть: {Title}" : $"{Title} (пусто)";
+                if (!IsSearched) return GameText.Format("Обыскать: {0}", Title);
+                return Inventory.Stacks.Count > 0 ? GameText.Format("Открыть: {0}", Title) : GameText.Format("{0} (пусто)", Title);
             }
         }
 

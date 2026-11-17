@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using ProjectMayham.Core;
 
@@ -29,6 +30,6 @@ namespace ProjectMayham.Player
         }
 
         /// <summary>The name of a skill for the player, or the id of one nobody named.</summary>
-        public static string Title(string skill) => Known.TryGetValue(skill, out var title) ? title : skill;
+        public static string Title(string skill) => Known.TryGetValue(skill, out var title) ? GameText.Translate(title) : skill;
     }
 }

@@ -43,6 +43,7 @@ namespace ProjectMayham.EditorTools
         static partial void DailyTests(Checks t);
         static partial void SkillTests(Checks t);
         static partial void ModuleTests(Checks t);
+        static partial void CoffeeTests(Checks t);
 
         [MenuItem("Mayham/Quests/Run Self-Test")]
         public static void RunMenu() => Debug.Log(Run());
@@ -69,6 +70,7 @@ namespace ProjectMayham.EditorTools
                 Group(t, "daily", () => DailyTests(t));
                 Group(t, "skills", () => SkillTests(t));
                 Group(t, "modules", () => ModuleTests(t));
+                Group(t, "coffee", () => CoffeeTests(t));
             }
             finally
             {

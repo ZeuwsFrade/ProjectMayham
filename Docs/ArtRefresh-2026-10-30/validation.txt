@@ -1,0 +1,1 @@
+Sprites=17; barricades=3; max repeat-fit delta=3.57627869E-07; issues=0

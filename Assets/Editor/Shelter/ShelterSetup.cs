@@ -144,7 +144,7 @@ namespace ProjectMayham.EditorTools
 
             var so = new SerializedObject(trader);
             so.FindProperty("displayName").stringValue = "Тайлер";
-            so.FindProperty("portrait").objectReferenceValue = PlayerSprite();
+            so.FindProperty("portrait").objectReferenceValue = TylerSprite();
             so.FindProperty("greeting").stringValue = "Здорово, [ИГРОК]. Присаживайся, смотри, что у меня есть. Что-то продашь — заплачу честно.";
             so.FindProperty("sellMarkup").floatValue = 1.3f;
             so.FindProperty("buyRate").floatValue = 0.5f;
@@ -194,10 +194,10 @@ namespace ProjectMayham.EditorTools
             }
         }
 
-        private static Sprite PlayerSprite()
+        private static Sprite TylerSprite()
         {
-            // The character art the player has in the scenes (the prefab still carries an older placeholder).
-            return AssetDatabase.LoadAllAssetsAtPath("Assets/Art/Characters/PlayerHero.png").OfType<Sprite>().FirstOrDefault();
+            return AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/Npcs/Tyler.png")
+                ?? AssetDatabase.LoadAllAssetsAtPath("Assets/Art/Characters/PlayerHero.png").OfType<Sprite>().FirstOrDefault();
         }
 
         // ================= placeholder art =================
@@ -466,8 +466,8 @@ namespace ProjectMayham.EditorTools
             npc.transform.position = new Vector3(7.5f, 2.4f, 0f);
             npc.layer = LayerMask.NameToLayer("Furniture");
             var body = npc.GetComponent<SpriteRenderer>();
-            body.sprite = PlayerSprite();
-            body.color = new Color(0.9f, 0.75f, 0.55f);
+            body.sprite = TylerSprite();
+            body.color = Color.white;
             body.sortingOrder = 10;
             npc.GetComponent<CircleCollider2D>().radius = 0.35f;
             var npcData = new SerializedObject(npc.GetComponent<NpcTrader>());

@@ -1,0 +1,15 @@
+# Перерисовка врагов — 29 октября 2026
+
+Заменены Assets/Sprites/Combat/Dokhodyaga.png (16×16) и Justice.png (22×22).
+Исходные .meta не изменены: GUID, PPU, pivot и ссылки префабов сохранены.
+Оригинальные PNG находятся здесь под исходными именами. Файлы *-Redrawn-Source.png — выбранные изображения генератора до уменьшения; *-Preview.png — увеличенные версии конечных игровых файлов без сглаживания.
+
+Использован встроенный image_gen в режиме редактирования с оригинальным PNG как референсом. Первые фронтальные варианты отклонены; выбранные варианты повторно созданы с указанием камеры сверху. Затем выполнено уменьшение nearest-neighbor до исходных размеров. Проверены размеры, наличие прозрачных пикселей, внешний вид уменьшенных версий и неизменность .meta. В Unity Play Mode не проверялось.
+
+## Финальный запрос: Dokhodyaga
+
+Redraw this tiny sprite while PRESERVING ITS EXACT OVERHEAD PROJECTION AND POSE. The reference is an overhead plan-view human, not a face. Camera exactly 90 degrees vertically above the character looking straight down at crown of head and shoulders. Character walks toward TOP of image. We see only the TOP of skull, TOP planes of shoulders and BACK of torn olive jacket. The head is small round grey crown at upper center; thin forearms reach straight toward top edge, one on each side of head, hands at top. Torso is a compact oval below head. Feet are hidden beneath torso from overhead. NO VISIBLE FACE, NO EYES, NO MOUTH, NO CHEST, NO STANDING FULL BODY, NO VERTICAL LEGS. Make an emaciated grey-skinned wretch in torn olive jacket. Preserve the tiny original U-shaped silhouette with extended arms at top and compact oval at bottom. Strict simple 16x16 pixel-art design, enlarged square pixels, 10 flat colors, black outline. Transparent background. Entire figure occupies central 14x14 logical pixels, uniform square canvas. THIS IS A BIRD'S EYE PLAN VIEW GAME TOKEN, NOT A CHARACTER PORTRAIT.
+
+## Финальный запрос: Justice
+
+Redraw attached tiny game token, preserving EXACT OVERHEAD PLAN VIEW and circular silhouette. Camera at exactly 90 degrees above a bulky blind man facing TOP / NORTH. We see crown of bald pale head, back of head wrapped in ivory cloth band, massive TOP planes of shoulders, bulky ochre brown coat back. Crown of head at upper center, in front of round wide torso which fills lower portion. Two compact hands protrude either side near top of shoulders. Ivory blindfold appears as thin band around top-facing edge of head, NO FACE IS VISIBLE. No eyes, mouth, nose, chest, hanging arms, standing legs, shoes or frontal figure. It's a compact ROUND TOKEN seen from a ceiling camera, head and shoulders only, like original. Strict 22x22 logical pixel-art with large flat square color blocks, dark outline, 12 colors, worn ochre coat and ivory wrap. Transparent canvas with 1 logical pixel margin around whole figure. North-facing directly overhead enemy for a top down game. Do not depict a standing character, portrait, side view or isometric view.

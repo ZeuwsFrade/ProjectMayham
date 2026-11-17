@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Dialogue;
 using ProjectMayham.Items;
 using ProjectMayham.Trade;
@@ -45,7 +46,7 @@ namespace ProjectMayham.Npcs
         [SerializeField] private GameObject shelterPrefab;
 
         public string Id => name;
-        public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
+        public string DisplayName => GameText.Translate(string.IsNullOrWhiteSpace(displayName) ? name : displayName);
         public Sprite Portrait => portrait;
         public DialogueDefinition Dialogue => dialogue;
         public TraderDefinition Trader => trader;

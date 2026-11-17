@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Core;
 using ProjectMayham.Interaction;
 using ProjectMayham.Items;
@@ -14,7 +15,7 @@ namespace ProjectMayham.Npcs
         private TraderBook book;
 
         public NpcDefinition Npc => npc;
-        public string Prompt => npc != null ? $"Поговорить: {npc.DisplayName}" : string.Empty;
+        public string Prompt => npc != null ? GameText.Format("Поговорить: {0}", npc.DisplayName) : string.Empty;
         public Vector2 Position => transform.position;
 
         private void Awake()

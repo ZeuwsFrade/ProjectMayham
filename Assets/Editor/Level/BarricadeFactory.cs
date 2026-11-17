@@ -98,6 +98,7 @@ namespace ProjectMayham.EditorTools
                     renderer.sortingOrder = piece.Order;
                 }
 
+                BarricadeVisualFitter.Fit(root);
                 PrefabUtility.SaveAsPrefabAsset(root, path);
                 Object.DestroyImmediate(root);
                 created++;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using ProjectMayham.Audio;
 using ProjectMayham.Combat;
 using ProjectMayham.Player;
 using ProjectMayham.Vision;
@@ -59,6 +60,7 @@ namespace ProjectMayham.AI
         private LayerMask wallMask;
 
         private EnemyState state = EnemyState.Patrol;
+        private float voiceTimer;
         private float stateTime;
         private float senseTimer;
 
@@ -169,6 +171,7 @@ namespace ProjectMayham.AI
 
         private void OnEnable()
         {
+            ScheduleVoice();
             all.Add(this);
             health.Damaged += OnDamaged;
             health.Died += OnDied;
@@ -191,6 +194,12 @@ namespace ProjectMayham.AI
             if (state == EnemyState.Dead) return;
 
             float dt = Time.deltaTime;
+            voiceTimer -= dt;
+            if (voiceTimer <= 0f)
+            {
+                GameAudio.MonsterVoice(transform.position);
+                ScheduleVoice();
+            }
             stateTime += dt;
             attackCooldown -= dt;
             shoutCooldown -= dt;
@@ -464,8 +473,15 @@ namespace ProjectMayham.AI
             bool wasHunting = IsHunting;
             SetState(EnemyState.Chase);
             lostTimer = 0f;
-            if (noticed && !wasHunting && hasLastKnown) OnPlayerNoticed(lastKnown);
+            if (noticed && !wasHunting && hasLastKnown)
+            {
+                GameAudio.MonsterVoice(transform.position);
+                ScheduleVoice();
+                OnPlayerNoticed(lastKnown);
+            }
         }
+
+        private void ScheduleVoice() => voiceTimer = UnityEngine.Random.Range(9f, 22f);
 
         private void TickChase(float dt)
         {
@@ -716,6 +732,7 @@ namespace ProjectMayham.AI
         private void OnDamaged(DamageInfo info)
         {
             if (state == EnemyState.Dead) return;
+            GameAudio.MonsterHurt(transform.position);
 
             // In the middle of something nothing stops (a charge): it takes the damage and goes on.
             if (Unstoppable) return;
@@ -746,6 +763,7 @@ namespace ProjectMayham.AI
 
         private void OnDied(DamageInfo info)
         {
+            GameAudio.MonsterHurt(transform.position);
             SetState(EnemyState.Dead);
             motor.Stop();
             motor.Shove(info.Direction * info.Knockback * (1f - definition.KnockbackResistance));

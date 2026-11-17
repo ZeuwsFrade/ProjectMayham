@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System;
 using System.Collections;
 using System.Linq;
@@ -55,7 +56,7 @@ namespace ProjectMayham.Level
         /// <summary>Raised when what is inside or what is coming out changes; the text says what happened, or is null.</summary>
         public event Action<string> Changed;
 
-        public string Prompt => "Автомат с едой";
+        public string Prompt => GameText.Translate("Автомат с едой");
         public Vector2 Position => transform.position;
         public ItemDefinition Coin => coin;
         /// <summary>Things paid for (or shaken loose) that have not come out yet.</summary>
@@ -88,9 +89,9 @@ namespace ProjectMayham.Level
         /// <summary>Pays a coin for the thing and sets it coming out. Null when done, else why not.</summary>
         public string Buy(GameObject actor, ItemDefinition item)
         {
-            if (!actor.TryGetComponent<GridInventory>(out var backpack)) return "Не получится";
-            if (!Contents.Slots.Any(s => s.Item == item)) return "Закончилось";
-            if (VendingStock.Coins(backpack, coin) <= 0) return "Нужна монета";
+            if (!actor.TryGetComponent<GridInventory>(out var backpack)) return GameText.Translate("Не получится");
+            if (!Contents.Slots.Any(s => s.Item == item)) return GameText.Translate("Закончилось");
+            if (VendingStock.Coins(backpack, coin) <= 0) return GameText.Translate("Нужна монета");
             VendingStock.PayCoin(backpack, coin);
             Contents.Take(item);
             StartCoroutine(GiveOut(actor, item));
@@ -100,10 +101,10 @@ namespace ProjectMayham.Level
         /// <summary>One shake. What happened, for the window to say.</summary>
         public string Shake(GameObject actor)
         {
-            if (!CanShake) return "Не знаю, как это делается";
-            if (Contents.Jammed) return "Автомат заклинило";
-            if (Contents.IsEmpty) return "Внутри пусто";
-            if (actor.TryGetComponent<PlayerStats>(out var stats) && !stats.TrySpendStamina(shakeStamina)) return "Не хватает сил";
+            if (!CanShake) return GameText.Translate("Не знаю, как это делается");
+            if (Contents.Jammed) return GameText.Translate("Автомат заклинило");
+            if (Contents.IsEmpty) return GameText.Translate("Внутри пусто");
+            if (actor.TryGetComponent<PlayerStats>(out var stats) && !stats.TrySpendStamina(shakeStamina)) return GameText.Translate("Не хватает сил");
 
             Noise.Emit(transform.position, shakeNoise, actor);
             var result = Contents.Shake(UnityEngine.Random.value, UnityEngine.Random.value, shakeChance, jamAfter, out var dropped);
@@ -111,13 +112,13 @@ namespace ProjectMayham.Level
             {
                 case VendingStock.ShakeResult.Dropped:
                     StartCoroutine(GiveOut(actor, dropped));
-                    Changed?.Invoke("Что-то сдвинулось внутри…");
-                    return "Что-то сдвинулось внутри…";
+                    Changed?.Invoke(GameText.Translate("Что-то сдвинулось внутри…"));
+                    return GameText.Translate("Что-то сдвинулось внутри…");
                 case VendingStock.ShakeResult.Jammed:
-                    Changed?.Invoke("Автомат заклинило");
-                    return "Автомат заклинило";
+                    Changed?.Invoke(GameText.Translate("Автомат заклинило"));
+                    return GameText.Translate("Автомат заклинило");
                 default:
-                    return "Ничего не выпало";
+                    return GameText.Translate("Ничего не выпало");
             }
         }
 
@@ -133,11 +134,11 @@ namespace ProjectMayham.Level
 
             if (actor != null && Near(actor) && actor.TryGetComponent<GridInventory>(out var backpack) && backpack.Add(item, 1) == 0)
             {
-                Tell($"Выпало: {item.DisplayName}");
+                Tell(GameText.Format("Выпало: {0}", item.DisplayName));
                 yield break;
             }
             DropInFront(item, actor);
-            Tell($"Выпало на пол: {item.DisplayName}");
+            Tell(GameText.Format("Выпало на пол: {0}", item.DisplayName));
         }
 
         // To the open window of the machine; with the window closed, a note on the screen.

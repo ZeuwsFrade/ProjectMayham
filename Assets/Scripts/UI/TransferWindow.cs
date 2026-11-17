@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using ProjectMayham.Items;
 using TMPro;
@@ -110,7 +111,7 @@ namespace ProjectMayham.UI
                 || builtLeft != player.GridSize || builtRight != storage.GridSize)
             {
                 DiscardUI();
-                views[0] = new View { Inventory = player, Name = "Рюкзак" };
+                views[0] = new View { Inventory = player, Name = GameText.Translate("Рюкзак") };
                 views[1] = new View { Inventory = storage, Name = storageName };
             }
             Show();
@@ -123,7 +124,7 @@ namespace ProjectMayham.UI
         protected virtual Vector2 PanelOffset => Vector2.zero;
 
         /// <summary>The line under the grids while the pointer is over nothing.</summary>
-        protected virtual string Hint => DefaultHint;
+        protected virtual string Hint => GameText.Translate(DefaultHint);
 
         /// <summary>Font size of that line.</summary>
         protected virtual float HintSize => 22f;
@@ -401,7 +402,7 @@ namespace ProjectMayham.UI
         private void Wear(View view, GridInventory.Stack stack)
         {
             if (!stack.Item.Wearable || equipment == null) return;
-            if (!equipment.WearFrom(view.Inventory, stack)) Say("Не надеть: будет слишком тяжело");
+            if (!equipment.WearFrom(view.Inventory, stack)) Say(GameText.Translate("Не надеть: будет слишком тяжело"));
         }
 
         // A refusal or a result: stays for a while.
@@ -445,15 +446,15 @@ namespace ProjectMayham.UI
             slot.IsHands ? Player.InHand(slot.Hand.Value) : equipment != null ? equipment[slot.Slot] : null;
 
         private static string SlotTitleOf(SlotView slot) =>
-            slot.Hand == Hand.Right ? "Правая рука" : slot.Hand == Hand.Left ? "Левая рука" : PlayerEquipment.SlotTitle(slot.Slot);
+            slot.Hand == Hand.Right ? GameText.Translate("Правая рука") : slot.Hand == Hand.Left ? GameText.Translate("Левая рука") : PlayerEquipment.SlotTitle(slot.Slot);
 
         private string SlotInfo(SlotView slot, ItemDefinition item)
         {
             string title = SlotTitleOf(slot);
             if (item == null)
-                return slot.IsHands ? $"{title}: пусто. Перетащите сюда то, что можно держать" : $"{title}: пусто. Перетащите сюда вещь или двойной клик по ней — надеть";
-            string both = slot.IsHands && Player.HoldsTwoHanded ? ", в обеих руках" : string.Empty;
-            return $"{title}: {item.DisplayName}{both}. ПКМ или Shift+клик — убрать на другую сторону, перетащите — положить куда нужно";
+                return slot.IsHands ? GameText.Format("{0}: пусто. Перетащите сюда то, что можно держать", title) : GameText.Format("{0}: пусто. Перетащите сюда вещь или двойной клик по ней — надеть", title);
+            string both = slot.IsHands && Player.HoldsTwoHanded ? GameText.Translate(", в обеих руках") : string.Empty;
+            return GameText.Format("{0}: {1}{2}. ПКМ или Shift+клик — убрать на другую сторону, перетащите — положить куда нужно", title, item.DisplayName, both);
         }
 
         private static bool ToLocal(View view, Vector2 screen, out Vector2 local) =>
@@ -482,14 +483,14 @@ namespace ProjectMayham.UI
             var to = Other(from);
             if (to == views[1] && stack.Item.IsPerson)
             {
-                Say(PersonRefusal);
+                Say(GameText.Translate(PersonRefusal));
                 return;
             }
             if (to == views[1] && StorageBusy) return;
             var item = stack.Item;
             int count = stack.Count;
             int left = to.Inventory.Add(item, count);
-            if (left >= count) { Say("Не помещается: нет места или слишком тяжело"); return; }
+            if (left >= count) { Say(GameText.Translate("Не помещается: нет места или слишком тяжело")); return; }
             from.Inventory.Reduce(stack, count - left);
         }
 
@@ -501,16 +502,16 @@ namespace ProjectMayham.UI
             if (item == null) return;
             if (item.IsPerson)
             {
-                Say(PersonRefusal);
+                Say(GameText.Translate(PersonRefusal));
                 return;
             }
             if (slot.IsHands)
             {
                 if (Storage.Add(item, 1) == 0) Player.TakeHeld(slot.Hand.Value, out _);
-                else Say("Не помещается: нет места или слишком тяжело");
+                else Say(GameText.Translate("Не помещается: нет места или слишком тяжело"));
                 return;
             }
-            if (!equipment.TakeOffTo(Storage, slot.Slot)) Say("Не помещается: нет места или слишком тяжело");
+            if (!equipment.TakeOffTo(Storage, slot.Slot)) Say(GameText.Translate("Не помещается: нет места или слишком тяжело"));
         }
 
         private void BeginDrag(View view, GridInventory.Stack stack, Vector2 screen)
@@ -562,10 +563,10 @@ namespace ProjectMayham.UI
             foreach (var slot in slots) slot.Frame.color = slot != over || slot == draggedSlot ? SlotIdle : FitsSlot(slot) ? ValidColor : InvalidColor;
             if (over != null)
             {
-                if (over != draggedSlot) Hover(!FitsSlot(over) ? "Сюда это не годится"
-                    : !over.IsHands ? "Отпустите, чтобы надеть"
-                    : draggedSlot != null ? "Отпустите, чтобы переложить в другую руку"
-                    : draggedItem.TwoHanded ? "Отпустите, чтобы взять в обе руки" : "Отпустите, чтобы взять в эту руку");
+                if (over != draggedSlot) Hover(!FitsSlot(over) ? GameText.Translate("Сюда это не годится")
+                    : !over.IsHands ? GameText.Translate("Отпустите, чтобы надеть")
+                    : draggedSlot != null ? GameText.Translate("Отпустите, чтобы переложить в другую руку")
+                    : draggedItem.TwoHanded ? GameText.Translate("Отпустите, чтобы взять в обе руки") : GameText.Translate("Отпустите, чтобы взять в эту руку"));
                 return;
             }
 
@@ -618,14 +619,14 @@ namespace ProjectMayham.UI
             if (overSlot != null)
             {
                 if (fits) DropOnSlot(overSlot, from, stack);
-                else Say("Сюда это не годится");
+                else Say(GameText.Translate("Сюда это не годится"));
                 return;
             }
             if (!onGrid) return; // dropped outside of the grids: it stays where it was
 
             if (target == views[1] && from != target && stack.Item.IsPerson)
             {
-                Say(PersonRefusal);
+                Say(GameText.Translate(PersonRefusal));
                 return;
             }
             if (target == from)
@@ -636,7 +637,7 @@ namespace ProjectMayham.UI
 
             int placed = target.Inventory.PlaceItem(stack.Item, stack.Count, origin, rotated);
             if (placed > 0) from.Inventory.Reduce(stack, placed);
-            else Say("Сюда не положить: место занято или слишком тяжело");
+            else Say(GameText.Translate("Сюда не положить: место занято или слишком тяжело"));
         }
 
         // A stack dropped on the hands (one piece is held) or on a slot of what is worn (it is put on).
@@ -644,18 +645,18 @@ namespace ProjectMayham.UI
         {
             if (!slot.IsHands)
             {
-                if (!equipment.WearFrom(from.Inventory, stack)) Say("Не надеть: будет слишком тяжело");
+                if (!equipment.WearFrom(from.Inventory, stack)) Say(GameText.Translate("Не надеть: будет слишком тяжело"));
                 return;
             }
             var hand = slot.Hand.Value;
             if (from == views[0])
             {
-                if (!Player.Hold(stack, hand)) Say("Не взять в руки: то, что в них, некуда положить");
+                if (!Player.Hold(stack, hand)) Say(GameText.Translate("Не взять в руки: то, что в них, некуда положить"));
                 return;
             }
             // From the storage: what the hands held goes into the backpack, else on the floor.
             if (Player.HoldNew(stack.Item, hand)) from.Inventory.Reduce(stack, 1);
-            else Say("Не взять в руки: слишком тяжело");
+            else Say(GameText.Translate("Не взять в руки: слишком тяжело"));
         }
 
         // The thing in the hands or a slot dropped on a grid.
@@ -666,23 +667,23 @@ namespace ProjectMayham.UI
                 if (StorageBusy) return;
                 if (item.IsPerson)
                 {
-                    Say(PersonRefusal);
+                    Say(GameText.Translate(PersonRefusal));
                     return;
                 }
                 if (slot.IsHands)
                 {
                     if (Storage.PlaceItem(item, 1, origin, rotated) == 1) Player.TakeHeld(slot.Hand.Value, out _);
-                    else Say("Сюда не положить: место занято или слишком тяжело");
+                    else Say(GameText.Translate("Сюда не положить: место занято или слишком тяжело"));
                 }
-                else if (!equipment.TakeOffTo(Storage, slot.Slot, origin, rotated)) Say("Не помещается: нет места или слишком тяжело");
+                else if (!equipment.TakeOffTo(Storage, slot.Slot, origin, rotated)) Say(GameText.Translate("Не помещается: нет места или слишком тяжело"));
                 return;
             }
 
             if (slot.IsHands)
             {
-                if (!Player.PlaceHeld(slot.Hand.Value, origin, rotated)) Say("Сюда не положить: место занято");
+                if (!Player.PlaceHeld(slot.Hand.Value, origin, rotated)) Say(GameText.Translate("Сюда не положить: место занято"));
             }
-            else if (!equipment.TakeOffToGrid(slot.Slot, origin, rotated)) Say("Сюда не положить: место занято");
+            else if (!equipment.TakeOffToGrid(slot.Slot, origin, rotated)) Say(GameText.Translate("Сюда не положить: место занято"));
         }
 
         private void CancelDrag()
@@ -704,7 +705,7 @@ namespace ProjectMayham.UI
         {
             if (stack.Count < 2)
             {
-                Say("Здесь одна штука — делить нечего");
+                Say(GameText.Translate("Здесь одна штука — делить нечего"));
                 return;
             }
             splitFrom = view;
@@ -731,7 +732,7 @@ namespace ProjectMayham.UI
 
         private void RefreshSplit()
         {
-            splitTitle.text = $"{splitStack.Item.DisplayName} ×{splitStack.Count}: сколько?";
+            splitTitle.text = GameText.Format("{0} ×{1}: сколько?", splitStack.Item.DisplayName, splitStack.Count);
             splitValue.text = splitAmount.ToString();
         }
 
@@ -772,9 +773,9 @@ namespace ProjectMayham.UI
             if (to == views[1] && StorageBusy) return;
             int left = to.Inventory.Add(stack.Item, amount);
             int moved = amount - left;
-            if (moved <= 0) { Say("Не помещается: нет места или слишком тяжело"); return; }
+            if (moved <= 0) { Say(GameText.Translate("Не помещается: нет места или слишком тяжело")); return; }
             from.Inventory.Reduce(stack, moved);
-            if (left > 0) Say($"Поместилось только {moved}");
+            if (left > 0) Say(GameText.Format("Поместилось только {0}", moved));
         }
 
         // So many of the stack become a stack of their own beside it.
@@ -785,7 +786,7 @@ namespace ProjectMayham.UI
             var stack = splitStack;
             int amount = splitAmount;
             CloseSplit();
-            if (from.Inventory.Split(stack, amount) == null) Say("Не разделить: нет свободного места");
+            if (from.Inventory.Split(stack, amount) == null) Say(GameText.Translate("Не разделить: нет свободного места"));
         }
 
         // ---- drawing ----
@@ -828,8 +829,8 @@ namespace ProjectMayham.UI
                 // A storage without a practical weight limit shows only what it holds.
                 bool limited = view.Inventory.MaxWeight < UnlimitedWeight;
                 view.WeightLabel.text = limited
-                    ? $"{view.Inventory.TotalWeight:0.#} / {view.Inventory.MaxWeight:0.#} кг"
-                    : $"{view.Inventory.TotalWeight:0.#} кг";
+                    ? GameText.Format("{0:0.#} / {1:0.#} кг", view.Inventory.TotalWeight, view.Inventory.MaxWeight)
+                    : GameText.Format("{0:0.#} кг", view.Inventory.TotalWeight);
             }
 
             bool both = Player.HoldsTwoHanded;
@@ -904,13 +905,13 @@ namespace ProjectMayham.UI
 
         private static string Describe(GridInventory.Stack stack)
         {
-            if (stack.Sealed) return "Ещё не найдено";
+            if (stack.Sealed) return GameText.Translate("Ещё не найдено");
 
             var item = stack.Item;
             string count = stack.Count > 1 ? $" ×{stack.Count}" : string.Empty;
-            string wear = item.Wearable ? ". Двойной клик — надеть" : string.Empty;
-            string split = stack.Count > 1 ? ". Ctrl+клик — разделить" : string.Empty;
-            return $"{item.DisplayName}{count} — {item.Weight * stack.Count:0.##} кг ({item.Weight:0.##} кг/шт), {item.GridSize.x}×{item.GridSize.y}{wear}{split}";
+            string wear = item.Wearable ? GameText.Translate(". Двойной клик — надеть") : string.Empty;
+            string split = stack.Count > 1 ? GameText.Translate(". Ctrl+клик — разделить") : string.Empty;
+            return GameText.Format("{0}{1} — {2:0.##} кг ({3:0.##} кг/шт), {4}×{5}{6}{7}", item.DisplayName, count, item.Weight * stack.Count, item.Weight, item.GridSize.x, item.GridSize.y, wear, split);
         }
     }
 }

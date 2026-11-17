@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.UI;
 using TMPro;
 using UnityEngine;
@@ -17,8 +18,8 @@ namespace ProjectMayham.Tutorial
             var window = Get<NoteWindow>();
             if (window.IsOpen) return;
             window.Show();
-            window.titleLabel.text = title;
-            window.textLabel.text = text;
+            window.titleLabel.text = GameText.Translate(title);
+            window.textLabel.text = GameText.Translate(text);
         }
 
         protected override void Build(Canvas canvas)

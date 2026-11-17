@@ -536,6 +536,7 @@ GameObject:
   - component: {fileID: 81411512}
   - component: {fileID: 81411514}
   - component: {fileID: 81411513}
+  - component: {fileID: 81411515}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -612,9 +613,9 @@ MonoBehaviour:
   m_fontSize: 30
   m_fontSizeBase: 30
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 22.5
+  m_fontSizeMax: 30
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -662,6 +663,30 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 81411511}
   m_CullTransparentMesh: 1
+--- !u!114 &81411515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 81411511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca4000fc28723ea43be29400f68a8374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Localization.LocalizedLabel
+  text:
+    m_TableReference:
+      m_TableCollectionName: GUID:7f9e699aba70e4e4cb8900f4e2e9bdba
+    m_TableEntryReference:
+      m_KeyId: 1143582735
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!1001 &103324690
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1901,6 +1926,7 @@ GameObject:
   - component: {fileID: 315297507}
   - component: {fileID: 315297509}
   - component: {fileID: 315297508}
+  - component: {fileID: 315297510}
   m_Layer: 5
   m_Name: Title
   m_TagString: Untagged
@@ -1977,9 +2003,9 @@ MonoBehaviour:
   m_fontSize: 24
   m_fontSizeBase: 24
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 18
+  m_fontSizeMax: 24
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -2027,6 +2053,30 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 315297506}
   m_CullTransparentMesh: 1
+--- !u!114 &315297510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 315297506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca4000fc28723ea43be29400f68a8374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Localization.LocalizedLabel
+  text:
+    m_TableReference:
+      m_TableCollectionName: GUID:7f9e699aba70e4e4cb8900f4e2e9bdba
+    m_TableEntryReference:
+      m_KeyId: 1143582734
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &327694634
 GameObject:
   m_ObjectHideFlags: 0
@@ -6057,6 +6107,7 @@ GameObject:
   - component: {fileID: 670424534}
   - component: {fileID: 670424536}
   - component: {fileID: 670424535}
+  - component: {fileID: 670424537}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -6133,9 +6184,9 @@ MonoBehaviour:
   m_fontSize: 30
   m_fontSizeBase: 30
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 22.5
+  m_fontSizeMax: 30
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -6183,6 +6234,30 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 670424533}
   m_CullTransparentMesh: 1
+--- !u!114 &670424537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 670424533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca4000fc28723ea43be29400f68a8374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Localization.LocalizedLabel
+  text:
+    m_TableReference:
+      m_TableCollectionName: GUID:7f9e699aba70e4e4cb8900f4e2e9bdba
+    m_TableEntryReference:
+      m_KeyId: 1143582737
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &675984693
 GameObject:
   m_ObjectHideFlags: 0
@@ -10121,6 +10196,7 @@ GameObject:
   - component: {fileID: 1495960656}
   - component: {fileID: 1495960658}
   - component: {fileID: 1495960657}
+  - component: {fileID: 1495960659}
   m_Layer: 5
   m_Name: Title
   m_TagString: Untagged
@@ -10197,9 +10273,9 @@ MonoBehaviour:
   m_fontSize: 30
   m_fontSizeBase: 30
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 22.5
+  m_fontSizeMax: 30
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -10247,6 +10323,30 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1495960655}
   m_CullTransparentMesh: 1
+--- !u!114 &1495960659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1495960655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca4000fc28723ea43be29400f68a8374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Localization.LocalizedLabel
+  text:
+    m_TableReference:
+      m_TableCollectionName: GUID:7f9e699aba70e4e4cb8900f4e2e9bdba
+    m_TableEntryReference:
+      m_KeyId: 1143582733
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &1520548175
 GameObject:
   m_ObjectHideFlags: 0
@@ -19642,6 +19742,7 @@ GameObject:
   - component: {fileID: 1886684316}
   - component: {fileID: 1886684318}
   - component: {fileID: 1886684317}
+  - component: {fileID: 1886684319}
   m_Layer: 5
   m_Name: HandsLabel
   m_TagString: Untagged
@@ -19718,9 +19819,9 @@ MonoBehaviour:
   m_fontSize: 20
   m_fontSizeBase: 20
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 0
-  m_fontSizeMax: 0
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 15
+  m_fontSizeMax: 20
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -19768,6 +19869,30 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1886684315}
   m_CullTransparentMesh: 1
+--- !u!114 &1886684319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1886684315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca4000fc28723ea43be29400f68a8374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Localization.LocalizedLabel
+  text:
+    m_TableReference:
+      m_TableCollectionName: GUID:7f9e699aba70e4e4cb8900f4e2e9bdba
+    m_TableEntryReference:
+      m_KeyId: 1143582732
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &1902334960
 GameObject:
   m_ObjectHideFlags: 0

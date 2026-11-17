@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System;
 using System.Linq;
 using ProjectMayham.Core;
@@ -103,7 +104,7 @@ namespace ProjectMayham.Trade
             callback?.Invoke();
         }
 
-        private void OnMoneyChanged(int money) => moneyLabel.text = $"Деньги: {money} $";
+        private void OnMoneyChanged(int money) => moneyLabel.text = GameText.Format("Деньги: {0} $", money);
 
         private void SetTab(Tab newTab)
         {
@@ -114,7 +115,7 @@ namespace ProjectMayham.Trade
 
         private void Refresh()
         {
-            moneyLabel.text = $"Деньги: {GameSession.Money} $";
+            moneyLabel.text = GameText.Format("Деньги: {0} $", GameSession.Money);
             for (int i = 0; i < tabButtons.Length; i++)
             {
                 // The open tab has an accent-colored caption.
@@ -132,7 +133,7 @@ namespace ProjectMayham.Trade
 
         private void Report(string text, bool error)
         {
-            statusLabel.text = text;
+            statusLabel.text = GameText.Translate(text);
             statusLabel.color = error ? UIKit.Bad : UIKit.Muted;
         }
 
@@ -149,7 +150,7 @@ namespace ProjectMayham.Trade
                 int price = book.BuyPrice(item);
                 var row = NewRow();
                 AddIcon(row, item);
-                AddText(row, $"{item.DisplayName}\n<size=22><color=#FFFFFF99>{item.Weight:0.##} кг, в наличии {ware.Count}</color></size>", 0f, true);
+                AddText(row, GameText.Format("{0}\n<size=22><color=#FFFFFF99>{1:0.##} кг, в наличии {2}</color></size>", item.DisplayName, item.Weight, ware.Count), 0f, true);
                 AddText(row, $"{price} $", 140f, false, TextAlignmentOptions.Right);
                 AddButton(row, "Купить", () => Buy(item, 1), GameSession.Money >= price);
                 AddButton(row, "×5", () => Buy(item, 5), GameSession.Money >= price && ware.Count >= 2, 90f);
@@ -167,7 +168,7 @@ namespace ProjectMayham.Trade
                 int have = inventory.CountOf(item);
                 var row = NewRow();
                 AddIcon(row, item);
-                AddText(row, $"{item.DisplayName}\n<size=22><color=#FFFFFF99>есть {have}</color></size>", 0f, true);
+                AddText(row, GameText.Format("{0}\n<size=22><color=#FFFFFF99>есть {1}</color></size>", item.DisplayName, have), 0f, true);
                 AddText(row, price > 0 ? $"{price} $" : "не нужно", 140f, false, TextAlignmentOptions.Right);
                 AddButton(row, "Продать", () => Sell(item, 1), price > 0);
                 AddButton(row, "Все", () => Sell(item, have), price > 0 && have > 1, 90f);
@@ -185,7 +186,7 @@ namespace ProjectMayham.Trade
                 string give = Describe(offer.playerGives);
                 string receive = Describe(offer.playerReceives);
                 string title = string.IsNullOrEmpty(offer.title) ? string.Empty : $"<color=#FFD65A>{offer.title}</color>\n";
-                AddText(row, $"{title}Отдаёте: {give}\nПолучаете: {receive}", 0f, true);
+                AddText(row, GameText.Format("{0}Отдаёте: {1}\nПолучаете: {2}", title, give, receive), 0f, true);
                 AddButton(row, "Обменять", () => Barter(offer), TraderBook.HasItems(inventory, offer), 180f);
             }
         }
@@ -197,22 +198,22 @@ namespace ProjectMayham.Trade
 
         private void Buy(ItemDefinition item, int count)
         {
-            if (book.TryBuy(inventory, item, count, out string error)) Report($"Куплено: {item.DisplayName}", false);
-            else Report(error, true);
+            if (book.TryBuy(inventory, item, count, out string error)) Report(GameText.Format("Куплено: {0}", item.DisplayName), false);
+            else Report(GameText.Translate(error), true);
             Refresh();
         }
 
         private void Sell(ItemDefinition item, int count)
         {
-            if (book.TrySell(inventory, item, count, out string error)) Report($"Продано: {item.DisplayName}", false);
-            else Report(error, true);
+            if (book.TrySell(inventory, item, count, out string error)) Report(GameText.Format("Продано: {0}", item.DisplayName), false);
+            else Report(GameText.Translate(error), true);
             Refresh();
         }
 
         private void Barter(BarterOffer offer)
         {
             if (book.TryBarter(inventory, offer, out string error)) Report("Обмен состоялся", false);
-            else Report(error, true);
+            else Report(GameText.Translate(error), true);
             Refresh();
         }
 

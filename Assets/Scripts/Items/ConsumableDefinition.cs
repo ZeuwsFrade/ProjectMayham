@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using UnityEngine;
 
 namespace ProjectMayham.Items
@@ -34,7 +35,7 @@ namespace ProjectMayham.Items
         [SerializeField, Min(1f)] private float regenMultiplier = 1f;
         [SerializeField, Min(0f)] private float regenSeconds;
 
-        public string Verb => string.IsNullOrEmpty(verb) ? "Использовать" : verb;
+        public string Verb => string.IsNullOrEmpty(verb) ? GameText.Translate("Использовать") : GameText.Translate(verb);
         public float UseSeconds => Mathf.Max(0.1f, useSeconds);
         public float Satiety => satiety;
         public float Hydration => hydration;

@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Core;
 using ProjectMayham.Items;
 using ProjectMayham.UI;
@@ -17,7 +18,7 @@ namespace ProjectMayham.Shelter
         private GridInventory stash;
 
         public GridInventory Inventory => stash;
-        public override string Prompt => $"Открыть: {title}";
+        public override string Prompt => GameText.Format("Открыть: {0}", GameText.Translate(title));
 
         private void Awake() => stash = GetComponent<GridInventory>();
 

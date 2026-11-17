@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using ProjectMayham.Trade;
 using UnityEngine;
@@ -64,7 +65,7 @@ namespace ProjectMayham.Quests
         public IReadOnlyList<string> RequiredChoices => requiredChoices;
         public IReadOnlyList<string> ExcludingChoices => excludingChoices;
         public int RewardLoyalty => Mathf.Max(0, rewardLoyalty);
-        public string Title => string.IsNullOrWhiteSpace(title) ? name : title;
+        public string Title => GameText.Translate(string.IsNullOrWhiteSpace(title) ? name : title);
         public string OfferText => offerText;
         public IReadOnlyList<QuestObjective> Objectives => objectives;
         public string ReminderText => reminderText;

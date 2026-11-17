@@ -37,6 +37,8 @@ namespace ProjectMayham.Core
         public string slot;
         public int loaded;
         public int ready;
+        /// <summary>Coffee preparations left in the loaded portion of beans (older saves start empty).</summary>
+        public int beanUses;
         /// <summary>The day (<see cref="SaveData.raids"/>) the loaded things were put in.</summary>
         public int day;
     }

@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System;
 using System.Collections.Generic;
 using ProjectMayham.Core;
@@ -175,6 +176,7 @@ namespace ProjectMayham.Dialogue
 
         /// <summary>[ИГРОК] stands for the name the player chose.</summary>
         private static string Personalize(string text) =>
-            string.IsNullOrEmpty(text) ? string.Empty : text.Replace("[ИГРОК]", GameSession.Data.playerName);
+            string.IsNullOrEmpty(text) ? string.Empty : GameText.Translate(text).Replace("[ИГРОК]", GameSession.Data.playerName == SaveData.DefaultPlayerName
+                ? GameText.Translate(SaveData.DefaultPlayerName) : GameSession.Data.playerName);
     }
 }

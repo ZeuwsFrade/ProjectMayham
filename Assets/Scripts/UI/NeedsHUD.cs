@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Player;
 using TMPro;
 using UnityEngine;
@@ -153,7 +154,7 @@ namespace ProjectMayham.UI
             int percent = Mathf.RoundToInt(value * 100f);
             if (percent == row.shownPercent) return;
             row.shownPercent = percent;
-            row.label.text = $"{row.title} {percent}%";
+            row.label.text = $"{GameText.Translate(row.title)} {percent}%";
         }
 
         private void ShowUse()
@@ -165,7 +166,7 @@ namespace ProjectMayham.UI
             if (text != shownUse)
             {
                 shownUse = text;
-                useLabel.text = text;
+                useLabel.text = GameText.Translate(text);
             }
 
             var max = useFill.rectTransform.anchorMax;
@@ -176,7 +177,7 @@ namespace ProjectMayham.UI
 
         private void OnNotice(string text)
         {
-            notice.text = text;
+            notice.text = GameText.Translate(text);
             var color = notice.color;
             color.a = 1f;
             notice.color = color;

@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Interaction;
 using ProjectMayham.Items;
 using TMPro;
@@ -35,17 +36,17 @@ namespace ProjectMayham.UI
         private string BuildText()
         {
             if (interactor == null) return string.Empty;
-            if (climber != null && climber.Message.Length > 0) return climber.Message;
+            if (climber != null && climber.Message.Length > 0) return GameText.Translate(climber.Message);
 
             var hold = interactor.HoldTarget;
-            if (hold != null) return $"{hold.HoldLabel}… {Mathf.RoundToInt(interactor.HoldProgress * 100f)}%";
+            if (hold != null) return $"{GameText.Translate(hold.HoldLabel)}… {Mathf.RoundToInt(interactor.HoldProgress * 100f)}%";
 
             var current = interactor.Current;
             if (current == null) return string.Empty;
 
-            string text = interactor.CurrentUsable ? $"[E] {current.Prompt}" : BlockedMessage(current);
+            string text = interactor.CurrentUsable ? $"[E] {GameText.Translate(current.Prompt)}" : BlockedMessage(current);
             if (current is IPromptHints hints && !string.IsNullOrEmpty(hints.Hints))
-                text = string.IsNullOrEmpty(text) ? hints.Hints : $"{text} · {hints.Hints}";
+                text = string.IsNullOrEmpty(text) ? GameText.Translate(hints.Hints) : $"{text} · {GameText.Translate(hints.Hints)}";
             return text;
         }
 
@@ -56,9 +57,9 @@ namespace ProjectMayham.UI
             if (interactor.TryGetComponent<Inventory>(out var inventory)
                 && inventory.HasRoomFor(pickup.Item) && !inventory.FitsByWeight(pickup.Item))
             {
-                return tooHeavyMessage;
+                return GameText.Translate(tooHeavyMessage);
             }
-            return fullMessage;
+            return GameText.Translate(fullMessage);
         }
     }
 }

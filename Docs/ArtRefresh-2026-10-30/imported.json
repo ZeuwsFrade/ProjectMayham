@@ -1,0 +1,155 @@
+[
+  {
+    "key": "PlayerHero",
+    "path": "Assets/Art/Characters/PlayerHero.png",
+    "width": 512,
+    "height": 512,
+    "ppu": 512.0,
+    "worldWidth": 1.0,
+    "worldHeight": 1.0
+  },
+  {
+    "key": "Intern",
+    "path": "Assets/Sprites/Npcs/Intern.png",
+    "width": 512,
+    "height": 512,
+    "ppu": 512.0,
+    "worldWidth": 1.0,
+    "worldHeight": 1.0
+  },
+  {
+    "key": "Ram",
+    "path": "Assets/Sprites/Combat/Ram.png",
+    "width": 320,
+    "height": 320,
+    "ppu": 256.0,
+    "worldWidth": 1.25,
+    "worldHeight": 1.25
+  },
+  {
+    "key": "Pipe",
+    "path": "Assets/Sprites/Combat/Pipe.png",
+    "width": 80,
+    "height": 384,
+    "ppu": 256.0,
+    "worldWidth": 0.3125,
+    "worldHeight": 1.5
+  },
+  {
+    "key": "Box",
+    "path": "Assets/Sprites/Level/Box.png",
+    "width": 256,
+    "height": 256,
+    "ppu": 256.0,
+    "worldWidth": 1.0,
+    "worldHeight": 1.0
+  },
+  {
+    "key": "Crate",
+    "path": "Assets/Sprites/Level/Crate.png",
+    "width": 256,
+    "height": 256,
+    "ppu": 256.0,
+    "worldWidth": 1.0,
+    "worldHeight": 1.0
+  },
+  {
+    "key": "Sledgehammer",
+    "path": "Assets/Sprites/Combat/Sledgehammer.png",
+    "width": 160,
+    "height": 448,
+    "ppu": 256.0,
+    "worldWidth": 0.625,
+    "worldHeight": 1.75
+  },
+  {
+    "key": "Car-Blue",
+    "path": "Assets/Sprites/Level/Car-Blue.png",
+    "width": 512,
+    "height": 768,
+    "ppu": 256.0,
+    "worldWidth": 2.0,
+    "worldHeight": 3.0
+  },
+  {
+    "key": "Bed",
+    "path": "Assets/Sprites/Shelter/Bed.png",
+    "width": 512,
+    "height": 768,
+    "ppu": 256.0,
+    "worldWidth": 2.0,
+    "worldHeight": 3.0
+  },
+  {
+    "key": "Door",
+    "path": "Assets/Sprites/Level/Door.png",
+    "width": 256,
+    "height": 512,
+    "ppu": 256.0,
+    "worldWidth": 1.0,
+    "worldHeight": 2.0
+  },
+  {
+    "key": "Exit",
+    "path": "Assets/Sprites/Level/Exit.png",
+    "width": 512,
+    "height": 512,
+    "ppu": 256.0,
+    "worldWidth": 2.0,
+    "worldHeight": 2.0
+  },
+  {
+    "key": "ParkingSpot",
+    "path": "Assets/Sprites/Level/ParkingSpot.png",
+    "width": 512,
+    "height": 768,
+    "ppu": 256.0,
+    "worldWidth": 2.0,
+    "worldHeight": 3.0
+  },
+  {
+    "key": "WallMap",
+    "path": "Assets/Sprites/Level/WallMap.png",
+    "width": 256,
+    "height": 160,
+    "ppu": 256.0,
+    "worldWidth": 1.0,
+    "worldHeight": 0.625
+  },
+  {
+    "key": "Tyler",
+    "path": "Assets/Sprites/Npcs/Tyler.png",
+    "width": 512,
+    "height": 512,
+    "ppu": 512.0,
+    "worldWidth": 1.0,
+    "worldHeight": 1.0
+  },
+  {
+    "key": "Intern-Carried",
+    "path": "Assets/Sprites/Npcs/Intern-Carried.png",
+    "width": 1536,
+    "height": 512,
+    "ppu": 256.0,
+    "worldWidth": 6.0,
+    "worldHeight": 2.0
+  },
+  {
+    "key": "Car-Gray",
+    "path": "Assets/Sprites/Level/Car-Gray.png",
+    "width": 512,
+    "height": 768,
+    "ppu": 256.0,
+    "worldWidth": 2.0,
+    "worldHeight": 3.0
+  },
+  {
+    "key": "Car-Red",
+    "path": "Assets/Sprites/Level/Car-Red.png",
+    "width": 512,
+    "height": 768,
+    "ppu": 256.0,
+    "worldWidth": 2.0,
+    "worldHeight": 3.0
+  }
+]

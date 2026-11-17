@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,9 +43,9 @@ namespace ProjectMayham.Items
         {
             switch (slot)
             {
-                case EquipSlot.Head: return "Голова";
-                case EquipSlot.Back: return "Рюкзак";
-                case EquipSlot.Feet: return "Ноги";
+                case EquipSlot.Head: return GameText.Translate("Голова");
+                case EquipSlot.Back: return GameText.Translate("Рюкзак");
+                case EquipSlot.Feet: return GameText.Translate("Ноги");
                 default: return string.Empty;
             }
         }

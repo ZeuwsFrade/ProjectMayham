@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Items;
 using ProjectMayham.Level;
 using ProjectMayham.Player;
@@ -164,13 +165,13 @@ namespace ProjectMayham.UI
             if (machine == null) return;
             var backpack = actor.GetComponent<GridInventory>();
             int coins = VendingStock.Coins(backpack, machine.Coin);
-            coinsLabel.text = $"Монет: {coins}";
+            coinsLabel.text = GameText.Format("Монет: {0}", coins);
 
             UIKit.ClearChildren(list);
             var contents = machine.Contents;
             if (contents.IsEmpty)
             {
-                var empty = UIKit.Label(list, machine.Coming > 0 ? "Последнее уже выдаётся" : "Внутри пусто", 24f, TextAlignmentOptions.Left, UIKit.Muted);
+                var empty = UIKit.Label(list, machine.Coming > 0 ? GameText.Translate("Последнее уже выдаётся") : GameText.Translate("Внутри пусто"), 24f, TextAlignmentOptions.Left, UIKit.Muted);
                 empty.gameObject.AddComponent<LayoutElement>().preferredHeight = 44f;
             }
             foreach (var slot in contents.Slots)
@@ -198,14 +199,14 @@ namespace ProjectMayham.UI
 
             shakeButton.gameObject.SetActive(machine.CanShake);
             shakeButton.interactable = !contents.Jammed && !contents.IsEmpty;
-            UIKit.SetButtonText(shakeButton, contents.Jammed ? "Заклинило" : "Потрясти");
+            UIKit.SetButtonText(shakeButton, contents.Jammed ? GameText.Translate("Заклинило") : GameText.Translate("Потрясти"));
         }
 
         private void Buy(ItemDefinition item)
         {
             if (machine == null) return;
             string refusal = machine.Buy(actor, item);
-            statusLabel.text = refusal ?? $"Оплачено: {item.DisplayName}. Ждём…";
+            statusLabel.text = refusal ?? GameText.Format("Оплачено: {0}. Ждём…", item.DisplayName);
             Redraw();
         }
 

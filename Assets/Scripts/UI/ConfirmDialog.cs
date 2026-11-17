@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System;
 using TMPro;
 using UnityEngine;
@@ -65,10 +66,10 @@ namespace ProjectMayham.UI
         private void Present(string title, string message, Action yes, Action no, string yesText, string noText)
         {
             Show(); // builds the UI on first use
-            titleLabel.text = title;
-            messageLabel.text = message;
-            yesLabel.text = yesText;
-            noLabel.text = noText;
+            titleLabel.text = GameText.Translate(title);
+            messageLabel.text = GameText.Translate(message);
+            yesLabel.text = GameText.Translate(yesText);
+            noLabel.text = GameText.Translate(noText);
             // With no "No" text the window is a plain notice: one button in the middle.
             bool hasNo = noText != null;
             noButton.SetActive(hasNo);

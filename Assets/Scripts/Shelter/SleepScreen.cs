@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections;
 using ProjectMayham.Core;
 using ProjectMayham.Player;
@@ -44,7 +45,7 @@ namespace ProjectMayham.Shelter
 
             if (stats != null) stats.RestoreAll();
             GameSession.Save();
-            label.text = "Вы отдохнули. Здоровье восстановлено.";
+            label.text = GameText.Translate("Вы отдохнули. Здоровье восстановлено.");
             yield return Wait(1.6f);
 
             label.text = string.Empty;

@@ -1,0 +1,146 @@
+{
+  "tool": "built-in imagegen",
+  "excluded": [
+    "Assets/Sprites/Level/Wall-Hole.png",
+    "Assets/Sprites/Level/Wall-Hole-Turned.png"
+  ],
+  "assets": [
+    {
+      "key": "PlayerHero",
+      "path": "Assets/Art/Characters/PlayerHero.png",
+      "template": "Assets/Art/Characters/PlayerHero.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-811db46f-157a-40ee-bba5-cf780d3d5ace.png",
+      "prompt": "Use case: style-transfer. Asset type: transparent Unity top-down pixel-art game sprite. Image1 is EDIT TARGET PlayerHero; image2 is ONLY brushwork/outline/lighting reference, NEVER copy the coffee machine subject. EXACT SUBJECT AND INVARIANTS: ONE human player character in EXACT DIRECT TOP-DOWN overhead game view, facing UP (+Y, toward top of image). Preserve original brown hair crown at center, muted dark forest-green long sleeves, olive vest/backpack torso behind the head toward bottom. BOTH ARMS EXTEND FORWARD TOWARD TOP, with elbows slightly bent and two bare hands held forward in a ready fighting/weapon-holding stance, one hand at upper-left and one at upper-right. Back of head/crown visible, no front portrait face, no side view, no standing front-view full-body character. Preserve original raised-arms silhouette and relative hand positions; no weapon included. More detailed hair strands in pixel clusters, vest panels, fabric folds, cuffs and knuckles. Not a mannequin. Match the established detailed chunky pixel-art style: crisp visible square pixel clusters, deep navy outline, restrained material highlights from upper-left, cool slate shadow clusters, muted original palette and tasteful wear. This is a single static in-game overhead CHARACTER sprite, not a portrait or sprite sheet. Preserve camera direction and anatomy required for gameplay. Isolated complete silhouette with small transparent margins, genuine alpha background. No floor, scenery, external cast shadow, glow, UI, watermark or text. Keep overall proportions close to target; add material detail rather than extra objects.",
+      "kind": "character"
+    },
+    {
+      "key": "Intern",
+      "path": "Assets/Sprites/Npcs/Intern.png",
+      "template": "Assets/Sprites/Npcs/Intern.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-5e9635bf-4fdb-453b-b6c7-bd1a062c21cc.png",
+      "prompt": "Use case: style-transfer. Asset type: transparent Unity top-down pixel-art game sprite. Image1 is EDIT TARGET Intern; image2 is ONLY brushwork/outline/lighting reference, NEVER copy the coffee machine subject. EXACT SUBJECT AND INVARIANTS: ONE human-sized office DISPLAY MANNEQUIN dressed as an intern: pale ivory plastic or painted wood mannequin skin, subtle circular wrist/shoulder joints and neck seam, blond molded wig/hair crown, off-white office shirt, red tie, dark navy trousers, black shoes. Ordinary mannequin that could be mistaken for a person, neutral and slightly uncanny, NOT a robot, NOT undead, no gore. SAME NEAR-OVERHEAD top-down game camera as original, head toward top, shoulders and shirt below, short arms held close in front of waist as original. Strong recognizable silhouette and clothing. No exaggerated facial expression. Match the established detailed chunky pixel-art style: crisp visible square pixel clusters, deep navy outline, restrained material highlights from upper-left, cool slate shadow clusters, muted original palette and tasteful wear. This is a single static in-game overhead CHARACTER sprite, not a portrait or sprite sheet. Preserve camera direction and anatomy required for gameplay. Isolated complete silhouette with small transparent margins, genuine alpha background. No floor, scenery, external cast shadow, glow, UI, watermark or text. Keep overall proportions close to target; add material detail rather than extra objects.",
+      "kind": "character"
+    },
+    {
+      "key": "Ram",
+      "path": "Assets/Sprites/Combat/Ram.png",
+      "template": "Assets/Sprites/Combat/Ram.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-f5b86138-d3cc-4116-be8b-175b8ce718f5.png",
+      "prompt": "Use case: style-transfer. Asset type: transparent Unity top-down pixel-art game sprite. Image1 is EDIT TARGET Ram; image2 is ONLY brushwork/outline/lighting reference, NEVER copy the coffee machine subject. EXACT SUBJECT AND INVARIANTS: ONE broad hunched HUMANOID HULK enemy named Ram/Taran seen DIRECTLY FROM ABOVE, facing UP. Massive muted brown hide-covered shoulders/back form a wide oval body; heavy lowered dark brown head projects forward at TOP CENTER, flanked by TWO IVORY HORN-LIKE RAMMING ARMOR PLATES pointing forward at UPPER LEFT and UPPER RIGHT. Match original silhouette and brown/ivory palette. Detail leathery folds, scuffed bone plates, powerful shoulder anatomy and dark separations. This is a charging hulking creature, NOT a sheep or four-legged animal, NOT a human front portrait. No weapon, no gore. Match the established detailed chunky pixel-art style: crisp visible square pixel clusters, deep navy outline, restrained material highlights from upper-left, cool slate shadow clusters, muted original palette and tasteful wear. This is a single static in-game overhead CHARACTER sprite, not a portrait or sprite sheet. Preserve camera direction and anatomy required for gameplay. Isolated complete silhouette with small transparent margins, genuine alpha background. No floor, scenery, external cast shadow, glow, UI, watermark or text. Keep overall proportions close to target; add material detail rather than extra objects.",
+      "kind": "character"
+    },
+    {
+      "key": "Pipe",
+      "path": "Assets/Sprites/Combat/Pipe.png",
+      "template": "Assets/Sprites/Combat/Pipe.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-d4a3ed15-3830-4cf1-bb4a-7680c0c5b35f.png",
+      "prompt": "Use case: style-transfer. Asset type: transparent Unity top-down pixel-art game sprite. Image1 is EDIT TARGET Pipe; image2 is ONLY brushwork/outline/lighting reference, NEVER copy the coffee machine subject. EXACT SUBJECT AND INVARIANTS: ONE improvised steel PIPE melee weapon, straight long narrow vertical metal pipe, striking end at TOP and grip end at BOTTOM. Preserve original straight silhouette and orientation. Gray-blue worn steel, dark open hollow rim at top, small rust flecks, scratches, seam and subtly darkened lower grip. No hands or character, no wrench, no gun. Entire object visible and slender, no extra attachments. Match the established detailed chunky pixel-art style: crisp visible square pixel clusters, deep navy outline, restrained material highlights from upper-left, cool slate shadow clusters, muted original palette and tasteful wear.  Isolated complete silhouette with small transparent margins, genuine alpha background. No floor, scenery, external cast shadow, glow, UI, watermark or text. Keep overall proportions close to target; add material detail rather than extra objects.",
+      "kind": "weapon"
+    },
+    {
+      "key": "Box",
+      "path": "Assets/Sprites/Level/Box.png",
+      "template": "Assets/Sprites/Level/Box.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-d7f4c9cb-968e-454d-8f76-7e8db990a8da.png",
+      "prompt": "Use case: style-transfer. Asset type: transparent Unity top-down pixel-art game sprite. Image1 is EDIT TARGET Box; image2 is ONLY brushwork/outline/lighting reference, NEVER copy the coffee machine subject. EXACT SUBJECT AND INVARIANTS: ONE worn small CARDBOARD SHIPPING BOX directly overhead, square tan cardboard top, folded flaps, beige packing tape crossing the lid, a small blank off-white shipping label, dark crease seams and scuffed corners. Preserve original cardboard box identity, tan palette and compact square footprint. No extra boxes or scene. Match the established detailed chunky pixel-art style: crisp visible square pixel clusters, deep navy outline, restrained material highlights from upper-left, cool slate shadow clusters, muted original palette and tasteful wear.  Isolated complete silhouette with small transparent margins, genuine alpha background. No floor, scenery, external cast shadow, glow, UI, watermark or text. Keep overall proportions close to target; add material detail rather than extra objects.",
+      "kind": "prop"
+    },
+    {
+      "key": "Crate",
+      "path": "Assets/Sprites/Level/Crate.png",
+      "template": "Assets/Sprites/Level/Crate.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-8ac128c4-723c-4e60-971d-15a83295a358.png",
+      "prompt": "Use case: style-transfer. Asset type: transparent Unity top-down pixel-art game sprite. Image1 is EDIT TARGET Crate; image2 is ONLY brushwork/outline/lighting reference, NEVER copy the coffee machine subject. EXACT SUBJECT AND INVARIANTS: ONE square WOODEN SHIPPING CRATE directly overhead. Brown slatted wood lid with X-shaped reinforcing planks, small dark nail heads, wood grain, chipped corners, dark plank gaps and worn tan highlights. Preserve square footprint, no tall front face, no extra objects. Match the established detailed chunky pixel-art style: crisp visible square pixel clusters, deep navy outline, restrained material highlights from upper-left, cool slate shadow clusters, muted original palette and tasteful wear.  Isolated complete silhouette with small transparent margins, genuine alpha background. No floor, scenery, external cast shadow, glow, UI, watermark or text. Keep overall proportions close to target; add material detail rather than extra objects.",
+      "kind": "prop"
+    },
+    {
+      "key": "Sledgehammer",
+      "path": "Assets/Sprites/Combat/Sledgehammer.png",
+      "template": "Assets/Sprites/Combat/Sledgehammer.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-248157ac-2a1b-47d0-be44-01507bd4b2c8.png",
+      "prompt": "Use case: style-transfer. Asset type: transparent Unity top-down pixel-art game sprite. Image1 is EDIT TARGET Sledgehammer; image2 is ONLY brushwork/outline/lighting reference, NEVER copy the coffee machine subject. EXACT SUBJECT AND INVARIANTS: ONE heavy SLEDGEHAMMER melee weapon, vertical long worn brown wooden handle with grip at BOTTOM, a horizontal rectangular dark steel hammer head at TOP. Preserve original T-shaped silhouette and orientation. Detailed wood grain, small splinters, dark grip wear, steel head bevels, dents, cool gray highlights, strong near-black contour. No hands, no character, no added second tool. Match the established detailed chunky pixel-art style: crisp visible square pixel clusters, deep navy outline, restrained material highlights from upper-left, cool slate shadow clusters, muted original palette and tasteful wear.  Isolated complete silhouette with small transparent margins, genuine alpha background. No floor, scenery, external cast shadow, glow, UI, watermark or text. Keep overall proportions close to target; add material detail rather than extra objects.",
+      "kind": "weapon"
+    },
+    {
+      "key": "Car-Blue",
+      "path": "Assets/Sprites/Level/Car-Blue.png",
+      "template": "Assets/Sprites/Level/Car-Blue.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-a3a3ebce-fe62-4d11-8e85-95b807de174f.png",
+      "prompt": "Use case: precise-object-edit. This is one top-down blue car sprite for a game. Keep EXACT SAME body shape, proportions, vertical orientation, hood at top, windows, wheels, mirrors, lights, pixel-art outlines and surface details from input. Keep the blue paint unchanged. CLEAN ALPHA CUTOUT REQUIRED: remove ALL blurry blue glow, haze and cast shadow around the silhouette. Every pixel outside the crisp car outline, wheels and mirrors must be 100% TRANSPARENT, including all spaces between mirrors and wheels. Crisp pixel edge, no blurred fringe, no background, no ground, no newly added parts, no labels.",
+      "kind": "prop"
+    },
+    {
+      "key": "Bed",
+      "path": "Assets/Sprites/Shelter/Bed.png",
+      "template": "Assets/Sprites/Shelter/Bed.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-95969c74-8b16-4942-9695-1497d797e3ba.png",
+      "prompt": "Use case: style-transfer. Asset type: transparent Unity top-down pixel-art game sprite. Image1 is EDIT TARGET Bed; image2 is ONLY brushwork/outline/lighting reference, NEVER copy the coffee machine subject. EXACT SUBJECT AND INVARIANTS: ONE narrow single BED in a shelter, DIRECTLY OVERHEAD top-down camera, vertical orientation, pillow at TOP. Preserve original blue-gray metal frame, pale white pillow at upper end, blue blanket covering mattress toward lower end. Add pillow seams, rumpled fabric folds, stitching, worn chipped bed-frame corners and mattress border. Single pillow, no person, no other furniture, no tall frontal facade. Match the established detailed chunky pixel-art style: crisp visible square pixel clusters, deep navy outline, restrained material highlights from upper-left, cool slate shadow clusters, muted original palette and tasteful wear.  Isolated complete silhouette with small transparent margins, genuine alpha background. No floor, scenery, external cast shadow, glow, UI, watermark or text. Keep overall proportions close to target; add material detail rather than extra objects.",
+      "kind": "prop"
+    },
+    {
+      "key": "Door",
+      "path": "Assets/Sprites/Level/Door.png",
+      "template": "Assets/Sprites/Level/Door.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-4b675c02-bf40-4ea7-adf3-4e968a2cdb74.png",
+      "prompt": "Use case: style-transfer. Asset type: transparent Unity top-down pixel-art game sprite. Image1 is EDIT TARGET Door; image2 is ONLY brushwork/outline/lighting reference, NEVER copy the coffee machine subject. EXACT SUBJECT AND INVARIANTS: ONE closed WOODEN DOOR game sprite, vertical narrow rectangle as original. Brown wood panel with visible wood grain, inset panel border and slim dark frame, small brass handle on RIGHT side near center and hinges along LEFT side. Preserve original readable door-panel representation and dimensions, no walls, no room, no stairs, no ornate decorations. Upper-left highlights and worn lower edges. Match the established detailed chunky pixel-art style: crisp visible square pixel clusters, deep navy outline, restrained material highlights from upper-left, cool slate shadow clusters, muted original palette and tasteful wear.  Isolated complete silhouette with small transparent margins, genuine alpha background. No floor, scenery, external cast shadow, glow, UI, watermark or text. Keep overall proportions close to target; add material detail rather than extra objects.",
+      "kind": "prop"
+    },
+    {
+      "key": "Exit",
+      "path": "Assets/Sprites/Level/Exit.png",
+      "template": "Assets/Sprites/Level/Exit.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-3147048d-6733-4b34-b74e-ecfba4dc01f5.png",
+      "prompt": "Use case: style-transfer. Asset type: transparent Unity top-down pixel-art game sprite. Image1 is EDIT TARGET Exit; image2 is ONLY brushwork/outline/lighting reference, NEVER copy the coffee machine subject. EXACT SUBJECT AND INVARIANTS: ONE narrow industrial EXIT DOOR game sprite, vertical orientation. Preserve original gray steel door with horizontal ventilation slats and a small GREEN emergency exit placard directly above the door. Placard uses ONLY a simple white running-person/arrow pictogram, no letters. Dark frame, worn steel edges, visible bolts and dark panel seams. No corridor or surrounding wall. Clearly an exit door, not an appliance. Match the established detailed chunky pixel-art style: crisp visible square pixel clusters, deep navy outline, restrained material highlights from upper-left, cool slate shadow clusters, muted original palette and tasteful wear.  Isolated complete silhouette with small transparent margins, genuine alpha background. No floor, scenery, external cast shadow, glow, UI, watermark or text. Keep overall proportions close to target; add material detail rather than extra objects.",
+      "kind": "prop"
+    },
+    {
+      "key": "ParkingSpot",
+      "path": "Assets/Sprites/Level/ParkingSpot.png",
+      "template": "Assets/Sprites/Level/ParkingSpot.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-c0a8f347-c2c9-4973-8b34-60e97a6d5a46.png",
+      "prompt": "Use case: background-extraction / precise-object-edit. Keep ONLY the three chipped OFF-WHITE PAINTED LINES forming the inverted-U parking marking (horizontal top, vertical left and right, open bottom). Remove all navy/blue border, dark outline, blur, glow, drop shadow and background, outside AND inside the marking. Every non-paint pixel must be fully transparent alpha=0. The paint must look FLAT on a floor, no extrusion, metal frame, bevel or 3D edge. Preserve the current line positions, elongated proportions and irregular chipped off-white paint texture. One inverted-U, no pavement, no other objects, no text, no numbers, no symbols. Clean transparent game floor-decal sprite.",
+      "kind": "marking"
+    },
+    {
+      "key": "WallMap",
+      "path": "Assets/Sprites/Level/WallMap.png",
+      "template": "Assets/Sprites/Level/WallMap.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-0f974360-fe83-43aa-a34b-d2b44e06fb38.png",
+      "prompt": "Use case: style-transfer. Asset type: transparent Unity top-down pixel-art game sprite. Image1 is EDIT TARGET WallMap; image2 is ONLY brushwork/outline/lighting reference, NEVER copy the coffee machine subject. EXACT SUBJECT AND INVARIANTS: ONE small WALL-MOUNTED OFFICE FLOOR MAP in a thin warm brown wooden frame, horizontal rectangular footprint. Pale cream paper diagram with navy-gray room partitions, thin muted red route line and one small red circular location marker, subtle green exit markers. No readable text or words. Add paper creases, pins, worn frame corners. Preserve original compact horizontal wall map identity, not a monitor or machine. Match the established detailed chunky pixel-art style: crisp visible square pixel clusters, deep navy outline, restrained material highlights from upper-left, cool slate shadow clusters, muted original palette and tasteful wear.  Isolated complete silhouette with small transparent margins, genuine alpha background. No floor, scenery, external cast shadow, glow, UI, watermark or text. Keep overall proportions close to target; add material detail rather than extra objects.",
+      "kind": "prop"
+    },
+    {
+      "key": "Tyler",
+      "path": "Assets/Sprites/Npcs/Tyler.png",
+      "template": "Assets/Art/Characters/PlayerHero.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-c5b9a772-493f-4b96-b4d0-2721b930cc42.png",
+      "prompt": "Use case: precise-object-edit. Create a separate Tyler NPC variant of this overhead player sprite. Keep EXACT SAME brown hair crown, dark forest-green jacket, olive backpack/vest, material rendering, top-down 90-degree camera, facing UP, body proportions, pixel scale and colors. CHANGE ONLY ARM POSE: lower BOTH arms from forward fighting stance to a relaxed neutral pose close ALONG LEFT AND RIGHT SIDES OF TORSO, hands down near lower sides/hips. No arms or fists extending above the head. Keep head and torso in their existing locations, keep the same centered complete character silhouette with a transparent background. This is an overhead in-game sprite seen from above/back, not a front portrait. Crisp detailed chunky pixel art. No weapon, new accessories, floor, shadow, text, or glow.",
+      "kind": "character",
+      "alignReference": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-811db46f-157a-40ee-bba5-cf780d3d5ace.png"
+    },
+    {
+      "key": "Intern-Carried",
+      "path": "Assets/Sprites/Npcs/Intern-Carried.png",
+      "template": "Assets/Sprites/Npcs/Intern-Carried.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-b442cae7-5666-4e54-9049-06f8c9a636df.png",
+      "prompt": "Use case: style-transfer. Image1 is the ORIGINAL HORIZONTAL CARRIED MANNEQUIN pose/layout; image2 is the final redesigned Intern mannequin, use its EXACT identity/clothes/colors/materials. Draw that SAME ONE mannequin LYING HORIZONTALLY, head at LEFT, feet at RIGHT, body face-up viewed from above, suitable as a carried item across both hands. Blond molded wig, blank pale ivory mannequin face with no eyes, subtle neck and wrist joints, white shirt, red tie, dark navy trousers, black shoes. Exactly two arms close to sides or resting across waist, exactly two straight legs. Keep original long horizontal about 3:1 footprint. Entire single mannequin visible, no carrier or additional person, no detached limbs, no gore. Crisp detailed chunky pixel-art matching image2, clean navy outlines, cool shadows, pale upper-left highlights, shirt folds and plastic joint seams. Genuine transparent background, no floor, shadow, glow, text, UI or watermark.",
+      "kind": "character"
+    },
+    {
+      "key": "Car-Gray",
+      "path": "Assets/Sprites/Level/Car-Gray.png",
+      "template": "Assets/Sprites/Level/Car-Gray.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-f88c8796-2853-4550-831a-1cfb57ab20aa.png",
+      "prompt": "Use case: precise-object-edit. This is one top-down gray car sprite for a game. Keep EXACT SAME body shape, proportions, vertical orientation, hood at top, windows, wheels, mirrors, lights, pixel-art outlines and surface details from input. Change ONLY painted body panels from blue to muted cool medium GRAY, preserving all shading and scratches. Windows stay blue-gray, tires dark, front lamps ivory, tail lights red. CLEAN ALPHA CUTOUT REQUIRED: remove ALL blurry blue glow, haze and cast shadow around the silhouette. Every pixel outside the crisp car outline, wheels and mirrors must be 100% TRANSPARENT, including all spaces between mirrors and wheels. Crisp pixel edge, no blurred fringe, no background, no ground, no newly added parts, no labels.",
+      "kind": "prop"
+    },
+    {
+      "key": "Car-Red",
+      "path": "Assets/Sprites/Level/Car-Red.png",
+      "template": "Assets/Sprites/Level/Car-Red.png",
+      "generated": "C:\\Users\\Макс\\.codex\\generated_images\\01a1880e-dd8a-7fb0-9009-87228c5b8b39\\exec-99debeaf-a4d5-40a2-80c7-284984f5c02e.png",
+      "prompt": "Use case: precise-object-edit. This is one top-down red car sprite for a game. Keep EXACT SAME body shape, proportions, vertical orientation, hood at top, windows, wheels, mirrors, lights, pixel-art outlines and surface details from input. Change ONLY painted body panels from blue to muted rich RED, preserving all shading and scratches. Windows stay blue-gray, tires dark, front lamps ivory, tail lights red. CLEAN ALPHA CUTOUT REQUIRED: remove ALL blurry blue glow, haze and cast shadow around the silhouette. Every pixel outside the crisp car outline, wheels and mirrors must be 100% TRANSPARENT, including all spaces between mirrors and wheels. Crisp pixel edge, no blurred fringe, no background, no ground, no newly added parts, no labels.",
+      "kind": "prop"
+    }
+  ]
+}

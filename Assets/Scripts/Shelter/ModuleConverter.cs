@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System;
 using System.Collections.Generic;
 using ProjectMayham.Core;
@@ -35,7 +36,7 @@ namespace ProjectMayham.Shelter
         public int Capacity => Mathf.Max(1, capacity);
         public string Title => module != null ? module.DisplayName : name;
         public string Description => module != null ? module.Description : string.Empty;
-        public override string Prompt => $"Открыть: {Title}";
+        public override string Prompt => GameText.Format("Открыть: {0}", Title);
 
         /// <summary>What it holds now; what was loaded on an earlier day has turned into the output.</summary>
         public ModuleStateData State => Ripen(StateOf(slotId), QuestLog.Day, OutputPerInput);

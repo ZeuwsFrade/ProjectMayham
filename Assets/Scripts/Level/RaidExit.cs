@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Core;
 using ProjectMayham.Interaction;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace ProjectMayham.Level
         /// <summary>The exit of the raid that is on, or null: a raid without one lets Esc leave from anywhere.</summary>
         public static RaidExit Active { get; private set; }
 
-        public string Prompt => "Выйти из рейда";
+        public string Prompt => GameText.Translate("Выйти из рейда");
         public Vector2 Position => transform.position;
 
         private void OnEnable()

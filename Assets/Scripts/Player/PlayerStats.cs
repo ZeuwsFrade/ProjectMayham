@@ -1,4 +1,5 @@
 using System;
+using ProjectMayham.Audio;
 using ProjectMayham.Combat;
 using ProjectMayham.Items;
 using UnityEngine;
@@ -117,7 +118,7 @@ namespace ProjectMayham.Player
             if (controller.IsSprinting)
             {
                 SetRecoveringHealth(false);
-                Drain(sprintDrain * DrainMultiplier() * dt);
+                Drain(sprintDrain * DrainMultiplier() * dt, sprinting: true);
                 return;
             }
 
@@ -142,6 +143,7 @@ namespace ProjectMayham.Player
             SetHealth(health - amount);
             regenTimer = Mathf.Max(regenTimer, regenDelay);
             Damaged?.Invoke(before - health);
+            GameAudio.PlayerHurt();
 
             if (health <= 0f)
             {
@@ -216,10 +218,12 @@ namespace ProjectMayham.Player
             return Mathf.Lerp(1f, drainAtComfortableWeight, load);
         }
 
-        private void Drain(float amount)
+        private void Drain(float amount, bool sprinting = false)
         {
+            float before = stamina;
             SetStamina(stamina - amount);
             regenTimer = regenDelay;
+            GameAudio.StaminaSpent(this, controller, before - stamina, sprinting);
 
             if (stamina <= 0f && !exhausted)
             {

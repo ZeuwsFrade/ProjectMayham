@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -101,8 +102,8 @@ namespace ProjectMayham.Quests
                 if (reward == null || reward.item == null) continue;
                 parts.Add(reward.count > 1 ? $"{reward.item.DisplayName} ×{reward.count}" : reward.item.DisplayName);
             }
-            if (quest.RewardSkill.Length > 0) parts.Add($"навык «{Player.PlayerSkills.Title(quest.RewardSkill)}»");
-            if (quest.RewardBlueprint != null) parts.Add($"чертёж «{quest.RewardBlueprint.DisplayName}»");
+            if (quest.RewardSkill.Length > 0) parts.Add(GameText.Format("навык «{0}»", Player.PlayerSkills.Title(quest.RewardSkill)));
+            if (quest.RewardBlueprint != null) parts.Add(GameText.Format("чертёж «{0}»", quest.RewardBlueprint.DisplayName));
             return string.Join(", ", parts);
         }
 
@@ -110,9 +111,9 @@ namespace ProjectMayham.Quests
         public static string OfferSummary(QuestDefinition quest)
         {
             var lines = new List<string>();
-            if (quest.Objectives.Count > 0) lines.Add($"Нужно: {Objectives(quest)}");
+            if (quest.Objectives.Count > 0) lines.Add(GameText.Format("Нужно: {0}", Objectives(quest)));
             string reward = Reward(quest);
-            if (reward.Length > 0) lines.Add($"Награда: {reward}");
+            if (reward.Length > 0) lines.Add(GameText.Format("Награда: {0}", reward));
             return string.Join("\n", lines);
         }
 
@@ -122,11 +123,11 @@ namespace ProjectMayham.Quests
         private static string Line(ObjectiveProgress line)
         {
             string subject = line.Objective.Subject;
-            if (line.Objective.Kind == QuestObjectiveKind.VisitRoom) return $"{subject} — {(line.Done ? "есть" : "ещё нет")}";
-            if (line.Objective.Kind == QuestObjectiveKind.Rescue) return $"{subject} — {(line.Done ? "готово" : "ещё нет")}";
+            if (line.Objective.Kind == QuestObjectiveKind.VisitRoom) return $"{subject} — {(GameText.Translate(line.Done ? "есть" : "ещё нет"))}";
+            if (line.Objective.Kind == QuestObjectiveKind.Rescue) return $"{subject} — {(GameText.Translate(line.Done ? "готово" : "ещё нет"))}";
 
             string text = $"{subject} — {Mathf.Min(line.Have, line.Need)}/{line.Need}";
-            if (!line.Done && line.InStash > 0) text += $", в тайнике: {line.InStash}";
+            if (!line.Done && line.InStash > 0) text += GameText.Format(", в тайнике: {0}", line.InStash);
             return text;
         }
 

@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectMayham.Core;
@@ -261,8 +262,8 @@ namespace ProjectMayham.UI
             {
                 var worn = Equipment != null ? Equipment[slot] : null;
                 infoLabel.text = worn != null
-                    ? $"{PlayerEquipment.SlotTitle(slot)}: {worn.DisplayName}{GridNote(worn)}. ПКМ или перетащите в сетку — снять, за окно — выбросить"
-                    : $"{PlayerEquipment.SlotTitle(slot)}: пусто. Перетащите сюда вещь или ПКМ по ней в сетке — надеть";
+                    ? GameText.Format("{0}: {1}{2}. ПКМ или перетащите в сетку — снять, за окно — выбросить", PlayerEquipment.SlotTitle(slot), worn.DisplayName, GridNote(worn))
+                    : GameText.Format("{0}: пусто. Перетащите сюда вещь или ПКМ по ней в сетке — надеть", PlayerEquipment.SlotTitle(slot));
                 return;
             }
 
@@ -277,46 +278,46 @@ namespace ProjectMayham.UI
             var stack = StackUnder(screen);
             if (stack != null) infoLabel.text = Describe(stack) + HintFor(stack);
             else if (selected.Count > 1) infoLabel.text = DescribeSelection();
-            else infoLabel.text = "Мышь — перетаскивать, R — повернуть, Shift+клик или рамка — выделить несколько, Ctrl+клик — разделить, ПКМ — взять в руку или надеть, Q — сменить руку";
+            else infoLabel.text = GameText.Translate("Мышь — перетаскивать, R — повернуть, Shift+клик или рамка — выделить несколько, Ctrl+клик — разделить, ПКМ — взять в руку или надеть, Q — сменить руку");
         }
 
         private static string HintFor(GridInventory.Stack stack)
         {
             string hint = string.Empty;
-            if (stack.Item is ConsumableDefinition consumable) hint += $". F — {consumable.Verb.ToLowerInvariant()} (3 с)";
-            if (stack.Item.Holdable) hint += stack.Item.TwoHanded ? ". ПКМ — взять в обе руки" : ". ПКМ — взять в руку";
-            if (stack.Item.Wearable) hint += $"{GridNote(stack.Item)}. ПКМ — надеть";
-            if (stack.Count > 1) hint += ". Ctrl+клик — разделить";
+            if (stack.Item is ConsumableDefinition consumable) hint += GameText.Format(". F — {0} (3 с)", consumable.Verb.ToLowerInvariant());
+            if (stack.Item.Holdable) hint += stack.Item.TwoHanded ? GameText.Translate(". ПКМ — взять в обе руки") : GameText.Translate(". ПКМ — взять в руку");
+            if (stack.Item.Wearable) hint += GameText.Format("{0}. ПКМ — надеть", GridNote(stack.Item));
+            if (stack.Count > 1) hint += GameText.Translate(". Ctrl+клик — разделить");
             return hint;
         }
 
         private string HandInfo(Hand hand)
         {
             var item = inventory.InHand(hand);
-            string title = HandTitle(hand) + (hand == inventory.ActiveHand && !inventory.HoldsTwoHanded ? " (активная)" : string.Empty);
-            if (item == null) return $"{title}: пусто. Перетащите сюда предмет — взять в эту руку, клик — сделать её активной, Q — сменить руку";
-            string both = inventory.HoldsTwoHanded ? ", в обеих руках" : string.Empty;
-            return $"{title}: {item.DisplayName}{both}. ПКМ или перетащите в сетку — убрать, на другую руку — переложить, H — убрать всё, G — выбросить";
+            string title = HandTitle(hand) + (hand == inventory.ActiveHand && !inventory.HoldsTwoHanded ? GameText.Translate(" (активная)") : string.Empty);
+            if (item == null) return GameText.Format("{0}: пусто. Перетащите сюда предмет — взять в эту руку, клик — сделать её активной, Q — сменить руку", title);
+            string both = inventory.HoldsTwoHanded ? GameText.Translate(", в обеих руках") : string.Empty;
+            return GameText.Format("{0}: {1}{2}. ПКМ или перетащите в сетку — убрать, на другую руку — переложить, H — убрать всё, G — выбросить", title, item.DisplayName, both);
         }
 
-        private static string HandTitle(Hand hand) => hand == Hand.Right ? "Правая рука" : "Левая рука";
+        private static string HandTitle(Hand hand) => hand == Hand.Right ? GameText.Translate("Правая рука") : GameText.Translate("Левая рука");
 
         // A backpack tells how big the grid is with it on.
         private static string GridNote(ItemDefinition item) =>
-            item.EquipSlot == EquipSlot.Back ? $" (сетка {item.BackpackGrid.x}×{item.BackpackGrid.y})" : string.Empty;
+            item.EquipSlot == EquipSlot.Back ? GameText.Format(" (сетка {0}×{1})", item.BackpackGrid.x, item.BackpackGrid.y) : string.Empty;
 
         private static string Describe(GridInventory.Stack stack)
         {
             var item = stack.Item;
             string count = stack.Count > 1 ? $" ×{stack.Count}" : string.Empty;
-            return $"{item.DisplayName}{count} — {item.Weight * stack.Count:0.##} кг ({item.Weight:0.##} кг/шт), {item.GridSize.x}×{item.GridSize.y}";
+            return GameText.Format("{0}{1} — {2:0.##} кг ({3:0.##} кг/шт), {4}×{5}", item.DisplayName, count, item.Weight * stack.Count, item.Weight, item.GridSize.x, item.GridSize.y);
         }
 
         private string DescribeSelection()
         {
             var selected = inventory.SelectedStacks;
             float weight = selected.Sum(s => s.Item.Weight * s.Count);
-            return $"Выделено: {selected.Count} шт., {weight:0.##} кг. Перетащите группу, G или выход за окно — выбросить";
+            return GameText.Format("Выделено: {0} шт., {1:0.##} кг. Перетащите группу, G или выход за окно — выбросить", selected.Count, weight);
         }
 
         // ---- clicking and dragging ----
@@ -431,7 +432,7 @@ namespace ProjectMayham.UI
             var hand = HandUnder(screen);
             if (hand.HasValue)
             {
-                if (inventory.InHand(hand.Value) != null && !inventory.Unhold(hand.Value)) infoLabel.text = "Нет места в инвентаре";
+                if (inventory.InHand(hand.Value) != null && !inventory.Unhold(hand.Value)) infoLabel.text = GameText.Translate("Нет места в инвентаре");
                 return;
             }
 
@@ -442,8 +443,8 @@ namespace ProjectMayham.UI
                 if (Equipment != null) Equipment.WearFromGrid(stack);
                 return;
             }
-            if (!stack.Item.Holdable) infoLabel.text = $"{stack.Item.DisplayName} нельзя взять в руки";
-            else if (!inventory.Hold(stack)) infoLabel.text = "Некуда убрать то, что в руках";
+            if (!stack.Item.Holdable) infoLabel.text = GameText.Format("{0} нельзя взять в руки", stack.Item.DisplayName);
+            else if (!inventory.Hold(stack)) infoLabel.text = GameText.Translate("Некуда убрать то, что в руках");
         }
 
         // F over food, drink or medicine uses it from the backpack (the progress shows at the bottom of the screen).
@@ -453,7 +454,7 @@ namespace ProjectMayham.UI
             if (stack == null || stack.Sealed || !(stack.Item is ConsumableDefinition consumable)) return;
             if (!inventory.TryGetComponent<PlayerConsumer>(out var consumer)) return;
 
-            if (consumer.TryUseFromInventory(consumable)) infoLabel.text = $"{consumable.Verb}: {consumable.DisplayName}… ({consumer.InventoryUseSeconds:0.#} с)";
+            if (consumer.TryUseFromInventory(consumable)) infoLabel.text = GameText.Format("{0}: {1}… ({2:0.#} с)", consumable.Verb, consumable.DisplayName, consumer.InventoryUseSeconds);
             else if (consumer.Message.Length > 0) infoLabel.text = consumer.Message;
         }
 
@@ -493,22 +494,22 @@ namespace ProjectMayham.UI
             }
             if (slot != EquipSlot.None && slot != draggingSlot)
             {
-                infoLabel.text = CanWear(slot) ? "Отпустите, чтобы надеть" : $"Сюда надевается только то, что носят: {PlayerEquipment.SlotTitle(slot).ToLowerInvariant()}";
+                infoLabel.text = CanWear(slot) ? GameText.Translate("Отпустите, чтобы надеть") : GameText.Format("Сюда надевается только то, что носят: {0}", PlayerEquipment.SlotTitle(slot).ToLowerInvariant());
                 return;
             }
 
             if (!overWindow)
             {
                 infoLabel.text = IsGroupDrag
-                    ? $"Отпустите, чтобы выбросить выделенное ({dragSet.Count} шт.)"
-                    : $"Отпустите, чтобы выбросить: {Describe(dragged)}";
+                    ? GameText.Format("Отпустите, чтобы выбросить выделенное ({0} шт.)", dragSet.Count)
+                    : GameText.Format("Отпустите, чтобы выбросить: {0}", Describe(dragged));
             }
             else if (overHand.HasValue)
             {
-                infoLabel.text = !canHold ? (draggingHand == overHand ? Describe(dragged) : "Сюда кладётся только предмет, который берётся в руки")
-                    : draggingHand.HasValue ? "Отпустите, чтобы переложить в другую руку"
-                    : dragged.Item.TwoHanded ? "Отпустите, чтобы взять в обе руки"
-                    : $"Отпустите, чтобы взять: {HandTitle(overHand.Value).ToLowerInvariant()}";
+                infoLabel.text = !canHold ? (draggingHand == overHand ? Describe(dragged) : GameText.Translate("Сюда кладётся только предмет, который берётся в руки"))
+                    : draggingHand.HasValue ? GameText.Translate("Отпустите, чтобы переложить в другую руку")
+                    : dragged.Item.TwoHanded ? GameText.Translate("Отпустите, чтобы взять в обе руки")
+                    : GameText.Format("Отпустите, чтобы взять: {0}", HandTitle(overHand.Value).ToLowerInvariant());
             }
             else infoLabel.text = IsGroupDrag ? DescribeSelection() : Describe(dragged);
         }
@@ -593,7 +594,7 @@ namespace ProjectMayham.UI
             }
             if (overHand.HasValue)
             {
-                if (canHold && !inventory.Hold(stack, overHand.Value)) infoLabel.text = "Некуда убрать то, что в руках";
+                if (canHold && !inventory.Hold(stack, overHand.Value)) infoLabel.text = GameText.Translate("Некуда убрать то, что в руках");
                 return;
             }
             if (!ToGridLocal(screen, out var local)) return;
@@ -713,7 +714,7 @@ namespace ProjectMayham.UI
                 hit.Add(stack);
             }
             inventory.SetSelection(hit);
-            infoLabel.text = hit.Count > 0 ? $"Выделено рамкой: {hit.Count}" : "Тяните рамку, чтобы выделить предметы";
+            infoLabel.text = hit.Count > 0 ? GameText.Format("Выделено рамкой: {0}", hit.Count) : GameText.Translate("Тяните рамку, чтобы выделить предметы");
         }
 
         private void EndMarquee(Vector2 screen)
@@ -779,12 +780,12 @@ namespace ProjectMayham.UI
         {
             if (stack.Count < 2)
             {
-                infoLabel.text = "В этой стопке один предмет, делить нечего";
+                infoLabel.text = GameText.Translate("В этой стопке один предмет, делить нечего");
                 return;
             }
             if (!inventory.HasFreeSpotFor(stack.Item))
             {
-                infoLabel.text = "Нет свободного места для новой стопки";
+                infoLabel.text = GameText.Translate("Нет свободного места для новой стопки");
                 return;
             }
 
@@ -811,7 +812,7 @@ namespace ProjectMayham.UI
         private void RefreshSplit()
         {
             splitValue.text = splitAmount.ToString();
-            infoLabel.text = $"Отделить {splitAmount} из {splitTarget.Count} (останется {splitTarget.Count - splitAmount}). Колесо мыши или +/− — количество, Enter — подтвердить";
+            infoLabel.text = GameText.Format("Отделить {0} из {1} (останется {2}). Колесо мыши или +/− — количество, Enter — подтвердить", splitAmount, splitTarget.Count, splitTarget.Count - splitAmount);
         }
 
         private void ConfirmSplit()
@@ -819,7 +820,7 @@ namespace ProjectMayham.UI
             var target = splitTarget;
             int amount = splitAmount;
             CloseSplit();
-            if (inventory.Split(target, amount) == null) infoLabel.text = "Не удалось разделить: нет места";
+            if (inventory.Split(target, amount) == null) infoLabel.text = GameText.Translate("Не удалось разделить: нет места");
         }
 
         private void UpdateSplit(Vector2 screen, Mouse mouse, Keyboard keyboard)
@@ -1164,7 +1165,7 @@ namespace ProjectMayham.UI
 
         private void RefreshWeight()
         {
-            string text = $"Вес {inventory.TotalWeight:0.#} / {inventory.MaxWeight:0.#} кг";
+            string text = GameText.Format("Вес {0:0.#} / {1:0.#} кг", inventory.TotalWeight, inventory.MaxWeight);
             var color = inventory.IsOverloaded ? OverloadedColor : Color.white;
             if (weightLabel != null) { weightLabel.text = text; weightLabel.color = color; }
             if (weightHud != null) { weightHud.text = text; weightHud.color = color; }

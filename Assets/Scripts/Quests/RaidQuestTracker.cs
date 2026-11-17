@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using ProjectMayham.Core;
 using ProjectMayham.Level;
@@ -58,7 +59,7 @@ namespace ProjectMayham.Quests
                 if (visited.Contains(room.Kind) || !IsInside(room.Slot, position)) continue;
 
                 visited.Add(room.Kind);
-                if (demands != null && demands.WantsVisit(room.Kind)) Show($"Отмечено: {RoomSizes.Title(room.Kind)}");
+                if (demands != null && demands.WantsVisit(room.Kind)) Show(GameText.Format("Отмечено: {0}", RoomSizes.Title(room.Kind)));
             }
         }
 

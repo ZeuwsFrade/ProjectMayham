@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using ProjectMayham.Items;
 using UnityEngine;
@@ -30,7 +31,7 @@ namespace ProjectMayham.Level
         [Tooltip("Chance that a container with loot also gets one thing from the loot table of the room it stands in.")]
         [SerializeField, Range(0f, 1f)] private float roomLootChance = 0.3f;
 
-        public string Title => title;
+        public string Title => GameText.Translate(title);
         public Vector2Int GridSize => new Vector2Int(Mathf.Max(1, gridSize.x), Mathf.Max(1, gridSize.y));
         public float SecondsPerItem => Mathf.Max(0.05f, secondsPerItem);
         public float LookSeconds => Mathf.Max(0f, lookSeconds);

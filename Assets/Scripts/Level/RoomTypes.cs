@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using UnityEngine;
 
 namespace ProjectMayham.Level
@@ -53,12 +54,12 @@ namespace ProjectMayham.Level
         {
             switch (kind)
             {
-                case RoomKind.Office: return "Офис";
-                case RoomKind.BreakRoom: return "Комната отдыха";
-                case RoomKind.BossOffice: return "Офис босса";
-                case RoomKind.Toilet: return "Туалет";
-                case RoomKind.Parking: return "Парковка";
-                case RoomKind.Storage: return "Склад";
+                case RoomKind.Office: return GameText.Translate("Офис");
+                case RoomKind.BreakRoom: return GameText.Translate("Комната отдыха");
+                case RoomKind.BossOffice: return GameText.Translate("Офис босса");
+                case RoomKind.Toilet: return GameText.Translate("Туалет");
+                case RoomKind.Parking: return GameText.Translate("Парковка");
+                case RoomKind.Storage: return GameText.Translate("Склад");
                 default: return "Комната ксерокопии";
             }
         }

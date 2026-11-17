@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System;
 using ProjectMayham.Items;
 using ProjectMayham.Level;
@@ -64,8 +65,8 @@ namespace ProjectMayham.Quests
                 {
                     case QuestObjectiveKind.Deliver: return ItemName;
                     case QuestObjectiveKind.FindSpecial: return $"{ItemName} ({RoomSizes.Title(room)})";
-                    case QuestObjectiveKind.Rescue: return item != null ? $"Довести до убежища: {item.DisplayName}" : "Довести до убежища";
-                    default: return $"Побывать: {RoomSizes.Title(room)}";
+                    case QuestObjectiveKind.Rescue: return item != null ? GameText.Format("Довести до убежища: {0}", item.DisplayName) : GameText.Translate("Довести до убежища");
+                    default: return GameText.Format("Побывать: {0}", RoomSizes.Title(room));
                 }
             }
         }

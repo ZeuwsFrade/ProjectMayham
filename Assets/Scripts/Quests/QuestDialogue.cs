@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,7 +105,7 @@ namespace ProjectMayham.Quests
                 // There are quests, so their giver is known even when the catalog was asked too early.
                 talk.Giver ??= offers[0].Giver;
                 node.Text = talk.Giver.MenuText;
-                foreach (var quest in offers) node.Choices.Add(Go($"Новое дело: {quest.Title}", () => OfferNode(talk, quest, 0)));
+                foreach (var quest in offers) node.Choices.Add(Go(GameText.Format("Новое дело: {0}", quest.Title), () => OfferNode(talk, quest, 0)));
             }
             else
             {
@@ -115,8 +116,8 @@ namespace ProjectMayham.Quests
                 // What can be handed in comes first.
                 foreach (var quest in taken.OrderBy(q => QuestLog.Check(q, talk.Backpack).Ready ? 0 : 1))
                 {
-                    if (QuestLog.Check(quest, talk.Backpack).Ready) node.Choices.Add(Go($"Сдать: {quest.Title}", () => ReadyNode(talk, quest)));
-                    else node.Choices.Add(Go($"Напомни: {quest.Title}", () => ReminderNode(talk, quest)));
+                    if (QuestLog.Check(quest, talk.Backpack).Ready) node.Choices.Add(Go(GameText.Format("Сдать: {0}", quest.Title), () => ReadyNode(talk, quest)));
+                    else node.Choices.Add(Go(GameText.Format("Напомни: {0}", quest.Title), () => ReminderNode(talk, quest)));
                 }
             }
             node.Choices.Add(new DialogueChoice { Text = AnswerBack, Next = talk.Back });
@@ -189,7 +190,7 @@ namespace ProjectMayham.Quests
         private static DialogueNode AbandonAsk(Talk talk, QuestDefinition quest)
         {
             string ask = string.IsNullOrWhiteSpace(talk.Giver.AbandonAskText) ? string.Empty : talk.Giver.AbandonAskText.Trim() + "\n";
-            var node = new DialogueNode { Text = ask + QuestText.Small($"Отказаться от «{quest.Title}»?") };
+            var node = new DialogueNode { Text = ask + QuestText.Small(GameText.Format("Отказаться от «{0}»?", quest.Title)) };
             node.Choices.Add(Go(AnswerAbandonYes, () =>
             {
                 QuestLog.Abandon(quest);
@@ -236,7 +237,7 @@ namespace ProjectMayham.Quests
                 // Handed in: after the thanks and the reward the talk starts over from its beginning.
                 string reward = QuestText.Reward(quest);
                 return Say(quest.CompletedText, () => talk.Restart != null ? talk.Restart(null) : Menu(talk),
-                    reward.Length > 0 ? QuestText.Small($"Получено: {reward}") : null);
+                    reward.Length > 0 ? QuestText.Small(GameText.Format("Получено: {0}", reward)) : null);
             }));
             node.Choices.Add(Go(AnswerLater, () => Menu(talk)));
             return node;
@@ -254,7 +255,7 @@ namespace ProjectMayham.Quests
             {
                 pages.AddRange(QuestText.Pages(quest.CompletedText));
                 string reward = QuestText.Reward(quest);
-                if (reward.Length > 0) pages.Add(QuestText.Small($"Получено: {reward}"));
+                if (reward.Length > 0) pages.Add(QuestText.Small(GameText.Format("Получено: {0}", reward)));
             }
             else pages.AddRange(QuestText.Pages(giver != null ? giver.NoRoomText : string.Empty));
             if (pages.Count == 0) pages.Add(quest.Title);

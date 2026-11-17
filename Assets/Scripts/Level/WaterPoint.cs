@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Interaction;
 using ProjectMayham.Player;
 using UnityEngine;
@@ -22,9 +23,9 @@ namespace ProjectMayham.Level
         /// <summary>Someone has drunk at a cooler or a tap.</summary>
         public static event System.Action<GameObject> Used;
 
-        public string Prompt => prompt;
+        public string Prompt => GameText.Translate(prompt);
         public float HoldSeconds => seconds;
-        public string HoldLabel => "Пью";
+        public string HoldLabel => GameText.Translate("Пью");
         public Vector2 Position => transform.position;
 
         private void OnEnable() => Interactables.Register(this);

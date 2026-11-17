@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Core;
 using ProjectMayham.Interaction;
 using ProjectMayham.UI;
@@ -40,7 +41,7 @@ namespace ProjectMayham.Level
             if (!exit.HasValue) return "Выхода на карте нет";
             var wrap = WrapWorld.Active;
             Vector2 delta = wrap != null ? wrap.Delta(from, exit.Value) : exit.Value - from;
-            return $"Выход — {CompassText.Describe(delta)}";
+            return GameText.Format("Выход — {0}", CompassText.Describe(delta));
         }
     }
 }

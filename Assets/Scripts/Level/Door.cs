@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProjectMayham.Localization;
+using System;
 using ProjectMayham.Core;
 using ProjectMayham.Interaction;
 using ProjectMayham.Items;
@@ -44,12 +45,12 @@ namespace ProjectMayham.Level
         {
             get
             {
-                if (!locked) return $"Открыть: {title}";
-                return key != null ? $"Отпереть: {title}" : title;
+                if (!locked) return GameText.Format("Открыть: {0}", GameText.Translate(title));
+                return key != null ? GameText.Format("Отпереть: {0}", GameText.Translate(title)) : GameText.Translate(title);
             }
         }
 
-        public string Hints => locked && !opensForLastActor ? (key != null ? $"Нужен ключ: {key.DisplayName}" : lockedHint) : string.Empty;
+        public string Hints => locked && !opensForLastActor ? (key != null ? GameText.Format("Нужен ключ: {0}", key.DisplayName) : GameText.Translate(lockedHint)) : string.Empty;
 
         public Vector2 Position => transform.position;
 

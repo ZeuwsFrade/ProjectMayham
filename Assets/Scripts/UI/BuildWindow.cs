@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using System.Linq;
 using ProjectMayham.Items;
@@ -64,7 +65,7 @@ namespace ProjectMayham.UI
 
         protected override void OnOpened()
         {
-            statusLabel.text = "Ресурсы берутся из рюкзака и со склада.";
+            statusLabel.text = GameText.Translate("Ресурсы берутся из рюкзака и со склада.");
             Redraw();
         }
 
@@ -139,7 +140,7 @@ namespace ProjectMayham.UI
                 string line = $"{part.item.DisplayName} {Mathf.Min(have, need)}/{need}";
                 parts.Add(have >= need ? line : $"<color=#FF7366>{line}</color>");
             }
-            return parts.Count == 0 ? "Ничего не нужно" : "Нужно: " + string.Join("  ·  ", parts);
+            return parts.Count == 0 ? GameText.Translate("Ничего не нужно") : GameText.Format("Нужно: {0}", string.Join("  ·  ", parts));
         }
 
         private void Build(ShelterModuleDefinition module)
@@ -147,12 +148,12 @@ namespace ProjectMayham.UI
             if (slot == null) return;
             if (!slot.TryBuild(module, ModuleCost.StoresOf(actor)))
             {
-                statusLabel.text = slot.CannotBuild(module, ModuleCost.StoresOf(actor)) ?? "Не получилось";
+                statusLabel.text = slot.CannotBuild(module, ModuleCost.StoresOf(actor)) ?? GameText.Translate("Не получилось");
                 Redraw();
                 return;
             }
             Close();
-            ScreenNote.Show($"Построено: {module.DisplayName}", 3f);
+            ScreenNote.Show(GameText.Format("Построено: {0}", module.DisplayName), 3f);
         }
     }
 }

@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Interaction;
 using ProjectMayham.Player;
 using UnityEngine;
@@ -14,9 +15,9 @@ namespace ProjectMayham.Level
         /// <summary>Someone has used a toilet.</summary>
         public static event System.Action<GameObject> Used;
 
-        public string Prompt => "Справить нужду (удерживать)";
+        public string Prompt => GameText.Translate("Справить нужду (удерживать)");
         public float HoldSeconds => seconds;
-        public string HoldLabel => "Справляю нужду";
+        public string HoldLabel => GameText.Translate("Справляю нужду");
         public Vector2 Position => transform.position;
 
         private void OnEnable() => Interactables.Register(this);

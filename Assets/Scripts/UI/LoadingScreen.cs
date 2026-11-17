@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -68,8 +69,8 @@ namespace ProjectMayham.UI
         private IEnumerator Run(string sceneName, string caption)
         {
             busy = true;
-            titleLabel.text = "ЗАГРУЗКА";
-            captionLabel.text = caption ?? string.Empty;
+            titleLabel.text = GameText.Translate("ЗАГРУЗКА");
+            captionLabel.text = GameText.Translate(caption) ?? string.Empty;
             SetProgress(0f);
             group.blocksRaycasts = true; // nothing underneath can be clicked while loading
 

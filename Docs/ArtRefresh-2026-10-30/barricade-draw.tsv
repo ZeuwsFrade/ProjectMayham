@@ -1,0 +1,15 @@
+B|Barricade-Cabinets|2.8|0.85
+S|Barricade-Cabinets|Assets/Sprites/Office Furniture/Filing-Cabinet-Small.png|-1.62403452E-07|-1.362339|1.17740738|-1.40357884E-07|-0.923713446|-0.0022996068|256|90.5|90.5|5
+S|Barricade-Cabinets|Assets/Sprites/Office Furniture/Bookshelf.png|-1.56324163E-07|1.31134224|-1.13333333|-1.35103846E-07|-0.00256118621|0.00221354165|256|97.5|96|5
+S|Barricade-Cabinets|Assets/Sprites/Office Furniture/Filing-Cabinet-Small.png|-1.62403467E-07|1.36233914|-1.1774075|-1.403579E-07|0.9237136|0.0022996068|256|90.5|90.5|5
+S|Barricade-Cabinets|Assets/Sprites/Office Furniture/Chair.png|-0.725836635|-0.419062078|0.3621762|-0.6273075|0.444078952|0.0297799353|256|82.5|89.5|6
+B|Barricade-Crates|2.8|0.85
+S|Barricade-Crates|Assets/Sprites/Level/Crate.png|0.9654372|0|0|0.8388452|-0.9172813|0|256|128|128|5
+S|Barricade-Crates|Assets/Sprites/Level/Box.png|1.04349387|0|0|0.906666756|-0.00203803787|0.0283333454|256|128|128|5
+S|Barricade-Crates|Assets/Sprites/Level/Crate.png|0.9654372|0|0|0.8388452|0.924824|0|256|128|128|5
+S|Barricade-Crates|Assets/Sprites/Level/Box.png|0.551788449|-0.245672077|0.213458568|0.479435772|-0.444078952|0.0402887575|256|128|128|6
+B|Barricade-Tables|2.8|0.85
+S|Barricade-Tables|Assets/Sprites/Office Furniture/Small-Table.png|-1.09473681|9.57049338E-08|-8.442454E-08|-0.965704143|-0.9274671|0.003772294|256|117.5|79.5|5
+S|Barricade-Tables|Assets/Sprites/Office Furniture/Small-Table.png|1.09473681|0|0|0.965704143|0.00641447958|-0.003772268|256|117.5|79.5|5
+S|Barricade-Tables|Assets/Sprites/Level/Crate.png|0.8456527|-0.118848749|0.104840472|0.745978653|0.9243561|0.000409547472|256|128|128|5
+S|Barricade-Tables|Assets/Sprites/Office Furniture/Chair-2.png|-0.383087277|0.8215331|-0.724701941|-0.337934166|-0.493421078|0.0274358541|256|87|80.5|6

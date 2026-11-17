@@ -1,0 +1,8 @@
+Tyler scene renderers=2; fitted barricade prefabs=3
+PORTRAIT|Assets/Resources/Npcs/Tyler.asset
+PORTRAIT|Assets/Data/Traders/Tyler.asset
+SCENE|Assets/Scenes/Shelter.unity
+SCENE|Assets/Scenes/Tests/ShelterTest.unity
+BARRICADE|Assets/Prefabs/Barricades/Barricade-Cabinets.prefab|visual=(2.80, 0.85, 0.00)|collider=(2.80, 0.85)|mass=5|damping=4
+BARRICADE|Assets/Prefabs/Barricades/Barricade-Crates.prefab|visual=(2.80, 0.85, 0.00)|collider=(2.80, 0.85)|mass=5|damping=4
+BARRICADE|Assets/Prefabs/Barricades/Barricade-Tables.prefab|visual=(2.80, 0.85, 0.00)|collider=(2.80, 0.85)|mass=5|damping=4

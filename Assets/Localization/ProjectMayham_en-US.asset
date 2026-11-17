@@ -1,0 +1,2106 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: ProjectMayham_en-US
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en-US
+  m_SharedData: {fileID: 11400000, guid: 7f9e699aba70e4e4cb8900f4e2e9bdba, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 900313088
+    m_Localized: Project Mayham
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582720
+    m_Localized: New Game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582721
+    m_Localized: Load
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582722
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582723
+    m_Localized: Quit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582724
+    m_Localized: Close
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582725
+    m_Localized: AUDIO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582726
+    m_Localized: Music
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582727
+    m_Localized: Master Volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582728
+    m_Localized: Language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582729
+    m_Localized: Resolution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582730
+    m_Localized: Sound Effects
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582731
+    m_Localized: DISPLAY AND LANGUAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582732
+    m_Localized: Held Items
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582733
+    m_Localized: Inventory
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582734
+    m_Localized: Split Stack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582735
+    m_Localized: Cancel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582736
+    m_Localized: ENTER RAID
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582737
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582738
+    m_Localized: Yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582739
+    m_Localized: No
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582740
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582741
+    m_Localized: Start Tutorial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582742
+    m_Localized: Skip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582743
+    m_Localized: Continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582744
+    m_Localized: Play the tutorial? It takes a few minutes and ends at the shelter.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582745
+    m_Localized: Shelter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582746
+    m_Localized: Tutorial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582747
+    m_Localized: Raid
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582748
+    m_Localized: Main Menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582749
+    m_Localized: LOADING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582750
+    m_Localized: You Died
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582751
+    m_Localized: You lost everything you were carrying. You woke up in the shelter.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582752
+    m_Localized: Return to Shelter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582753
+    m_Localized: Return to the shelter?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582754
+    m_Localized: You will leave the raid and keep everything in your backpack.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582755
+    m_Localized: Return
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582756
+    m_Localized: Stay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582757
+    m_Localized: Extract
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582758
+    m_Localized: "Stage 1 of 3 \xB7 Search the Room"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582759
+    m_Localized: 'WASD to move, Shift to sprint, mouse to aim.
+
+      You''re hurt
+      and hungry. Search the furniture (E) for food and bandages.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582760
+    m_Localized: Search cabinets and drawers (E) for food and bandages
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582761
+    m_Localized: Open inventory (I), point at food, and press F to eat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582762
+    m_Localized: Use bandages the same way (F)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582763
+    m_Localized: "Stage 2 of 3 \xB7 Enemies"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582764
+    m_Localized: Drifters are ahead. Hold Ctrl to crouch. They won't hear your steps
+      and can only spot you up close. Stay out of their line of sight.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582765
+    m_Localized: Crouch (Ctrl) and sneak behind the Drifter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582766
+    m_Localized: Pick up the mug (E)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582767
+    m_Localized: Distract the second one. Hold G, aim, and throw the mug
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582768
+    m_Localized: Get to the exit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582769
+    m_Localized: "Stage 3 of 3 \xB7 The Environment"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582770
+    m_Localized: Drink at the water cooler and use the restroom. Ignoring your needs
+      slows you down and makes it easier for enemies to smell you.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582771
+    m_Localized: Drink from the cooler (hold E)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582772
+    m_Localized: Use the restroom (hold E)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582773
+    m_Localized: Crawl through the opening (hold E)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582774
+    m_Localized: Climb over the barricade (Space)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582775
+    m_Localized: Find the key in the drawers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582776
+    m_Localized: Unlock the door and leave
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582777
+    m_Localized: You made it! Pick up the mug (E). Throwing things makes noise that
+      attracts enemies.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582778
+    m_Localized: 'The second Drifter is guarding the exit. Stay crouched, hold G,
+      and throw the mug into the upper corner near him.
+
+      When he investigates,
+      sneak to the exit along the bottom.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582779
+    m_Localized: A barricade blocks the way. Walk up to it and press Space to climb
+      over. Climbing uses stamina.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582780
+    m_Localized: The exit is locked. Search the drawers for the key.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582781
+    m_Localized: Good work! The door to the next room is open.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582782
+    m_Localized: Tutorial Complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582783
+    m_Localized: 'Next stop: the shelter. Rest, trade, and gear up for a raid. You''ll
+      keep everything you''re carrying.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582784
+    m_Localized: You kept your gear. The tutorial will restart from the beginning
+      of this stage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582785
+    m_Localized: Try Again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582786
+    m_Localized: Skip the tutorial?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582787
+    m_Localized: You'll go straight to the shelter and keep everything you're carrying.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582788
+    m_Localized: Note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582789
+    m_Localized: 'Read: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582790
+    m_Localized: Hunger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582791
+    m_Localized: Thirst
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582792
+    m_Localized: Restroom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582793
+    m_Localized: "You couldn't hold it\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582794
+    m_Localized: Inventory is full
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582795
+    m_Localized: Too heavy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582796
+    m_Localized: Enemy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582797
+    m_Localized: 'Search: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582798
+    m_Localized: 'Open: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582799
+    m_Localized: '{0} (empty)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582800
+    m_Localized: 'Unlock: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582801
+    m_Localized: 'Key required: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582802
+    m_Localized: 'Pick up: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582803
+    m_Localized: "Pick up: {0} \xD7{1}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582804
+    m_Localized: Talk to {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582805
+    m_Localized: Container
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582806
+    m_Localized: Door
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582807
+    m_Localized: Locked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1143582808
+    m_Localized: No room to climb over
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777024
+    m_Localized: Not enough stamina
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777025
+    m_Localized: Blocked on the other side
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777026
+    m_Localized: Can't squeeze through
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777027
+    m_Localized: Dismantle (hold)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777028
+    m_Localized: Dismantling barricade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777029
+    m_Localized: "[Space] Climb \xB7 Walk into it to push"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777030
+    m_Localized: '[Space] Climb'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777031
+    m_Localized: Walk into it to push
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777032
+    m_Localized: Crawl through (hold)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777033
+    m_Localized: Crawling through
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777034
+    m_Localized: Drink (hold)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777035
+    m_Localized: Drinking
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777036
+    m_Localized: Use restroom (hold)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777037
+    m_Localized: Using restroom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777038
+    m_Localized: Check the map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777039
+    m_Localized: Checking the map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777040
+    m_Localized: The exit isn't marked on this map
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777041
+    m_Localized: The exit is {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777042
+    m_Localized: nearby
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777043
+    m_Localized: to the east
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777044
+    m_Localized: to the northeast
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777045
+    m_Localized: to the north
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777046
+    m_Localized: to the northwest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777047
+    m_Localized: to the west
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777048
+    m_Localized: to the southwest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777049
+    m_Localized: to the south
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777050
+    m_Localized: to the southeast
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777051
+    m_Localized: Eat
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777052
+    m_Localized: Drink
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777053
+    m_Localized: Apply
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777054
+    m_Localized: Use
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777055
+    m_Localized: You don't need that right now
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777056
+    m_Localized: Not enough stamina
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777057
+    m_Localized: '{0} broke'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777058
+    m_Localized: Head
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777059
+    m_Localized: Backpack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777060
+    m_Localized: Feet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777061
+    m_Localized: Right Hand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777062
+    m_Localized: Left Hand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777063
+    m_Localized: '{0}: {1}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777064
+    m_Localized: '{0}: empty'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777065
+    m_Localized: Close (Esc)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777066
+    m_Localized: Buy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777067
+    m_Localized: Sell
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777068
+    m_Localized: Trade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777069
+    m_Localized: Trade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777070
+    m_Localized: All
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777071
+    m_Localized: All
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777072
+    m_Localized: Collect
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777073
+    m_Localized: Back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777074
+    m_Localized: Next
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777075
+    m_Localized: I'll be going
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777076
+    m_Localized: Got it
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777077
+    m_Localized: Show me what you've got
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777078
+    m_Localized: "Hey, [\u0418\u0413\u0420\u041E\u041A]."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777079
+    m_Localized: The trader is out of stock.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777080
+    m_Localized: Your inventory is empty.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777081
+    m_Localized: The trader has no barter offers right now.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777082
+    m_Localized: Not buying
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777083
+    m_Localized: 'Bought: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777084
+    m_Localized: 'Sold: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777085
+    m_Localized: Trade complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777086
+    m_Localized: 'Money: ${0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777087
+    m_Localized: Not enough room or too heavy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777088
+    m_Localized: Not enough money
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777089
+    m_Localized: Out of stock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777090
+    m_Localized: Unavailable for now
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777091
+    m_Localized: You can't sell people
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777092
+    m_Localized: The trader won't buy that
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777093
+    m_Localized: Item unavailable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777094
+    m_Localized: Missing items for this trade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777095
+    m_Localized: Vending Machine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777096
+    m_Localized: Food Vending Machine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777097
+    m_Localized: Shake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777098
+    m_Localized: Jammed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777099
+    m_Localized: Move or press E to leave
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777100
+    m_Localized: Dispensing the last item
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777101
+    m_Localized: It's empty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777102
+    m_Localized: 1 coin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777103
+    m_Localized: 'Coins: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777104
+    m_Localized: "Paid for {0}. Dispensing\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777105
+    m_Localized: Can't do that
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777106
+    m_Localized: Out of stock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777107
+    m_Localized: A coin is required
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777108
+    m_Localized: I don't know how to do that
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777109
+    m_Localized: The machine is jammed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777110
+    m_Localized: "Something moved inside\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777111
+    m_Localized: Nothing came out
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777112
+    m_Localized: 'Dispensed: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777113
+    m_Localized: 'Fell to the floor: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777114
+    m_Localized: Coffee Machine
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777115
+    m_Localized: Add Water
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777116
+    m_Localized: Add Beans
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777117
+    m_Localized: Collect Coffee
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777118
+    m_Localized: Supplies come from your backpack and stash.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777119
+    m_Localized: The next coffee will be ready after the raid.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777120
+    m_Localized: Add more coffee beans.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777121
+    m_Localized: Add water to continue.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777122
+    m_Localized: 'Water: {0}/{1}
+
+      Beans: {2}/{3} uses
+
+      Coffee ready:
+      {4}
+
+      {5}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777123
+    m_Localized: "Add Water \xD7{0}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777124
+    m_Localized: 'Water added: {0}.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777125
+    m_Localized: No water available or the tank is full.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777126
+    m_Localized: Beans added. Enough for three cups.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777127
+    m_Localized: No beans available or there are still beans in the machine.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777128
+    m_Localized: 'Coffee collected: {0}. Still in the machine: {1}.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777129
+    m_Localized: Your backpack and stash are full.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777130
+    m_Localized: 'Each raid brews one coffee using one water and one serving of beans.
+
+      A
+      batch of beans makes three cups. Refill supplies to keep brewing.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777131
+    m_Localized: Module Slot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777132
+    m_Localized: Build
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777133
+    m_Localized: No materials needed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777134
+    m_Localized: 'Required: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777135
+    m_Localized: Couldn't build
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777136
+    m_Localized: 'Built: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777137
+    m_Localized: You haven't learned any blueprints. Earn them from quests or find
+      them during raids.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777138
+    m_Localized: 'Amount to load:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777139
+    m_Localized: Move
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777140
+    m_Localized: Split
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777141
+    m_Localized: "Looking\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777142
+    m_Localized: "Looking\u2026 Press E or move away to close."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777143
+    m_Localized: Searching one item at a time. Right-click to take, Ctrl+click to
+      split. Press E or move away to close.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777144
+    m_Localized: Search complete. Right-click to take or store, Ctrl+click to split.
+      Use the side column for gear and hands. Press E or move away to close.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777145
+    m_Localized: No free space for a new stack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777146
+    m_Localized: This stack has only one item
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777147
+    m_Localized: No room to put away what's in your hands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777148
+    m_Localized: 'Can''t split the stack: no free space'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777149
+    m_Localized: Weight {0:0.#} / {1:0.#} kg
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777150
+    m_Localized: Drag to move, R to rotate, Shift+click or box-select for multiple
+      items, Ctrl+click to split, right-click to hold or equip, Q to switch hands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777151
+    m_Localized: Release to equip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777152
+    m_Localized: Release to switch hands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777153
+    m_Localized: Release to hold with both hands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777154
+    m_Localized: Drag a box to select items
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777155
+    m_Localized: ', in both hands'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777156
+    m_Localized: ' (active)'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777157
+    m_Localized: . Right-click to hold with both hands
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777158
+    m_Localized: . Right-click to hold
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777159
+    m_Localized: . Ctrl+click to split
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777160
+    m_Localized: '{0}: empty. Drag an item here to hold it, click to activate this
+      hand, or press Q to switch hands'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777161
+    m_Localized: '{0}: {1}{2}. Right-click or drag to the grid to put away, drag
+      to the other hand to switch, H to put all away, G to drop'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777162
+    m_Localized: "{0}{1} \u2014 {2:0.##} kg ({3:0.##} kg each), {4}\xD7{5}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777163
+    m_Localized: "{0}{1} \u2014 {2:0.##} kg ({3:0.##} kg each), {4}\xD7{5}{6}{7}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777164
+    m_Localized: Office
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777165
+    m_Localized: Break Room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777166
+    m_Localized: Manager's Office
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777167
+    m_Localized: Restroom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777168
+    m_Localized: Parking Garage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777169
+    m_Localized: Stash
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777170
+    m_Localized: Copy Room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777171
+    m_Localized: Tyler
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777172
+    m_Localized: Drifter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777173
+    m_Localized: Justice
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777174
+    m_Localized: Ram
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1147777175
+    m_Localized: Intern
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821645914112
+    m_Localized: Books
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302720
+    m_Localized: Coffee Beans
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302721
+    m_Localized: Coin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302722
+    m_Localized: Folders
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302723
+    m_Localized: Mop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302724
+    m_Localized: Mug
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302725
+    m_Localized: Notes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302726
+    m_Localized: Office Paper
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302727
+    m_Localized: Exit Key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302728
+    m_Localized: Bandages
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302729
+    m_Localized: Snack Bar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302730
+    m_Localized: Cheese Foam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302731
+    m_Localized: Coffee
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302732
+    m_Localized: Drip Coffee
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302733
+    m_Localized: Instant Noodles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302734
+    m_Localized: Sandwich
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302735
+    m_Localized: Water
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302736
+    m_Localized: Briefcase
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302737
+    m_Localized: Cap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302738
+    m_Localized: Sneakers
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302739
+    m_Localized: Red Folder 2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302740
+    m_Localized: Red Folder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302741
+    m_Localized: Pipe
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302742
+    m_Localized: Sledgehammer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302743
+    m_Localized: Trash Can
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302744
+    m_Localized: Bookshelf
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302745
+    m_Localized: Box
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302746
+    m_Localized: Cabinet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302747
+    m_Localized: Locker
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302748
+    m_Localized: Drawer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302749
+    m_Localized: Vitya the Intern
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302750
+    m_Localized: Mug for Folders
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302751
+    m_Localized: Mop for Books
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302752
+    m_Localized: Notes for Coins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302753
+    m_Localized: Exit Door
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302754
+    m_Localized: Instructions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302755
+    m_Localized: Warning
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302756
+    m_Localized: Get Me Out
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302757
+    m_Localized: Something in the Garage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302758
+    m_Localized: Filing Supplies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302759
+    m_Localized: Coffee for the Survivors
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302760
+    m_Localized: Paperwork
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302761
+    m_Localized: Garage Recon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302762
+    m_Localized: Books for Kindling
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302763
+    m_Localized: Restroom Patrol
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302764
+    m_Localized: Paper Press
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302765
+    m_Localized: Paper Press
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302766
+    m_Localized: Mugs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302767
+    m_Localized: Crooked Vending Machines
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302768
+    m_Localized: Why are you whispering?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302769
+    m_Localized: I've got to go
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302770
+    m_Localized: How can I help?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302771
+    m_Localized: Come with me
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302772
+    m_Localized: Stay here
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302773
+    m_Localized: Let's trade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302774
+    m_Localized: Got any work?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302775
+    m_Localized: How do you like it here?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302776
+    m_Localized: What's new?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302777
+    m_Localized: To the offices
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302778
+    m_Localized: To the break room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302779
+    m_Localized: To the manager's office
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302780
+    m_Localized: To the restroom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302781
+    m_Localized: To the parking garage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302782
+    m_Localized: To storage
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302783
+    m_Localized: To the copy room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302784
+    m_Localized: I don't know yet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302785
+    m_Localized: "If it's not too much trouble\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302786
+    m_Localized: Really? Thanks!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302787
+    m_Localized: You got it? You're the best.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302788
+    m_Localized: Well? How's it coming along?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302789
+    m_Localized: I've got a couple of jobs.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302790
+    m_Localized: It's a deal.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302791
+    m_Localized: I see you've got everything.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302792
+    m_Localized: "Two mugs, [\u0418\u0413\u0420\u041E\u041A]."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302793
+    m_Localized: I'll do it
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302794
+    m_Localized: "I'll do it. One more thing\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302795
+    m_Localized: See you
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302796
+    m_Localized: Not now
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302797
+    m_Localized: Here you go
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302798
+    m_Localized: Later
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302799
+    m_Localized: Abandon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302800
+    m_Localized: Yes, abandon it
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302801
+    m_Localized: No, I'll finish it
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302802
+    m_Localized: Got any work for me?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302803
+    m_Localized: "No work right now, [\u0418\u0413\u0420\u041E\u041A]. Check back
+      later."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302804
+    m_Localized: You aren't working on anything for me.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302805
+    m_Localized: You haven't finished yet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302806
+    m_Localized: Make room for your reward and come back.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302807
+    m_Localized: Giving up? Fine. I'll remember that.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302808
+    m_Localized: Fine. I'll find someone else.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302809
+    m_Localized: "About your job\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302810
+    m_Localized: 'New Job: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302811
+    m_Localized: 'Turn In: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302812
+    m_Localized: 'Marked: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302813
+    m_Localized: 'Reward: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302814
+    m_Localized: "skill \u201C{0}\u201D"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302815
+    m_Localized: "blueprint \u201C{0}\u201D"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302816
+    m_Localized: Shake Vending Machines
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302817
+    m_Localized: I barely know you. Help me out first and then we'll talk.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302818
+    m_Localized: Can't do that.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302819
+    m_Localized: 'Too heavy: that''s another {0:0.#} kg. Drop some gear first.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302820
+    m_Localized: "You'll need {0}\xD7{1} spaces in your backpack or free hands."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302821
+    m_Localized: "Shh! Keep it down\u2026 Are you alive? For real?\n\nI'm Vitya,
+      an intern in accounting. I went to hand in a report and got lost. That was
+      a long time ago."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302822
+    m_Localized: 'Something''s walking around by the garage. I saw it. It wasn''t
+      human.
+
+
+      I ran so fast I dropped all my notes. Now I''m sitting here
+      trying not to breathe.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302823
+    m_Localized: Leave? I can't. I'm so weak I can barely take a step. Help me get
+      back on my feet first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302824
+    m_Localized: 'I don''t know. It was tall. It stands still as long as you look
+      at it.
+
+
+      Help me get back on my feet and then we''ll see.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302825
+    m_Localized: You came back! I thought something had eaten you.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302826
+    m_Localized: 'At least there are chairs here. And nothing''s walking around behind
+      the wall.
+
+
+      If you need anything, I''ve got some office supplies lying
+      around.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302827
+    m_Localized: 'It''s quiet here. Sometimes I dream about the maze.
+
+
+      They
+      say I can show you something when you build a workshop. I can do more than
+      write reports, you know.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302828
+    m_Localized: "Hey, [\u0418\u0413\u0420\u041E\u041A]! I always keep the good stuff
+      for my people."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302829
+    m_Localized: "Hey, [\u0418\u0413\u0420\u041E\u041A]. Sit down and see what I've
+      got. If you have something to sell, I'll pay a fair price."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302830
+    m_Localized: 'Word is there''s someone alive in the maze. An accounting intern,
+      if the rumors are true.
+
+
+      I don''t know how he ended up there, but I
+      doubt he''ll get out on his own.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302831
+    m_Localized: Depends where you're headed. Go on, tell me.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302832
+    m_Localized: Same everywhere. Keep quiet, don't play hero, and watch your step.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302833
+    m_Localized: Brews one coffee per raid using one water and one serving of beans.
+      A batch makes three cups. The tank holds three waters.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302834
+    m_Localized: Turns one stack of books into five packs of paper. Load the books
+      and the paper will be ready when you return from a raid.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302835
+    m_Localized: Get me out of here, will you? I won't make it on my own.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302836
+    m_Localized: "Walls\u2026 Real walls. Thanks, [\u0418\u0413\u0420\u041E\u041A].\n\nTake
+      my briefcase. I don't need it anymore. The report's long gone anyway."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302837
+    m_Localized: A mug. I need a mug. I'll lose my mind without coffee. There isn't
+      any here, but at least I can hold the mug.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302838
+    m_Localized: "Thanks\u2026 I feel better already, even without coffee.\n\nListen,
+      will you get me out of here? I can stand up now."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302839
+    m_Localized: I ran so fast I dropped all my notes. Bring them back so I can reconstruct
+      the report.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302840
+    m_Localized: Great. Now I'm almost a useful employee.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302841
+    m_Localized: You asked what I saw by the garage. Go take a look and come straight
+      back. I need to know I didn't imagine it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302842
+    m_Localized: So it's there. I wasn't imagining things. Thanks for checking.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302843
+    m_Localized: I want to organize the shelter. Bring me two packs of folders.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302844
+    m_Localized: Now this looks like a proper office.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302845
+    m_Localized: 'We''ve got a mug and four walls, but still no coffee. We can''t
+      live like this.
+
+
+      I''ve sketched a coffee machine. Bring two mugs, two
+      bottles of water, and three packs of paper so I can test the water feed and
+      finish the design. I''ll give you the blueprint and enough beans for the first
+      three cups.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302846
+    m_Localized: Two mugs, two waters, and three packs of paper. The blueprint's
+      nearly done. Look for beans in break rooms and storage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302847
+    m_Localized: 'It works! On paper, anyway. Here''s the blueprint and the beans.
+
+
+      Build
+      the coffee machine in an open module slot. Add water and a batch of beans for
+      three uses. It brews one cup per raid as long as it has water and beans.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302848
+    m_Localized: "Let's start simple, [\u0418\u0413\u0420\u041E\u041A]. I need ordinary
+      office paper. It's all over the raid, in offices and by the copiers.\n\nBring
+      me three packs and I'll pay you. Yes, for paper. Don't ask."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302849
+    m_Localized: "Paper, [\u0418\u0413\u0420\u041E\u041A]. Three packs. They won't
+      walk here on their own."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302850
+    m_Localized: 'That''s what I''m talking about. Here''s what we agreed on.
+
+
+      Come
+      back later. I''ve got a bigger job for you.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302851
+    m_Localized: 'There''s a red folder in the manager''s office. What''s inside
+      is none of your business. Or mine, honestly.
+
+
+      Bring it back. You''ll
+      know the office by the smell of power and expensive coffee.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302852
+    m_Localized: The red folder from the manager's office. It's the only one like
+      it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302853
+    m_Localized: "That's the one. Not even bent. A pleasure doing business with you,
+      [\u0418\u0413\u0420\u041E\u041A]."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302854
+    m_Localized: "They say someone left a car running in the garage. It's been three
+      years.\n\nSee for yourself and come back alive, [\u0418\u0413\u0420\u041E\u041A].
+      Dead people are terrible storytellers."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302855
+    m_Localized: The parking garage. Get there, take a look, and come back.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302856
+    m_Localized: So it's still there. All right. Here's something for your trouble.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302857
+    m_Localized: It's getting colder. Bring me two stacks of books. Nobody's going
+      to read them anyway.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302858
+    m_Localized: They burn well. I mean, they're good books.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302859
+    m_Localized: "We're out of paper again. Five packs, [\u0418\u0413\u0420\u041E\u041A],
+      and we're square for today."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302860
+    m_Localized: Check the restroom in the maze today. Make sure everything's as
+      usual, then come back.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302861
+    m_Localized: 'Everyone needs paper and nobody reads books. I saw a press at a
+      print shop once. Books went in and paper came out.
+
+
+      Bring three stacks
+      of books for a trial run. I''ll draw up a blueprint.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302862
+    m_Localized: "Three stacks of books, [\u0418\u0413\u0420\u041E\u041A]. I can't
+      draw up anything without them."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302863
+    m_Localized: Here's the blueprint. Build it at the shelter with folders, a mop,
+      and a couple of coins. Don't ask how. Just build it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302864
+    m_Localized: I keep breaking dishes. Don't ask how. Bring me two mugs. Any will
+      do, as long as they're intact.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302865
+    m_Localized: 'The machines in the break rooms eat coins and keep half the goods.
+      But there''s a way to make them cooperate.
+
+
+      Bring me five coins and
+      I''ll show you.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302866
+    m_Localized: "Five coins, [\u0418\u0413\u0420\u041E\u041A]. Then we'll talk."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302867
+    m_Localized: Hit it on the side, right here, and shake. Keep it short and quiet
+      or they'll come running.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302868
+    m_Localized: "\u2022 Thirst slows healing. Hunger drains stamina.\n\u2022 Approach
+      the water cooler and hold E to drink. You'll need the restroom soon enough.\n\u2022
+      If you wait too long, you'll slow down and enemies will pick up your scent.
+      Hold E at the toilet.\n\u2022 The corridor ends here, but there's an opening
+      in the wall to the right. Hold E near it to crawl through."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302869
+    m_Localized: "If you're reading this, you're awake. The building is crawling
+      with Drifters, but it's quiet here for now.\n\n\u2022 WASD to move, Shift to
+      sprint (uses stamina).\n\u2022 E to search furniture or pick up items. I opens
+      the inventory.\n\u2022 In the inventory, point at food and press F to eat.
+      Right-click to hold an item, then hold left-click to use it.\n\nYou're hurt
+      and hunger drains your stamina. Find food and bandages."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 821654302870
+    m_Localized: "Drifters are weak alone, but they call for help.\n\n\u2022 Hold
+      Ctrl to crouch. Your steps are silent and enemies can only see you up close.\n\u2022
+      Walking can be heard nearby. Running carries farther.\n\u2022 Stay out of their
+      sight. They look ahead, not behind.\n\u2022 A picked-up item is selected in
+      the inventory. Hold G, aim, and release to throw it. Enemies will investigate
+      the noise."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013037965312
+    m_Localized: 'Blueprint learned: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685568
+    m_Localized: 'Blueprints learned: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685569
+    m_Localized: 'Remind Me: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685570
+    m_Localized: "Abandon \u201C{0}\u201D?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685571
+    m_Localized: 'Received: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685572
+    m_Localized: 'Escort to Shelter: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685573
+    m_Localized: Escort to Shelter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685574
+    m_Localized: 'Visit: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685575
+    m_Localized: ', in stash: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685576
+    m_Localized: done
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685577
+    m_Localized: done
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685578
+    m_Localized: pending
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685579
+    m_Localized: Sleep
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685580
+    m_Localized: Enter the raid?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685581
+    m_Localized: You'll leave the shelter and take everything in your backpack with
+      you.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685582
+    m_Localized: Leave
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685583
+    m_Localized: Build a Module
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685584
+    m_Localized: Slot occupied
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685585
+    m_Localized: Can't build this
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685586
+    m_Localized: Blueprint missing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013096685587
+    m_Localized: Already built
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879872
+    m_Localized: Not enough materials
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879873
+    m_Localized: You rested and recovered your health.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879874
+    m_Localized: '{0}
+
+      <size=22><color=#FFFFFF99>{1:0.##} kg, {2} in stock</color></size>'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879875
+    m_Localized: '{0}
+
+      <size=22><color=#FFFFFF99>{1} owned</color></size>'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879876
+    m_Localized: '{0}You give: {1}
+
+      You get: {2}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879877
+    m_Localized: "Loaded: {0} \xD7{1} of {2}. Ready after the raid"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879878
+    m_Localized: 'Loaded: nothing (holds up to {0})'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879879
+    m_Localized: "Ready: {0} \xD7{1}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879880
+    m_Localized: 'Ready: nothing'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879881
+    m_Localized: "{0}\n{1}\nYou have: {2} \xD7{3} (backpack and stash)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879882
+    m_Localized: Load {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879883
+    m_Localized: "Loaded: {0} \xD7{1}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879884
+    m_Localized: Nothing to load or no room
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879885
+    m_Localized: "Collected: {0} \xD7{1}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879886
+    m_Localized: . No room for the rest
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879887
+    m_Localized: Your backpack and stash are full
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879888
+    m_Localized: '{0}: {1}{2}. Right-click or drag to the grid to remove, drag outside
+      to drop'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879889
+    m_Localized: '{0}: empty. Drag gear here or right-click it in the grid to equip'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879890
+    m_Localized: . F to {0} (3 s)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879891
+    m_Localized: '{0}. Right-click to equip'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879892
+    m_Localized: " ({0}\xD7{1} grid)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879893
+    m_Localized: 'Selected: {0} items, {1:0.##} kg. Drag the group to move it, or
+      press G or drag outside to drop it'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879894
+    m_Localized: You can't hold {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879895
+    m_Localized: "{0}: {1}\u2026 ({2:0.#} s)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879896
+    m_Localized: 'Only gear for this slot fits here: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879897
+    m_Localized: Release to drop the selection ({0} items)
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879898
+    m_Localized: 'Release to drop: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879899
+    m_Localized: Only items you can hold go here
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879900
+    m_Localized: Release to move to {0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879901
+    m_Localized: 'Box-selected: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879902
+    m_Localized: "Split {0} of {1} ({2} left). Mouse wheel or +/\u2212 to adjust,
+      Enter to confirm"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879903
+    m_Localized: You can't put a person here
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879904
+    m_Localized: Drag to move, R to rotate, Ctrl+click to split. Right-click or Shift+click
+      to transfer. Drag gear in or out of a slot. Heavy items need both hands. Double-click
+      to equip.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879905
+    m_Localized: 'Can''t equip: too heavy'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879906
+    m_Localized: '{0}: empty. Drag an item here to hold it'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879907
+    m_Localized: '{0}: empty. Drag gear here or double-click to equip'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879908
+    m_Localized: '{0}: {1}{2}. Right-click or Shift+click to transfer, or drag to
+      move it'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879909
+    m_Localized: Not enough room or too heavy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879910
+    m_Localized: This item doesn't fit here
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879911
+    m_Localized: Release to hold in this hand
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879912
+    m_Localized: 'Can''t put it here: no space or too heavy'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879913
+    m_Localized: No room to put away your held items
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879914
+    m_Localized: 'Can''t hold: too heavy'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879915
+    m_Localized: 'Can''t put it here: space occupied'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879916
+    m_Localized: This stack has only one item
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879917
+    m_Localized: "{0} \xD7{1}: how many?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879918
+    m_Localized: Only {0} fit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879919
+    m_Localized: 'Can''t split: no free space'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879920
+    m_Localized: '{0:0.#} / {1:0.#} kg'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879921
+    m_Localized: '{0:0.#} kg'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879922
+    m_Localized: Not discovered yet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879923
+    m_Localized: . Double-click to equip
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879924
+    m_Localized: ${0}
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879925
+    m_Localized: Forget the notes. Let's go
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879926
+    m_Localized: What did you see by the garage?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879927
+    m_Localized: "About your request\u2026"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879928
+    m_Localized: Any advice before I head out?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879929
+    m_Localized: Office supplies! Almost none of it stolen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879930
+    m_Localized: Hiking Backpack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879931
+    m_Localized: Paper Press
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879932
+    m_Localized: "Nothing right now. Thanks for asking, [\u0418\u0413\u0420\u041E\u041A]."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879933
+    m_Localized: I'll wait. I'm used to waiting here.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879934
+    m_Localized: You've got nowhere to put it. Make some space. I'm not going anywhere.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879935
+    m_Localized: "Two stacks of books, [\u0418\u0413\u0420\u041E\u041A]."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879936
+    m_Localized: Paper for Today
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879937
+    m_Localized: Five packs of paper. Today.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879938
+    m_Localized: Good. That'll last until tomorrow.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879939
+    m_Localized: The restroom. Take a look and come back.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879940
+    m_Localized: Same as usual? Good. Here you go.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879941
+    m_Localized: They're intact. Great. Here's your money.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879942
+    m_Localized: Eat and bandage your wounds first
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

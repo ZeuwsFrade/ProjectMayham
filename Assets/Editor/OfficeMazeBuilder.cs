@@ -340,7 +340,11 @@ namespace ProjectMayham.EditorTools
                         var cell = new Vector2Int(p.pos.x + rng.Next(p.w), p.pos.y + rng.Next(p.h));
                         Spawn(top, CellCenter(cell.x, cell.y, 1, 1), 6, false);
                     }
-                    if (chair != null) TryPlaceAt(r, chair, new Vector2Int(p.pos.x + rng.Next(p.w), p.pos.y - 1));
+                    if (chair != null)
+                    {
+                        Footprint(chair, out _, out int chairHeight);
+                        TryPlaceAt(r, chair, new Vector2Int(p.pos.x + rng.Next(p.w), p.pos.y - chairHeight));
+                    }
                 }
             }
 
@@ -378,8 +382,7 @@ namespace ProjectMayham.EditorTools
             private bool TryPlace(Room r, string name, string mode, out Placed placed)
             {
                 placed = null;
-                var spr = GetSprite(name);
-                int w = Mathf.RoundToInt(spr.rect.width / spr.pixelsPerUnit), h = Mathf.RoundToInt(spr.rect.height / spr.pixelsPerUnit);
+                Footprint(name, out int w, out int h);
                 for (int attempt = 0; attempt < 80; attempt++)
                 {
                     int x, y;
@@ -406,9 +409,18 @@ namespace ProjectMayham.EditorTools
             private bool TryPlaceAt(Room r, string name, Vector2Int cell)
             {
                 if (cell.x < r.x0 || cell.x > r.x1 || cell.y < r.y0 || cell.y > r.y1) return false;
-                if (!TryOccupy(r, cell.x, cell.y, 1, 1)) return false;
-                Spawn(name, CellCenter(cell.x, cell.y, 1, 1), 5, true, 1, 1);
+                Footprint(name, out int w, out int h);
+                if (!TryOccupy(r, cell.x, cell.y, w, h)) return false;
+                Spawn(name, CellCenter(cell.x, cell.y, w, h), 5, true, w, h);
                 return true;
+            }
+
+            private void Footprint(string name, out int w, out int h)
+            {
+                // Reserve the scaled collision footprint so enlarged props cannot cut a passage.
+                var size = OpaqueBounds(name).size * (0.9f * FurnitureScalePolicy.Multiplier(name));
+                w = Mathf.Max(1, Mathf.CeilToInt(size.x));
+                h = Mathf.Max(1, Mathf.CeilToInt(size.y));
             }
 
             /// <summary>Marks the footprint as occupied if it is free and the room stays fully connected.</summary>
@@ -462,6 +474,7 @@ namespace ProjectMayham.EditorTools
                 var go = new GameObject(name);
                 go.transform.SetParent(interactable ? interactableRoot : furnitureRoot, false);
                 go.transform.position = center;
+                go.transform.localScale = Vector3.one * FurnitureScalePolicy.Multiplier(name);
                 var sr = go.AddComponent<SpriteRenderer>();
                 sr.sprite = GetSprite(name);
                 sr.sortingOrder = order;

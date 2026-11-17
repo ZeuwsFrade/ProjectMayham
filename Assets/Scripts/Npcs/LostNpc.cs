@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.AI;
 using ProjectMayham.Core;
 using ProjectMayham.Interaction;
@@ -30,7 +31,7 @@ namespace ProjectMayham.Npcs
         private float alpha = 1f;
 
         public NpcDefinition Npc => npc;
-        public string Prompt => npc != null ? $"Поговорить: {npc.DisplayName}" : string.Empty;
+        public string Prompt => npc != null ? GameText.Format("Поговорить: {0}", npc.DisplayName) : string.Empty;
         public Vector2 Position => transform.position;
         /// <summary>True while the NPC hides from an enemy.</summary>
         public bool Hidden => hiding.Hidden;
@@ -62,7 +63,7 @@ namespace ProjectMayham.Npcs
 
         private string TakeAlong(GridInventory backpack)
         {
-            if (Loyalty.Level(npc.Id) < npc.TakeAlongLevel) return "Я тебя почти не знаю. Помоги мне сначала — тогда поговорим.";
+            if (Loyalty.Level(npc.Id) < npc.TakeAlongLevel) return GameText.Translate("Я тебя почти не знаю. Помоги мне сначала — тогда поговорим.");
 
             string refusal = TryCarry(backpack, npc.CarryItem);
             if (refusal != null) return refusal;
@@ -78,16 +79,16 @@ namespace ProjectMayham.Npcs
         /// </summary>
         public static string TryCarry(GridInventory backpack, ItemDefinition person)
         {
-            if (backpack == null || person == null) return "Не получится.";
+            if (backpack == null || person == null) return GameText.Translate("Не получится.");
             if (!backpack.FitsByWeight(person))
-                return $"Слишком тяжело: это ещё {person.Weight:0.#} кг. Освободись от лишнего.";
+                return GameText.Format("Слишком тяжело: это ещё {0:0.#} кг. Освободись от лишнего.", person.Weight);
             if (backpack.CanFit(person, 1))
             {
                 backpack.Add(person, 1);
                 return null;
             }
             if (backpack.HoldNew(person)) return null;
-            return $"Некуда взять: нужно место {person.GridSize.x}×{person.GridSize.y} в рюкзаке или свободные руки.";
+            return GameText.Format("Некуда взять: нужно место {0}×{1} в рюкзаке или свободные руки.", person.GridSize.x, person.GridSize.y);
         }
 
         private void Update()

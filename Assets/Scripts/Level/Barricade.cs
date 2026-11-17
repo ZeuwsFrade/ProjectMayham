@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using ProjectMayham.Interaction;
 using UnityEngine;
@@ -45,17 +46,17 @@ namespace ProjectMayham.Level
         public Vector2 Across => transform.up;
         public float HalfThickness => box.size.y * 0.5f * Mathf.Abs(transform.lossyScale.y);
 
-        public string Prompt => "Разобрать (удерживать)";
+        public string Prompt => GameText.Translate("Разобрать (удерживать)");
         public float HoldSeconds => dismantleSeconds;
-        public string HoldLabel => "Разбираю баррикаду";
+        public string HoldLabel => GameText.Translate("Разбираю баррикаду");
 
         public string Hints
         {
             get
             {
-                if (canClimb && canPush) return "[Пробел] Перелезть · толкать: идти на неё";
-                if (canClimb) return "[Пробел] Перелезть";
-                return canPush ? "Толкать: идти на неё" : string.Empty;
+                if (canClimb && canPush) return GameText.Translate("[Пробел] Перелезть · толкать: идти на неё");
+                if (canClimb) return GameText.Translate("[Пробел] Перелезть");
+                return canPush ? GameText.Translate("Толкать: идти на неё") : string.Empty;
             }
         }
 

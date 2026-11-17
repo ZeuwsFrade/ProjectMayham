@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Shelter;
 using TMPro;
 using UnityEngine;
@@ -148,10 +149,10 @@ namespace ProjectMayham.UI
             titleLabel.text = converter.Title;
             aboutLabel.text = converter.Description;
             string loaded = state.loaded > 0
-                ? $"Загружено: {input.DisplayName} ×{state.loaded} из {converter.Capacity} — будет готово после рейда"
-                : $"Загружено: ничего (входит до {converter.Capacity})";
-            string ready = state.ready > 0 ? $"Готово: {output.DisplayName} ×{state.ready}" : "Готово: ничего";
-            stateLabel.text = $"{loaded}\n{ready}\nУ тебя: {input.DisplayName} ×{have} (рюкзак и склад)";
+                ? GameText.Format("Загружено: {0} ×{1} из {2} — будет готово после рейда", input.DisplayName, state.loaded, converter.Capacity)
+                : GameText.Format("Загружено: ничего (входит до {0})", converter.Capacity);
+            string ready = state.ready > 0 ? GameText.Format("Готово: {0} ×{1}", output.DisplayName, state.ready) : GameText.Translate("Готово: ничего");
+            stateLabel.text = GameText.Format("{0}\n{1}\nУ тебя: {2} ×{3} (рюкзак и склад)", loaded, ready, input.DisplayName, have);
 
             bool canLoad = loadable > 0;
             amountLabel.text = canLoad ? amount.ToString() : "0";
@@ -159,7 +160,7 @@ namespace ProjectMayham.UI
             plusButton.interactable = canLoad && amount < loadable;
             allButton.interactable = canLoad && amount < loadable;
             loadButton.interactable = canLoad;
-            UIKit.SetButtonText(loadButton, canLoad ? $"Загрузить {amount}" : "Загрузить");
+            UIKit.SetButtonText(loadButton, canLoad ? GameText.Format("Загрузить {0}", amount) : GameText.Translate("Загрузить"));
             collectButton.interactable = state.ready > 0;
         }
 
@@ -167,7 +168,7 @@ namespace ProjectMayham.UI
         {
             if (converter == null) return;
             int count = converter.Load(ModuleCost.StoresOf(actor), amount);
-            statusLabel.text = count > 0 ? $"Загружено: {converter.Input.DisplayName} ×{count}" : "Нечего загрузить или нет места";
+            statusLabel.text = count > 0 ? GameText.Format("Загружено: {0} ×{1}", converter.Input.DisplayName, count) : GameText.Translate("Нечего загрузить или нет места");
             amount = int.MaxValue; // next time again all that fits
             Redraw();
         }
@@ -177,8 +178,8 @@ namespace ProjectMayham.UI
             if (converter == null) return;
             int count = converter.Collect(ModuleCost.StoresOf(actor));
             statusLabel.text = count > 0
-                ? $"Забрано: {converter.Output.DisplayName} ×{count}" + (converter.State.ready > 0 ? ". Остальное не влезло" : string.Empty)
-                : "Некуда положить: рюкзак и склад полны";
+                ? GameText.Format("Забрано: {0} ×{1}", converter.Output.DisplayName, count) + (converter.State.ready > 0 ? GameText.Translate(". Остальное не влезло") : string.Empty)
+                : GameText.Translate("Некуда положить: рюкзак и склад полны");
             Redraw();
         }
     }

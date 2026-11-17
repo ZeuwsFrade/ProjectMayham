@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using ProjectMayham.Interaction;
 using UnityEngine;
@@ -39,10 +40,10 @@ namespace ProjectMayham.Level
         public Vector2 Across => transform.up;
         public float HalfThickness => box.size.y * 0.5f * Mathf.Abs(transform.lossyScale.y);
 
-        public string Prompt => "Пролезть через дыру (удерживать)";
+        public string Prompt => GameText.Translate("Пролезть через дыру (удерживать)");
         public float HoldSeconds => holdSeconds;
-        public string HoldLabel => "Пролезаю через дыру";
-        public string Hints => blocked ? "С той стороны завалено" : string.Empty;
+        public string HoldLabel => GameText.Translate("Пролезаю через дыру");
+        public string Hints => blocked ? GameText.Translate("С той стороны завалено") : string.Empty;
 
         private void Awake()
         {

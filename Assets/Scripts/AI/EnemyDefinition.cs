@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using UnityEngine;
 
 namespace ProjectMayham.AI
@@ -76,7 +77,7 @@ namespace ProjectMayham.AI
         [SerializeField, Min(0f)] private float surroundRange = 5f;
         [SerializeField, Min(0.1f)] private float separationRadius = 0.9f;
 
-        public string DisplayName => displayName;
+        public string DisplayName => GameText.Translate(displayName);
         public float MaxHealth => maxHealth;
         public float StaggerResistance => staggerResistance;
         public float KnockbackResistance => knockbackResistance;

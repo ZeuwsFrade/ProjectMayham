@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Core;
 using ProjectMayham.Interaction;
 using UnityEngine;
@@ -10,7 +11,7 @@ namespace ProjectMayham.Tutorial
         [SerializeField] private string title = "Записка";
         [SerializeField, TextArea(3, 10)] private string text;
 
-        public string Prompt => $"Прочитать: {title}";
+        public string Prompt => GameText.Format("Прочитать: {0}", GameText.Translate(title));
         public Vector2 Position => transform.position;
 
         private void OnEnable() => Interactables.Register(this);

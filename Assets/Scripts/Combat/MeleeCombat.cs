@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using ProjectMayham.Core;
 using ProjectMayham.Interaction;
@@ -211,7 +212,7 @@ namespace ProjectMayham.Combat
             bufferedPress = -1f;
             if (stats.IsExhausted || stats.Stamina < weapon.StaminaCost)
             {
-                Say("Не хватает сил");
+                Say(GameText.Translate("Не хватает сил"));
                 return;
             }
 
@@ -227,7 +228,7 @@ namespace ProjectMayham.Combat
             else if (stats.TrySpendStamina(weapon.StaminaCost)) heavy = false;
             else
             {
-                Say("Не хватает сил");
+                Say(GameText.Translate("Не хватает сил"));
                 Enter(MeleePhase.Raised);
                 return;
             }
@@ -354,7 +355,7 @@ namespace ProjectMayham.Combat
 
             weapon = null;
             Lower();
-            Say($"{broken.DisplayName}: сломалось");
+            Say(GameText.Format("{0}: сломалось", broken.DisplayName));
             CameraShake.Add(0.3f);
             CombatEvents.RaiseWeaponBroken(broken);
         }

@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections.Generic;
 using ProjectMayham.UI;
 using TMPro;
@@ -68,7 +69,7 @@ namespace ProjectMayham.Tutorial
         /// <summary>Shows the stage and its goals. <paramref name="done"/> says which goals are reached.</summary>
         public void ShowGoals(string stage, IReadOnlyList<string> goals, IReadOnlyList<bool> done)
         {
-            stageLabel.text = stage;
+            stageLabel.text = GameText.Translate(stage);
             while (goalLabels.Count < goals.Count)
             {
                 var label = UIKit.Label(goalsPanel, string.Empty, 24f);
@@ -81,7 +82,7 @@ namespace ProjectMayham.Tutorial
                 bool shown = i < goals.Count;
                 label.gameObject.SetActive(shown);
                 if (!shown) continue;
-                label.text = done[i] ? $"<s>• {goals[i]}</s>" : $"• {goals[i]}";
+                label.text = done[i] ? $"<s>• {GameText.Translate(goals[i])}</s>" : $"• {GameText.Translate(goals[i])}";
                 label.color = done[i] ? DoneColor : Color.white;
             }
         }
@@ -90,7 +91,7 @@ namespace ProjectMayham.Tutorial
         public void ShowHint(string text, float seconds = 9f)
         {
             if (string.IsNullOrEmpty(text)) return;
-            hintLabel.text = text;
+            hintLabel.text = GameText.Translate(text);
             hintRoot.SetActive(true);
             hintUntil = Time.unscaledTime + seconds;
         }

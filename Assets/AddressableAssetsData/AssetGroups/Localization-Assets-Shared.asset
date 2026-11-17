@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Localization-Assets-Shared
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Localization-Assets-Shared
+  m_GUID: 9d2fdc877c566554f820b74db1dc851b
+  m_SerializeEntries:
+  - m_GUID: 7f9e699aba70e4e4cb8900f4e2e9bdba
+    m_Address: Assets/Localization/ProjectMayham Shared Data.asset
+    m_ReadOnly: 1
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 1
+  m_Settings: {fileID: 11400000, guid: fbee39a16c107134c8fe53c12e68c4bf, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: ce6e208a434eba047b18d22c9386c5c5, type: 2}
+    - {fileID: 11400000, guid: bd0b82d1fd63dcf4fb210d41f4f40fbe, type: 2}
+    - {fileID: 11400000, guid: 9163afed1f744524c8e4cda1f97214b3, type: 2}

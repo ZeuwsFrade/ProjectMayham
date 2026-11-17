@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System;
 using System.Collections.Generic;
 using ProjectMayham.Items;
@@ -60,9 +61,9 @@ namespace ProjectMayham.Trade
         [SerializeField] private List<BarterOffer> barter = new List<BarterOffer>();
 
         public string Id => name;
-        public string DisplayName => displayName;
+        public string DisplayName => GameText.Translate(displayName);
         public Sprite Portrait => portrait;
-        public string Greeting => greeting;
+        public string Greeting => GameText.Translate(greeting);
         public float SellMarkup => sellMarkup;
         public float BuyRate => buyRate;
         public float DiscountPerLevel => discountPerLevel;

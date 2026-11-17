@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Items;
 using ProjectMayham.Level;
 using ProjectMayham.Player;
@@ -48,7 +49,7 @@ namespace ProjectMayham.UI
         // To the right of the searcher, who stands in the middle of the screen.
         protected override Vector2 PanelOffset => new Vector2(470f, 0f);
         protected override string Hint =>
-            container == null ? SearchedHint : container.IsLookingIn ? LookingHint : container.HiddenCount > 0 ? SearchingHint : SearchedHint;
+            GameText.Translate(container == null ? SearchedHint : container.IsLookingIn ? LookingHint : container.HiddenCount > 0 ? SearchingHint : SearchedHint);
         protected override bool StorageBusy => container != null && container.IsLookingIn;
         // During the first look nothing of what is inside shows, not even where it lies.
         protected override bool ShowSealed => container == null || !container.IsLookingIn;

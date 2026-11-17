@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using UnityEngine;
 
 namespace ProjectMayham.Items
@@ -64,7 +65,7 @@ namespace ProjectMayham.Items
         /// <summary>Stable key used in save files and barter data: the name of the asset.</summary>
         public string Id => name;
         public int Value => Mathf.Max(0, value);
-        public string DisplayName => displayName;
+        public string DisplayName => GameText.Translate(displayName);
         public Sprite Icon => icon;
         public int MaxStack => Mathf.Max(1, maxStack);
         /// <summary>Footprint in grid cells, at least 1x1.</summary>

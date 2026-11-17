@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -85,7 +86,7 @@ namespace ProjectMayham.UI
             TextAlignmentOptions align = TextAlignmentOptions.Left, Color? color = null)
         {
             var label = Rect("Text", parent).gameObject.AddComponent<TextMeshProUGUI>();
-            label.text = text;
+            label.text = GameText.Translate(text);
             label.fontSize = size;
             label.alignment = align;
             label.color = color ?? Color.white;
@@ -119,7 +120,7 @@ namespace ProjectMayham.UI
         }
 
         public static void SetButtonText(Button button, string text) =>
-            button.GetComponentInChildren<TMP_Text>().text = text;
+            button.GetComponentInChildren<TMP_Text>().text = GameText.Translate(text);
 
         /// <summary>A vertically scrolling list. Add rows to the returned content; rows decide their own height.</summary>
         public static RectTransform ScrollList(Transform parent, string name, out ScrollRect scroll)

@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using TMPro;
 using UnityEngine;
 
@@ -28,7 +29,7 @@ namespace ProjectMayham.UI
                 UIKit.Place(instance.label.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -180f), new Vector2(1100f, 60f));
                 instance.label.rectTransform.pivot = new Vector2(0.5f, 1f);
             }
-            instance.label.text = text;
+            instance.label.text = GameText.Translate(text);
             instance.label.gameObject.SetActive(true);
             // Unscaled: a window that pauses the game does not keep the note up.
             instance.until = Time.unscaledTime + seconds;

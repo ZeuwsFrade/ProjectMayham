@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using UnityEngine;
 
 namespace ProjectMayham.Level
@@ -16,10 +17,10 @@ namespace ProjectMayham.Level
         /// <summary>"на северо-востоке" for a thing up and to the right of where one stands; <see cref="Here"/> when it is close.</summary>
         public static string Describe(Vector2 delta)
         {
-            if (delta.magnitude < Near) return Here;
+            if (delta.magnitude < Near) return GameText.Translate(Here);
             float angle = Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg;
             int sector = Mathf.RoundToInt(angle / 45f);
-            return Where[((sector % 8) + 8) % 8];
+            return GameText.Translate(Where[((sector % 8) + 8) % 8]);
         }
     }
 }

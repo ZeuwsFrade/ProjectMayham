@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using System.Collections;
 using ProjectMayham.Core;
 using ProjectMayham.Level;
@@ -96,8 +97,8 @@ namespace ProjectMayham.Interaction
             Vector2 direction = offset >= 0f ? across : -across;
             float distance = Mathf.Abs(offset) + barricade.HalfThickness + radius + landingGap;
 
-            if (!LandingIsFree(position + direction * distance, barricade.transform)) return Refuse("Некуда перелезть");
-            if (stats != null && !stats.TrySpendStamina(barricade.ClimbStamina)) return Refuse("Не хватает выносливости");
+            if (!LandingIsFree(position + direction * distance, barricade.transform)) return Refuse(GameText.Translate("Некуда перелезть"));
+            if (stats != null && !stats.TrySpendStamina(barricade.ClimbStamina)) return Refuse(GameText.Translate("Не хватает выносливости"));
 
             StartCoroutine(Climb(barricade, direction, distance));
             return true;
@@ -152,7 +153,7 @@ namespace ProjectMayham.Interaction
             if (IsClimbing || hole == null) return false;
 
             CrawlPath(hole, out Vector2 entry, out Vector2 direction, out float distance);
-            if (!LandingIsFree(entry + direction * distance, hole.transform)) return Refuse("С той стороны завалено");
+            if (!LandingIsFree(entry + direction * distance, hole.transform)) return Refuse(GameText.Translate("С той стороны завалено"));
 
             StartCoroutine(Crawl(hole, entry, direction, distance));
             return true;
@@ -194,7 +195,7 @@ namespace ProjectMayham.Interaction
             if (hole == null || Mathf.Abs(Vector2.Dot(Offset(body.position, hole.Position), along)) > AlignTolerance)
             {
                 Finish();
-                Refuse("Не пролезть");
+                Refuse(GameText.Translate("Не пролезть"));
                 yield break;
             }
 

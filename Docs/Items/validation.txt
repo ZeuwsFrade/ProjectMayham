@@ -1,0 +1,1 @@
+Icons=18; ItemDefinition references=18; inherited room props=1837; scaled generator footprint=True; active=Assets/Scenes/Shelter.unity; dirty=True; issues=0

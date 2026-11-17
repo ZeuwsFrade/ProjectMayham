@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Dialogue;
 using ProjectMayham.Items;
 using ProjectMayham.Quests;
@@ -17,7 +18,7 @@ namespace ProjectMayham.Shelter
 
         private TraderBook book;
 
-        public override string Prompt => $"Поговорить: {trader.DisplayName}";
+        public override string Prompt => GameText.Format("Поговорить: {0}", trader.DisplayName);
 
         private void Awake() => book = new TraderBook(trader);
 

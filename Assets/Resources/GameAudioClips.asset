@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e9270c113064df4e8a4f786bedc2c81, type: 3}
+  m_Name: GameAudioClips
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Audio.GameAudioClips
+  musicBus: {fileID: 3038428869851262680, guid: 7b8cc667f83f5f8499b454543372b465, type: 2}
+  effectsBus: {fileID: -5671138324892979325, guid: 7b8cc667f83f5f8499b454543372b465, type: 2}
+  menuThemes:
+  - {fileID: 8300000, guid: 889e6519204d3c74f920eb15e09281a1, type: 3}
+  - {fileID: 8300000, guid: b50bb34bd8fea3343bd914e5a520464a, type: 3}
+  secretMenuTheme: {fileID: 8300000, guid: 3f8c7a639a3a00c46b5f68886e457d08, type: 3}
+  shelterMusic: {fileID: 8300000, guid: a544452ab31a7c34696f50225af6b516, type: 3}
+  shelterAmbience:
+  - {fileID: 8300000, guid: f740945804a01b948a9094382fc7447c, type: 3}
+  - {fileID: 8300000, guid: 13315ef501610f54c9146717c667545a, type: 3}
+  raidThemes:
+  - {fileID: 8300000, guid: f36b2808a9a49f240ac1176465b77aa5, type: 3}
+  - {fileID: 8300000, guid: 071d1461a9b0dae43b04468e766d125b, type: 3}
+  - {fileID: 8300000, guid: 749f0fa199703e443941da02c6785d5e, type: 3}
+  - {fileID: 8300000, guid: 8e4967b82db30c34a9c9e984af94f6f1, type: 3}
+  playerHurt: {fileID: 8300000, guid: 673a4c928e1b61c4899f2f15418d8b72, type: 3}
+  heavyBreathing: {fileID: 8300000, guid: f7832c37af2cb2a479e4c35d495fc9db, type: 3}
+  monsterHurt:
+  - {fileID: 8300000, guid: eb1c2e5192bcdec4287ea694f8f35964, type: 3}
+  - {fileID: 8300000, guid: bfea323f3fbd8644283bbf478054c90a, type: 3}
+  - {fileID: 8300000, guid: 8221729da4ef7a646a3664849b4d9cb7, type: 3}
+  - {fileID: 8300000, guid: f4a9533e05586504e8444d826dcb7dc1, type: 3}
+  monsterVoices:
+  - {fileID: 8300000, guid: ba6d5145b7bfdc84b9577e81ca47be6d, type: 3}
+  - {fileID: 8300000, guid: 955436fa67818664ab6812fd58d0c5a1, type: 3}
+  - {fileID: 8300000, guid: 287df614e009eab49941e7163d5187a9, type: 3}

@@ -1,3 +1,4 @@
+using ProjectMayham.Localization;
 using ProjectMayham.Interaction;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace ProjectMayham.Items
             get
             {
                 if (item == null) return string.Empty;
-                return count > 1 ? $"Подобрать: {item.DisplayName} ×{count}" : $"Подобрать: {item.DisplayName}";
+                return count > 1 ? GameText.Format("Подобрать: {0} ×{1}", item.DisplayName, count) : GameText.Format("Подобрать: {0}", item.DisplayName);
             }
         }
 
