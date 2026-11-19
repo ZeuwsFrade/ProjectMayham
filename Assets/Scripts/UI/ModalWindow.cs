@@ -27,6 +27,8 @@ namespace ProjectMayham.UI
         /// <summary>True when a modal window used this frame's Esc press (so the game must not treat it as its own).</summary>
         public static bool EscapeConsumed => escapeHandledFrame == Time.frameCount;
 
+        internal static void ConsumeEscape() => escapeHandledFrame = Time.frameCount;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics() => open.Clear();
 
@@ -109,7 +111,7 @@ namespace ProjectMayham.UI
 
             // Only the window on top reacts, and one Esc press closes one window.
             if (open.Count == 0 || open[open.Count - 1] != this || escapeHandledFrame == Time.frameCount) return;
-            escapeHandledFrame = Time.frameCount;
+            ConsumeEscape();
             OnCancel();
         }
 

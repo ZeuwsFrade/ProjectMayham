@@ -15,9 +15,10 @@ namespace ProjectMayham.Quests
         FindSpecial = 1,
         /// <summary>Enter a room of a kind in a raid and come back alive.</summary>
         VisitRoom = 2,
-        // 3 is kept for "kill enemies".
+        KillEnemies = 3,
         /// <summary>Bring the quest giver, lost in the maze, home alive. The item is what they are carried as, for the name.</summary>
         Rescue = 4,
+        VisitZone = 5,
     }
 
     /// <summary>One thing a quest asks the player to do.</summary>
@@ -30,6 +31,9 @@ namespace ProjectMayham.Quests
         [SerializeField] private RoomKind room;
         [Tooltip("For a special item: it is hidden in a container of the room instead of lying on the floor.")]
         [SerializeField] private bool hidden;
+        [Tooltip("For a special item: the shallowest raid zone allowed for the room containing it.")]
+        [SerializeField] private RaidZone minimumRaidZone;
+        [SerializeField] private RaidZone visitZone;
         [Tooltip("Own wording of the objective. Empty: it is put together from the item and the room.")]
         [SerializeField] private string text;
 
@@ -40,17 +44,22 @@ namespace ProjectMayham.Quests
         public RoomKind Room => room;
         /// <summary>True for a special item that has to be searched for in the containers of its room.</summary>
         public bool Hidden => kind == QuestObjectiveKind.FindSpecial && hidden;
+        public RaidZone MinimumRaidZone => minimumRaidZone;
+        public RaidZone Zone => visitZone;
 
         public bool NeedsItem => kind == QuestObjectiveKind.Deliver || kind == QuestObjectiveKind.FindSpecial;
         /// <summary>False when the objective cannot be checked: it needs an item and has none.</summary>
         public bool IsUsable => !NeedsItem || item != null;
 
         /// <summary>The mark in the save file that says the place was reached and brought home.</summary>
-        public string VisitMark => VisitMarkOf(room);
+        public string VisitMark => kind == QuestObjectiveKind.VisitZone ? "zone:" + visitZone : VisitMarkOf(room);
         public static string VisitMarkOf(RoomKind kind) => "visit:" + kind;
 
         private bool HasOwnText => !string.IsNullOrWhiteSpace(text);
         private string ItemName => item != null ? item.DisplayName : "?";
+        private string SpecialLocation => minimumRaidZone == RaidZone.Entry
+            ? RoomSizes.Title(room)
+            : $"{RoomSizes.Title(room)} · {GameText.Translate(minimumRaidZone == RaidZone.Risk ? "зона 2 или 3" : "зона 3")}";
 
         /// <summary>
         /// What the objective is about, without the amount: "Папки", "Красная папка (Офис босса)", "Побывать: Парковка",
@@ -64,7 +73,9 @@ namespace ProjectMayham.Quests
                 switch (kind)
                 {
                     case QuestObjectiveKind.Deliver: return ItemName;
-                    case QuestObjectiveKind.FindSpecial: return $"{ItemName} ({RoomSizes.Title(room)})";
+                    case QuestObjectiveKind.FindSpecial: return $"{ItemName} ({SpecialLocation})";
+                    case QuestObjectiveKind.VisitZone: return GameText.Format("Побывать: {0}", GameText.Translate(RaidZones.Title(visitZone)));
+                    case QuestObjectiveKind.KillEnemies: return GameText.Translate("Убить врагов");
                     case QuestObjectiveKind.Rescue: return item != null ? GameText.Format("Довести до убежища: {0}", item.DisplayName) : GameText.Translate("Довести до убежища");
                     default: return GameText.Format("Побывать: {0}", RoomSizes.Title(room));
                 }
@@ -74,10 +85,11 @@ namespace ProjectMayham.Quests
         /// <summary>The objective as it is offered, with the amount: "Папки ×3".</summary>
         public string Describe()
         {
+            if (!HasOwnText && kind == QuestObjectiveKind.KillEnemies) return $"{Subject} ×{Count}";
             if (HasOwnText || !NeedsItem || Count <= 1) return Subject;
             return kind == QuestObjectiveKind.Deliver
                 ? $"{ItemName} ×{Count}"
-                : $"{ItemName} ×{Count} ({RoomSizes.Title(room)})";
+                : $"{ItemName} ×{Count} ({SpecialLocation})";
         }
     }
 }

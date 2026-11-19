@@ -48,5 +48,19 @@ namespace ProjectMayham.Level
             int max = Mathf.Max(min, entry.maxCount);
             return rng.Next(min, max + 1);
         }
+
+        public Entry RollForZone(System.Random rng, RaidZone zone, System.Predicate<ItemDefinition> fits = null)
+        {
+            Entry best = null;
+            int picks = zone == RaidZone.Deep ? 4 : 2;
+            for (int attempt = 0; attempt < picks; attempt++)
+            {
+                var candidate = Roll(rng);
+                if (candidate == null || candidate.item == null || (fits != null && !fits(candidate.item))) continue;
+                if (best == null || (zone == RaidZone.Entry ? candidate.item.Value < best.item.Value : candidate.item.Value > best.item.Value))
+                    best = candidate;
+            }
+            return best;
+        }
     }
 }

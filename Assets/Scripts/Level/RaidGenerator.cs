@@ -11,12 +11,11 @@ namespace ProjectMayham.Level
     /// Fills the room slots of the corridor template with rooms (first those the active quests ask for), fills
     /// the loot containers among their furniture, blocks some corridors with barricades, scatters loot and breaks
     /// a few holes through the walls of the maze. Runs
-    /// when the scene starts, before
-    /// <see cref="World.WrapWorld"/> copies the tilemaps around the seam, so every raid has a different set of rooms
-    /// in the same places. The same seed always gives the same raid.
+    /// when the scene starts, before <see cref="World.WrapWorld"/> copies the tilemaps around the seam. The raid
+    /// seed changes the corridors and room contents; room slots stay fixed.
     /// </summary>
     [DefaultExecutionOrder(-200)]
-    public class RaidGenerator : MonoBehaviour
+    public partial class RaidGenerator : MonoBehaviour
     {
         /// <summary>A room that was put into a slot.</summary>
         public class PlacedRoom
@@ -26,6 +25,7 @@ namespace ProjectMayham.Level
             public RoomTemplate Prefab;
             public GameObject Instance;
             public int LootCount;
+            public RaidZone Zone;
             /// <summary>True when the kind was asked for by the demands instead of being picked by chance.</summary>
             public bool Forced;
             /// <summary>Loot containers among the furniture of the room.</summary>
@@ -92,9 +92,9 @@ namespace ProjectMayham.Level
         [SerializeField, Min(0f)] private float exitDistance = 50f;
         [Tooltip("A plan of the floor on corridor walls that tells which way the exit is: a prefab with WallMap.")]
         [SerializeField] private GameObject wallMapPrefab;
-        [SerializeField, Min(0)] private int wallMapCount = 3;
+        [SerializeField, Min(0)] private int wallMapCount = 12;
         [Tooltip("Tiles between two wall maps at least.")]
-        [SerializeField, Min(1f)] private float wallMapSpacing = 25f;
+        [SerializeField, Min(1f)] private float wallMapSpacing = 18f;
         [Tooltip("Distance from the points above that stays free of barricades, in world units.")]
         [SerializeField, Min(0f)] private float barricadeClearance = 9f;
         [Tooltip("Distance from the points above that stays free of holes, in world units.")]
@@ -171,6 +171,12 @@ namespace ProjectMayham.Level
             gameObject.AddComponent<RaidQuestTracker>().Begin(this, demands);
         }
 
+        private void Start()
+        {
+            var player = FindFirstObjectByType<Player.PlayerStats>();
+            if (player != null) gameObject.AddComponent<RaidAtmosphere>().Begin(this, player.transform);
+        }
+
         /// <summary>
         /// Builds a raid. Anything left from an earlier one (also from an editor preview) is removed first.
         /// <paramref name="demands"/> say what has to be in the raid whatever the dice say (rooms and items that
@@ -187,6 +193,8 @@ namespace ProjectMayham.Level
             root.transform.SetParent(transform, false);
 
             var slots = GetComponentsInChildren<RoomSlot>().OrderBy(s => s.name, System.StringComparer.Ordinal).ToList();
+            PrepareZones(slots);
+            RebuildCorridors(slots, new System.Random(seed ^ 0x2A910));
             var forced = AssignRequiredKinds(slots, demands, rng);
             foreach (var slot in slots)
             {
@@ -209,7 +217,7 @@ namespace ProjectMayham.Level
             // A blueprint changes nothing else either: it goes into a container that is filled already.
             PlaceBlueprint(new System.Random(seed ^ BlueprintSalt));
 
-            string summary = string.Join(", ", rooms.Select(r => $"{r.Slot.name}={RoomSizes.Title(r.Kind)}"));
+            string summary = string.Join(", ", rooms.Select(r => $"{r.Slot.name}={RoomSizes.Title(r.Kind)} ({r.Zone})"));
             Debug.Log($"Raid seed {seed}: {summary}; barricades: {barricades.Count}; holes: {holes.Count}; "
                 + $"containers: {containers.Count}, {containers.Count(c => c.HiddenCount > 0)} with loot");
         }
@@ -229,6 +237,8 @@ namespace ProjectMayham.Level
             paintedFloor.Clear();
             paintedWalls.Clear();
             paintedWindows.Clear();
+            RestoreCorridors();
+            roomZones.Clear();
             rooms.Clear();
             barricades.Clear();
             holes.Clear();
@@ -262,20 +272,27 @@ namespace ProjectMayham.Level
             var assigned = new Dictionary<RoomSlot, RoomKind>();
             if (demands == null || demands.IsEmpty) return assigned;
 
-            // Kinds that fit the same number of slots keep the order of the demands: what was asked first is served first.
-            var kinds = demands.Rooms()
-                .Select((kind, index) => (kind, index, fits: slots.Count(s => library.CanPlace(kind, s.Size))))
-                .OrderBy(k => k.fits).ThenBy(k => k.index).ToList();
-            foreach (var entry in kinds)
+            var candidates = demands.Rooms().ToDictionary(kind => kind, kind => slots
+                .Where(slot => roomZones[slot] >= demands.MinimumZone(kind) && library.CanPlace(kind, slot.Size))
+                .OrderBy(slot => roomZones[slot]).ThenBy(_ => rng.Next()).ToArray());
+
+            bool Assign(RoomKind kind, HashSet<RoomSlot> checkedSlots)
             {
-                var free = slots.Where(s => !assigned.ContainsKey(s) && library.CanPlace(entry.kind, s.Size)).ToList();
-                if (free.Count == 0)
+                foreach (var slot in candidates[kind])
                 {
-                    missingKinds.Add(entry.kind);
-                    Debug.LogWarning($"RaidGenerator: no free slot for a room of kind {entry.kind}; what needs it has to wait for another raid.", this);
-                    continue;
+                    if (!checkedSlots.Add(slot)) continue;
+                    if (assigned.TryGetValue(slot, out var occupant) && !Assign(occupant, checkedSlots)) continue;
+                    assigned[slot] = kind;
+                    return true;
                 }
-                assigned[free[rng.Next(free.Count)]] = entry.kind;
+                return false;
+            }
+
+            foreach (var kind in demands.Rooms().OrderBy(kind => candidates[kind].Length))
+            {
+                if (Assign(kind, new HashSet<RoomSlot>())) continue;
+                missingKinds.Add(kind);
+                Debug.LogWarning($"RaidGenerator: no free slot for {kind} in {demands.MinimumZone(kind)} or deeper.", this);
             }
             return assigned;
         }
@@ -344,7 +361,8 @@ namespace ProjectMayham.Level
 
         private PlacedRoom PlaceRoom(RoomSlot slot, Transform root, System.Random rng, RoomKind? forcedKind = null, RaidDemands demands = null)
         {
-            var info = forcedKind.HasValue ? library.Info(forcedKind.Value) : library.PickKind(slot.Size, rng);
+            var zone = roomZones[slot];
+            var info = forcedKind.HasValue ? library.Info(forcedKind.Value) : library.PickKind(slot.Size, rng, zone);
             if (info == null)
             {
                 Debug.LogWarning($"RaidGenerator: no room fits {slot.name} ({slot.Size}).", slot);
@@ -364,15 +382,15 @@ namespace ProjectMayham.Level
 
             var placed = new PlacedRoom
             {
-                Slot = slot, Kind = info.kind, Prefab = prefab, Instance = instance.gameObject, Forced = forcedKind.HasValue
+                Slot = slot, Kind = info.kind, Prefab = prefab, Instance = instance.gameObject, Forced = forcedKind.HasValue, Zone = zone
             };
             // What the demands want to lie in a room of this kind goes into the room that was put up for them.
             var wanted = forcedKind.HasValue && demands != null
                 ? demands.Items.Where(i => i.Room == info.kind).ToList()
                 : null;
             // The containers come first: what was to be hidden and found no container is laid on the floor with the rest.
-            placed.ContainerCount = FillContainers(instance, info, wanted);
-            placed.LootCount = SpawnRoomLoot(instance, info, rng, wanted);
+            placed.ContainerCount = FillContainers(instance, info, wanted, zone);
+            placed.LootCount = SpawnRoomLoot(instance, info, rng, zone, wanted);
             return placed;
         }
 
@@ -394,10 +412,10 @@ namespace ProjectMayham.Level
         /// Puts this raid's contents into the containers of a room and hides what the demands want hidden; the
         /// demands that were served are taken off <paramref name="wanted"/>. Returns the number of containers.
         /// </summary>
-        private int FillContainers(RoomTemplate room, RoomLibrary.KindInfo info, List<RaidDemands.ItemDemand> wanted)
+        private int FillContainers(RoomTemplate room, RoomLibrary.KindInfo info, List<RaidDemands.ItemDemand> wanted, RaidZone zone)
         {
             var found = room.GetComponentsInChildren<LootContainer>();
-            foreach (var container in found) container.Fill(containerRng, info.loot);
+            foreach (var container in found) container.Fill(containerRng, info.loot, zone);
             containers.AddRange(found);
             if (wanted == null) return found.Length;
 
@@ -417,7 +435,7 @@ namespace ProjectMayham.Level
             return found.Length;
         }
 
-        private int SpawnRoomLoot(RoomTemplate room, RoomLibrary.KindInfo info, System.Random rng, List<RaidDemands.ItemDemand> wanted = null)
+        private int SpawnRoomLoot(RoomTemplate room, RoomLibrary.KindInfo info, System.Random rng, RaidZone zone, List<RaidDemands.ItemDemand> wanted)
         {
             int spawned = 0;
             bool anyWanted = wanted != null && wanted.Count > 0;
@@ -449,9 +467,10 @@ namespace ProjectMayham.Level
                 }
             }
 
+            float chance = Mathf.Clamp01(info.lootChance * (zone == RaidZone.Entry ? 0.8f : zone == RaidZone.Deep ? 1.2f : 1f));
             foreach (var spot in spots)
             {
-                if (info.loot != null && rng.NextDouble() <= info.lootChance && SpawnLoot(info.loot, spot.position, room.transform, rng)) spawned++;
+                if (info.loot != null && rng.NextDouble() < chance && SpawnLoot(info.loot, spot.position, room.transform, rng, zone)) spawned++;
                 Remove(spot.gameObject);
             }
             return spawned;
@@ -716,7 +735,8 @@ namespace ProjectMayham.Level
                 total -= weights[index];
                 candidates.RemoveAt(index);
                 weights.RemoveAt(index);
-                SpawnLoot(corridorLoot, new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f), root, rng);
+                var position = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
+                SpawnLoot(corridorLoot, position, root, rng, ZoneAt(position));
             }
         }
 
@@ -738,9 +758,9 @@ namespace ProjectMayham.Level
             return open == 1;
         }
 
-        private static bool SpawnLoot(LootTable table, Vector3 position, Transform parent, System.Random rng)
+        private static bool SpawnLoot(LootTable table, Vector3 position, Transform parent, System.Random rng, RaidZone zone)
         {
-            var entry = table.Roll(rng);
+            var entry = table.RollForZone(rng, zone);
             if (entry == null || entry.item == null || entry.item.WorldPrefab == null) return false;
 
             var instance = Instantiate(entry.item.WorldPrefab, position, Quaternion.identity, parent);
@@ -830,7 +850,15 @@ namespace ProjectMayham.Level
 
             for (int i = 0; i < wallMapCount && candidates.Count > 0; i++)
             {
-                var (spot, wall) = candidates[dice.Next(candidates.Count)];
+                var candidate = i == 0
+                    ? candidates.OrderBy(c => WrappedDistance(c.spot, SpawnPoint)).First()
+                    : candidates[dice.Next(candidates.Count)];
+                if (i == 1 || i == 2)
+                {
+                    var zoneCandidates = candidates.Where(c => ZoneAt(c.spot) == (RaidZone)i).ToList();
+                    if (zoneCandidates.Count > 0) candidate = zoneCandidates[dice.Next(zoneCandidates.Count)];
+                }
+                var (spot, wall) = candidate;
                 // On the wall's face, the picture upright for someone standing in the corridor.
                 var position = spot + (Vector2)wall * 0.42f;
                 float angle = Mathf.Atan2(wall.y, wall.x) * Mathf.Rad2Deg - 90f;
@@ -848,7 +876,7 @@ namespace ProjectMayham.Level
             if (module == null) return;
 
             var item = module.BlueprintItem;
-            var fitting = containers.Where(c => c.CanHide(item, 1)).ToList();
+            var fitting = containers.Where(c => ZoneAt(c.transform.position) != RaidZone.Entry && c.CanHide(item, 1)).ToList();
             if (fitting.Count == 0)
             {
                 Debug.LogWarning($"RaidGenerator: no container takes the blueprint {item.Id}.", this);

@@ -9300,7 +9300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bb16dbeda785eb4f98247ff97654258, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Shelter.ShelterExit
-  raidScene: TileTest
+  raidScene: MainScene
 --- !u!61 &1412192058
 BoxCollider2D:
   m_ObjectHideFlags: 0

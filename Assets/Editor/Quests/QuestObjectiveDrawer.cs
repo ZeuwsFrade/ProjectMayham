@@ -13,10 +13,11 @@ namespace ProjectMayham.EditorTools
     [CustomPropertyDrawer(typeof(QuestObjective))]
     public class QuestObjectiveDrawer : PropertyDrawer
     {
-        // The kinds in the list and their names (the values have a gap: 3 is kept for "kill enemies").
         private static readonly QuestObjectiveKind[] Kinds =
-            { QuestObjectiveKind.Deliver, QuestObjectiveKind.FindSpecial, QuestObjectiveKind.VisitRoom, QuestObjectiveKind.Rescue };
-        private static readonly string[] KindNames = { "Принести предметы", "Найти особый предмет", "Побывать в комнате", "Довести до убежища" };
+            { QuestObjectiveKind.Deliver, QuestObjectiveKind.FindSpecial, QuestObjectiveKind.VisitRoom, QuestObjectiveKind.Rescue,
+                QuestObjectiveKind.VisitZone, QuestObjectiveKind.KillEnemies };
+        private static readonly string[] KindNames = { "Принести предметы", "Найти особый предмет", "Побывать в комнате", "Довести до убежища",
+            "Посетить зону рейда", "Убить врагов" };
 
         private static readonly RoomKind[] RoomKinds = (RoomKind[])Enum.GetValues(typeof(RoomKind));
         private static readonly string[] RoomNames = RoomKinds.Select(RoomSizes.Title).ToArray();
@@ -34,7 +35,7 @@ namespace ProjectMayham.EditorTools
             switch (kind)
             {
                 case QuestObjectiveKind.Deliver: return 4;       // kind, item, count, own wording
-                case QuestObjectiveKind.FindSpecial: return 6;   // kind, item, count, room, hidden, own wording
+                case QuestObjectiveKind.FindSpecial: return 7;
                 case QuestObjectiveKind.Rescue: return 3;        // kind, the person item, own wording
                 default: return 3;                               // kind, room, own wording
             }
@@ -60,10 +61,23 @@ namespace ProjectMayham.EditorTools
                     "Вещь-человек, которой его несут: по ней цель называется. Довести нужно того, кто даёт квест; квест берётся, когда он идёт с игроком, и сдаётся сам в убежище."));
                 row.y += Row;
             }
-            else if (kind != QuestObjectiveKind.VisitRoom)
+            else if (kind == QuestObjectiveKind.Deliver || kind == QuestObjectiveKind.FindSpecial)
             {
                 EditorGUI.PropertyField(row, property.FindPropertyRelative("item"), new GUIContent("Предмет"));
                 row.y += Row;
+                EditorGUI.PropertyField(row, property.FindPropertyRelative("count"), new GUIContent("Сколько"));
+                row.y += Row;
+            }
+
+            if (kind == QuestObjectiveKind.VisitZone)
+            {
+                var zone = property.FindPropertyRelative("visitZone");
+                zone.enumValueIndex = EditorGUI.Popup(row, "Куда прийти", zone.enumValueIndex,
+                    new[] { "Зона 1", "Зона 2", "Зона 3" });
+                row.y += Row;
+            }
+            else if (kind == QuestObjectiveKind.KillEnemies)
+            {
                 EditorGUI.PropertyField(row, property.FindPropertyRelative("count"), new GUIContent("Сколько"));
                 row.y += Row;
             }
@@ -81,6 +95,10 @@ namespace ProjectMayham.EditorTools
             {
                 EditorGUI.PropertyField(row, property.FindPropertyRelative("hidden"),
                     new GUIContent("Спрятан в контейнере", "Выключено — предмет лежит на полу комнаты. Включено — в одном из её контейнеров, его надо найти обыском."));
+                row.y += Row;
+                var minimum = property.FindPropertyRelative("minimumRaidZone");
+                minimum.enumValueIndex = EditorGUI.Popup(row, "Минимальная зона", minimum.enumValueIndex,
+                    new[] { "Любая", "Зона 2 или 3", "Только зона 3" });
                 row.y += Row;
             }
 

@@ -54,6 +54,7 @@ namespace ProjectMayham.Combat
         public static event Action<WeaponDefinition> WeaponBroken;
         /// <summary>Anyone who dies, the player included.</summary>
         public static event Action<GameObject> ActorDied;
+        public static event Action<GameObject> EnemyKilledByPlayer;
         /// <summary>A shout that wakes others (a Dokhodyaga calling its pack).</summary>
         public static event Action<GameObject, Vector2> EnemyShouted;
         /// <summary>The highest alert of all enemies changed. See <see cref="AI.AlertDirector"/>.</summary>
@@ -67,6 +68,7 @@ namespace ProjectMayham.Combat
             SwingMissed = null;
             WeaponBroken = null;
             ActorDied = null;
+            EnemyKilledByPlayer = null;
             EnemyShouted = null;
             AlertChanged = null;
         }
@@ -76,6 +78,7 @@ namespace ProjectMayham.Combat
         public static void RaiseSwingMissed(in SwingEvent e) => SwingMissed?.Invoke(e);
         public static void RaiseWeaponBroken(WeaponDefinition weapon) => WeaponBroken?.Invoke(weapon);
         public static void RaiseActorDied(GameObject actor) => ActorDied?.Invoke(actor);
+        internal static void RaiseEnemyKilledByPlayer(GameObject actor) => EnemyKilledByPlayer?.Invoke(actor);
         public static void RaiseEnemyShouted(GameObject enemy, Vector2 position) => EnemyShouted?.Invoke(enemy, position);
         public static void RaiseAlertChanged(AlertLevel level) => AlertChanged?.Invoke(level);
     }

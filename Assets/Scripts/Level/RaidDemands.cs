@@ -19,6 +19,7 @@ namespace ProjectMayham.Level
             public RoomKind Room;
             /// <summary>True when the item has to be hidden in a container of the room instead of lying on the floor.</summary>
             public bool Hidden;
+            public RaidZone MinimumZone;
         }
 
         private readonly List<ItemDemand> items = new List<ItemDemand>();
@@ -37,7 +38,7 @@ namespace ProjectMayham.Level
         /// Asks for an item in a room of a kind: on the floor, or hidden in one of the containers of the room.
         /// An item that is already asked for keeps its room and its place and gets the larger amount.
         /// </summary>
-        public void AddItem(ItemDefinition item, int count, RoomKind room, bool hidden = false)
+        public void AddItem(ItemDefinition item, int count, RoomKind room, bool hidden = false, RaidZone minimumZone = RaidZone.Entry)
         {
             if (item == null || count <= 0) return;
 
@@ -45,9 +46,10 @@ namespace ProjectMayham.Level
             if (existing != null)
             {
                 existing.Count = Mathf.Max(existing.Count, count);
+                if (minimumZone > existing.MinimumZone) existing.MinimumZone = minimumZone;
                 return;
             }
-            items.Add(new ItemDemand { Item = item, Count = count, Room = room, Hidden = hidden });
+            items.Add(new ItemDemand { Item = item, Count = count, Room = room, Hidden = hidden, MinimumZone = minimumZone });
             Require(room);
         }
 
@@ -58,6 +60,14 @@ namespace ProjectMayham.Level
         }
 
         public bool WantsVisit(RoomKind room) => visits.Contains(room);
+
+        public RaidZone MinimumZone(RoomKind room)
+        {
+            var zone = RaidZone.Entry;
+            foreach (var item in items)
+                if (item.Room == room && item.MinimumZone > zone) zone = item.MinimumZone;
+            return zone;
+        }
 
         private void Require(RoomKind room)
         {

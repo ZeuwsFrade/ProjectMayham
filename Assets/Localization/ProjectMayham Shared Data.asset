@@ -2485,6 +2485,66 @@ MonoBehaviour:
       \u0438 \u043F\u0435\u0440\u0435\u0432\u044F\u0436\u0438\u0442\u0435\u0441\u044C"
     m_Metadata:
       m_Items: []
+  - m_Id: 2013100879943
+    m_Key: "Пауза"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879944
+    m_Key: "Главное меню"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879945
+    m_Key: "Покинуть рейд"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879946
+    m_Key: "Покинуть рейд?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879947
+    m_Key: "Выйти в главное меню?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879948
+    m_Key: "Игра будет сохранена."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879949
+    m_Key: "Вы потеряете всё снаряжение при себе и прогресс заданий за этот рейд. Тайник и результаты прошлых рейдов сохранятся."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879950
+    m_Key: "Направление к выходу"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879951
+    m_Key: "Указатель: {0} с"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879952
+    m_Key: "[O] Указать выход"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879953
+    m_Key: "Прочитать указатель выхода"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879954
+    m_Key: "Убить врагов"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879955
+    m_Key: "Зона 1 · Внешние кабинеты"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879956
+    m_Key: "Зона 2 · Опасный сектор"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879957
+    m_Key: "Зона 3 · Глубокий сектор"
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

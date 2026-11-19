@@ -102,7 +102,7 @@ namespace ProjectMayham.Level
         public void Interact(GameObject actor) => SearchWindow.Open(actor, this);
 
         /// <summary>Empties the container and puts in what its profile rolls for this raid, all of it not found yet.</summary>
-        public int Fill(System.Random rng, LootTable roomLoot = null)
+        public int Fill(System.Random rng, LootTable roomLoot = null, RaidZone? zone = null)
         {
             var grid = Inventory;
             grid.Clear();
@@ -113,7 +113,7 @@ namespace ProjectMayham.Level
             if (profile == null) return 0;
 
             int placed = 0;
-            foreach (var (item, count) in profile.Roll(rng, roomLoot))
+            foreach (var (item, count) in profile.Roll(rng, roomLoot, zone))
             {
                 // What does not fit (a mop in a bin) is simply not there.
                 if (grid.AddSealed(item, count) != null) placed++;

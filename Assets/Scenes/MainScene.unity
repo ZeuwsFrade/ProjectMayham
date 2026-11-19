@@ -1847,8 +1847,8 @@ MonoBehaviour:
   exitPrefab: {fileID: 5623561911556945397, guid: ad0e4bfa0ecd2544f854d741dd364b86, type: 3}
   exitDistance: 50
   wallMapPrefab: {fileID: 3106102637304984696, guid: 80d8f5bd47a3e2241b6c5597db3515ee, type: 3}
-  wallMapCount: 3
-  wallMapSpacing: 25
+  wallMapCount: 12
+  wallMapSpacing: 18
   barricadeClearance: 20
   holeClearance: 12
   blueprintChance: 0.5
@@ -2325,7 +2325,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &523449952
 Transform:
   m_ObjectHideFlags: 0
@@ -77386,9 +77386,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RaidController
   stats: {fileID: 1640463109}
   persistence: {fileID: 1640463112}
-  inventoryWindow: {fileID: 1051227576}
   shelterScene: Shelter
-  leaveAnywhere: 1
 --- !u!4 &1770529060
 Transform:
   m_ObjectHideFlags: 0

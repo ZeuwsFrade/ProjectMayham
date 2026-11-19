@@ -183,6 +183,7 @@ namespace ProjectMayham.UI
                 if (keyboard[toggleKey].wasPressedThisFrame) SetOpen(!IsOpen);
                 else if (IsOpen && keyboard.escapeKey.wasPressedThisFrame)
                 {
+                    ModalWindow.ConsumeEscape();
                     if (IsSplitting) CloseSplit();
                     else SetOpen(false);
                 }

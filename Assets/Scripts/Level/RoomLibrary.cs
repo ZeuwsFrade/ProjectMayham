@@ -43,12 +43,12 @@ namespace ProjectMayham.Level
         }
 
         /// <summary>Picks a kind for a slot of this size by weight among the kinds that have a room for it.</summary>
-        public KindInfo PickKind(RoomSize size, System.Random rng)
+        public KindInfo PickKind(RoomSize size, System.Random rng, RaidZone zone = RaidZone.Risk)
         {
             float total = 0f;
             foreach (var info in kinds)
             {
-                if (Allows(info, size)) total += info.weight;
+                if (Allows(info, size)) total += Weight(info, zone);
             }
             if (total <= 0f) return null;
 
@@ -57,11 +57,20 @@ namespace ProjectMayham.Level
             foreach (var info in kinds)
             {
                 if (!Allows(info, size)) continue;
+                float weight = Weight(info, zone);
+                if (weight <= 0f) continue;
                 last = info;
-                pick -= info.weight;
+                pick -= weight;
                 if (pick <= 0.0) return info;
             }
             return last;
+        }
+
+        private static float Weight(KindInfo info, RaidZone zone)
+        {
+            bool premium = info.kind == RoomKind.BossOffice || info.kind == RoomKind.Parking || info.kind == RoomKind.Storage;
+            if (zone == RaidZone.Entry) return premium ? 0f : info.weight;
+            return zone == RaidZone.Deep && premium ? info.weight * 3f : info.weight;
         }
 
         /// <summary>A random room prefab of this kind and size, or null when there is none.</summary>

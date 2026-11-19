@@ -17,14 +17,14 @@ namespace ProjectMayham.EditorTools
         /// <summary>
         /// Generates raids in the open scene and checks what is in their containers: without demands, with a quest
         /// item that has to be hidden in a container, with one that lies on the floor and with one too large for
-        /// any container. Needs a scene with a RaidGenerator (TileTest) outside Play mode. The preview is cleared
+        /// any container. Needs a scene with a RaidGenerator (MainScene) outside Play mode. The preview is cleared
         /// afterwards and the scene is not saved.
         /// </summary>
         public static string RunRaidCheck()
         {
             if (EditorApplication.isPlaying) return "FAIL: leave Play mode first";
             var generator = Object.FindFirstObjectByType<RaidGenerator>();
-            if (generator == null) return "FAIL: the open scene has no RaidGenerator (open Assets/Scenes/Tests/TileTest.unity)";
+            if (generator == null) return "FAIL: the open scene has no RaidGenerator (open Assets/Scenes/MainScene.unity)";
 
             var folder = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/Data/Items/Quest/RedFolder.asset");
             if (folder == null) return "FAIL: no item at Assets/Data/Items/Quest/RedFolder.asset";

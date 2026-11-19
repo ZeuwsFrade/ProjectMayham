@@ -16,6 +16,8 @@ namespace ProjectMayham.Shelter
 
         private void Reset() => GetComponent<Collider2D>().isTrigger = true;
 
+        private void Start() => PauseMenu.Install();
+
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (ModalState.IsOpen || SceneLoader.IsLoading) return;

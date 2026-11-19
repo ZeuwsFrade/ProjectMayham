@@ -82080,9 +82080,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.RaidController
   stats: {fileID: 1857624785}
   persistence: {fileID: 868634105}
-  inventoryWindow: {fileID: 1736522402}
-  shelterScene: ShelterTest
-  leaveAnywhere: 1
+  shelterScene: Shelter
 --- !u!4 &1732957054
 Transform:
   m_ObjectHideFlags: 0
@@ -82870,8 +82868,8 @@ MonoBehaviour:
   exitPrefab: {fileID: 5623561911556945397, guid: ad0e4bfa0ecd2544f854d741dd364b86, type: 3}
   exitDistance: 50
   wallMapPrefab: {fileID: 3106102637304984696, guid: 80d8f5bd47a3e2241b6c5597db3515ee, type: 3}
-  wallMapCount: 3
-  wallMapSpacing: 25
+  wallMapCount: 12
+  wallMapSpacing: 18
   barricadeClearance: 20
   holeClearance: 12
   useFixedSeed: 0

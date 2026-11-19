@@ -1,6 +1,6 @@
 using ProjectMayham.Localization;
 using System.Collections.Generic;
-using ProjectMayham.Core;
+using ProjectMayham.Combat;
 using ProjectMayham.Level;
 using ProjectMayham.Player;
 using ProjectMayham.UI;
@@ -11,11 +11,7 @@ using UnityEngine;
 namespace ProjectMayham.Quests
 {
     /// <summary>
-    /// Watches where the player goes in a raid: remembers every kind of room they stood in and shows a short note
-    /// when it is one a quest asks for. What was reached is handed to the quests only when the player comes back:
-    /// the game is saved in a raid only on leaving it (<see cref="SceneLoader.Load"/>), so "a save while the
-    /// player is alive" means "came home". A death, or quitting in the middle of the raid, hands over nothing.
-    /// Added by <see cref="RaidGenerator"/> when a raid starts; nothing is placed in a scene.
+    /// Stages raid objectives in memory. Only successful extraction hands them over to the quest log.
     /// </summary>
     public class RaidQuestTracker : MonoBehaviour
     {
@@ -24,6 +20,9 @@ namespace ProjectMayham.Quests
         private const float NoticeSeconds = 2.5f;
 
         private readonly HashSet<RoomKind> visited = new HashSet<RoomKind>();
+        private readonly HashSet<RaidZone> zones = new HashSet<RaidZone>();
+        private int kills;
+        private bool committed;
         private RaidGenerator generator;
         private RaidDemands demands;
         private PlayerStats player;
@@ -41,8 +40,13 @@ namespace ProjectMayham.Quests
             demands = wanted;
         }
 
-        private void OnEnable() => GameSession.SaveRequested += Commit;
-        private void OnDisable() => GameSession.SaveRequested -= Commit;
+        private void OnEnable() => CombatEvents.EnemyKilledByPlayer += OnEnemyKilled;
+        private void OnDisable() => CombatEvents.EnemyKilledByPlayer -= OnEnemyKilled;
+
+        private void OnEnemyKilled(GameObject enemy)
+        {
+            if (!committed && generator != null && enemy != null && enemy.scene == gameObject.scene) kills++;
+        }
 
         private void Update()
         {
@@ -54,6 +58,7 @@ namespace ProjectMayham.Quests
             if (player == null || player.IsDead) return;
 
             Vector2 position = player.transform.position;
+            zones.Add(generator.ZoneAt(position));
             foreach (var room in generator.Rooms)
             {
                 if (visited.Contains(room.Kind) || !IsInside(room.Slot, position)) continue;
@@ -76,11 +81,12 @@ namespace ProjectMayham.Quests
             return Mathf.Abs(delta.x) <= half.x - WallInset && Mathf.Abs(delta.y) <= half.y - WallInset;
         }
 
-        private void Commit()
+        public void CommitExtraction()
         {
-            // No player or a dead one: what was reached in this raid is not brought home.
-            if (player == null || player.IsDead) return;
-            QuestLog.CommitVisits(visited);
+            if (committed || player == null || player.IsDead) return;
+
+            committed = true;
+            QuestLog.CommitRaid(visited, zones, kills);
         }
 
         private void Show(string text)

@@ -206,6 +206,7 @@ namespace ProjectMayham.Core
         public int state;
         /// <summary>Things done and brought home, for example "visit:Parking".</summary>
         public List<string> marks = new List<string>();
+        public int raidKills;
         /// <summary>The raid from which a daily or a refused quest is offered again.</summary>
         public int again;
         /// <summary>How many times the quest was turned in (a daily more than once).</summary>

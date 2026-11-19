@@ -105,8 +105,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 497d317bade77194e93568f50fa65417, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectMayham.Level.WallMap
-  studySeconds: 5
-  noteSeconds: 5
 --- !u!114 &8040421259330992472
 MonoBehaviour:
   m_ObjectHideFlags: 0

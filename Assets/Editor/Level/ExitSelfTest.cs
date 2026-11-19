@@ -9,7 +9,7 @@ namespace ProjectMayham.EditorTools
 {
     /// <summary>
     /// Checks of the raid exit and the wall maps (Mayham > Level > Check Exit and Wall Maps): the compass words, what
-    /// a map says, when Esc leaves a raid, and — in an open raid scene whose generator has the prefabs — 20 raids:
+    /// a map says, and — in an open raid scene whose generator has the prefabs — 20 raids:
     /// one exit on corridor floor far from the start, the maps on straight corridor walls and apart.
     /// </summary>
     public static class ExitSelfTest
@@ -38,8 +38,7 @@ namespace ProjectMayham.EditorTools
             foreach (var (delta, words) in points) Ok(CompassText.Describe(delta) == words, $"{delta} is '{words}', not '{CompassText.Describe(delta)}'");
             Ok(WallMap.Reading(Vector2.zero, new Vector2(0f, 20f)) == "Выход — на севере", "a map says where the exit is");
             Ok(WallMap.Reading(Vector2.zero, null) == "Выхода на карте нет", "a map of a raid without an exit says so");
-            Ok(RaidController.CanLeaveByEscape(true, true) && RaidController.CanLeaveByEscape(false, false) && !RaidController.CanLeaveByEscape(false, true),
-                "Esc leaves in a test scene or without an exit; with an exit only the exit does");
+            Ok(!typeof(Interaction.IHoldInteractable).IsAssignableFrom(typeof(WallMap)), "one interaction reads the sign without holding the key");
 
             // ---- raids ----
             var generator = Object.FindFirstObjectByType<RaidGenerator>();
@@ -78,6 +77,8 @@ namespace ProjectMayham.EditorTools
 
                     var maps = generator.WallMaps;
                     Ok(maps.Count == mapCount, $"raid {n}: {maps.Count} wall maps, not {mapCount}");
+                    Ok(maps.Any(map => Distance(map.transform.position, generator.SpawnPoint) < 24f),
+                        $"raid {n}: a sign is near the start");
                     foreach (var map in maps)
                     {
                         // Up in the picture points into the wall it hangs on.

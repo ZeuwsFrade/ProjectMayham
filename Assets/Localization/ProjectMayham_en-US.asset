@@ -2101,6 +2101,66 @@ MonoBehaviour:
     m_Localized: Eat and bandage your wounds first
     m_Metadata:
       m_Items: []
+  - m_Id: 2013100879943
+    m_Localized: "Paused"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879944
+    m_Localized: "Main menu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879945
+    m_Localized: "Abandon raid"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879946
+    m_Localized: "Abandon the raid?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879947
+    m_Localized: "Return to the main menu?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879948
+    m_Localized: "Your game will be saved."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879949
+    m_Localized: "You will lose all carried gear and quest progress from this raid. Your stash and progress from earlier raids are kept."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879950
+    m_Localized: "Extraction direction"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879951
+    m_Localized: "Compass: {0}s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879952
+    m_Localized: "[O] Locate extraction"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879953
+    m_Localized: "Read exit sign"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879954
+    m_Localized: "Kill enemies"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879955
+    m_Localized: "Zone 1 · Outer offices"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879956
+    m_Localized: "Zone 2 · High-risk sector"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2013100879957
+    m_Localized: "Zone 3 · Deep sector"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

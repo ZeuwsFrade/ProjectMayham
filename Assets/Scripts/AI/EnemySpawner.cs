@@ -15,7 +15,7 @@ namespace ProjectMayham.AI
     /// set in the scene: the spawner waits for the <see cref="NavGrid"/>, then picks free spots that are far enough from
     /// the player and can be walked to from where they start.
     /// </summary>
-    public class EnemySpawner : MonoBehaviour
+    public partial class EnemySpawner : MonoBehaviour
     {
         /// <summary>Where a lone enemy lives.</summary>
         public enum Haunt
@@ -79,6 +79,11 @@ namespace ProjectMayham.AI
             var player = FindFirstObjectByType<PlayerStats>();
             Vector2 start = player != null ? (Vector2)player.transform.position : Vector2.zero;
             var raid = FindFirstObjectByType<RaidGenerator>();
+            if (raid != null && player != null)
+            {
+                yield return PopulateRaid(grid, raid, player);
+                yield break;
+            }
 
             int placed = 0;
             for (int attempt = 0; attempt < packs * 40 && placed < packs; attempt++)

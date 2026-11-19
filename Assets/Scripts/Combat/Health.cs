@@ -51,6 +51,8 @@ namespace ProjectMayham.Combat
             }
 
             alive = false;
+            if (team == Team.Enemy && info.Attacker != null && info.Attacker.GetComponentInParent<Player.PlayerStats>() != null)
+                CombatEvents.RaiseEnemyKilledByPlayer(gameObject);
             Died?.Invoke(info);
             CombatEvents.RaiseActorDied(gameObject);
         }

@@ -13,16 +13,85 @@ namespace ProjectMayham.EditorTools
         [MenuItem("Mayham/Quests/Check Raid Demands (open raid scene)")]
         public static void RunRaidCheckMenu() => Debug.Log(RunRaidCheck());
 
+        [MenuItem("Mayham/Level/Check Raid Zones (open raid scene)")]
+        public static void RunZoneCheckMenu() => Debug.Log(RunZoneCheck());
+
+        public static string RunZoneCheck()
+        {
+            if (EditorApplication.isPlaying) return "FAIL: leave Play mode first";
+            var generator = Object.FindFirstObjectByType<RaidGenerator>();
+            if (generator == null) return "FAIL: open MainScene";
+
+            var tests = new Checks { Group = "raid zones" };
+            var demands = new RaidDemands();
+            var quest = AssetDatabase.LoadAssetAtPath<ProjectMayham.Quests.QuestDefinition>(
+                "Assets/Resources/Quests/Tyler/Tyler_02_RedFolder.asset");
+            foreach (var objective in quest.Objectives)
+                demands.AddItem(objective.Item, objective.Count, objective.Room, objective.Hidden, objective.MinimumRaidZone);
+            tests.Eq(demands.MinimumZone(RoomKind.BossOffice), RaidZone.Deep, "red folder is restricted to the deep zone");
+            tests.Eq(demands.MinimumZone(RoomKind.Toilet), RaidZone.Risk, "second item requires elevated risk");
+            demands.AddVisit(RoomKind.Parking);
+            var walls = generator.transform.Find("Walls").GetComponent<Tilemap>();
+            var baseline = WallCells(walls);
+            HashSet<Vector3Int> firstLayout = null;
+            try
+            {
+                foreach (int seed in new[] { 101, 101, 203, 407, 809, 1601 })
+                {
+                    generator.Generate(seed, demands);
+                    tests.Eq(generator.ZoneAt(generator.SpawnPoint), RaidZone.Entry, $"seed {seed}: safe spawn");
+                    tests.Eq(generator.Rooms.Select(room => room.Zone).Distinct().Count(), 3, $"seed {seed}: all room tiers");
+                    tests.Eq(generator.MissingKinds.Count, 0, $"seed {seed}: no unsatisfied room demands");
+                    tests.Eq(generator.QuestPickups.Count, demands.Items.Count, $"seed {seed}: quest items spawned");
+                    tests.Ok(generator.QuestPickups.All(pickup =>
+                        generator.ZoneAt(pickup.transform.position) >= demands.Items.First(demand => demand.Item == pickup.GetComponent<ItemPickup>().Item).MinimumZone),
+                        $"seed {seed}: quest items respect minimum risk");
+                    tests.Ok(generator.Exit != null, $"seed {seed}: extraction exists");
+                    tests.Eq(CutOffTiles(generator, includeFurniture: false), 0, $"seed {seed}: tilemap and room entrances connected");
+                    var layout = WallCells(walls);
+                    if (firstLayout == null) firstLayout = layout;
+                    else tests.Eq(layout.SetEquals(firstLayout), seed == 101, $"seed {seed}: wall geometry follows seed");
+                }
+                tests.Eq(AI.EnemySpawner.WaveBudget(52, 0, 1.5f, 170), 52, "initial quota");
+                tests.Eq(AI.EnemySpawner.WaveBudget(52, 1, 1.5f, 170), 26, "first reinforcement");
+                tests.Eq(AI.EnemySpawner.WaveBudget(52, 2, 1.5f, 170), 39, "second reinforcement");
+                tests.Eq(AI.EnemySpawner.WaveBudget(52, 3, 1.5f, 10), 10, "population limit");
+
+                var table = AssetDatabase.LoadAssetAtPath<LootTable>("Assets/Data/Level/Loot/Loot_Corridor.asset");
+                int Value(RaidZone zone)
+                {
+                    var random = new System.Random(3245);
+                    return Enumerable.Range(0, 400).Sum(_ => table.RollForZone(random, zone).item.Value);
+                }
+                int entryValue = Value(RaidZone.Entry), riskValue = Value(RaidZone.Risk), deepValue = Value(RaidZone.Deep);
+                tests.Ok(entryValue < riskValue && riskValue < deepValue, "shared table yields better loot with risk");
+            }
+            finally
+            {
+                generator.Clear();
+            }
+            tests.Ok(WallCells(walls).SetEquals(baseline), "clearing preview restores wall geometry");
+            return tests.Failures.Count == 0 ? $"PASS: {tests.Count} checks" : "FAIL: " + string.Join("; ", tests.Failures);
+        }
+
+        private static HashSet<Vector3Int> WallCells(Tilemap walls)
+        {
+            var cells = new HashSet<Vector3Int>();
+            foreach (var cell in walls.cellBounds.allPositionsWithin)
+                if (walls.HasTile(cell)) cells.Add(cell);
+            return cells;
+        }
+
         /// <summary>
         /// Generates 30 raids in the open scene without demands, with empty ones and with "an item in the boss
         /// office and a visit to the parking", and checks what comes out. Needs a scene with a RaidGenerator
-        /// (TileTest) outside Play mode. The preview is cleared afterwards and the scene is not saved.
+        /// (MainScene) outside Play mode. The preview is cleared afterwards and the scene is not saved.
         /// </summary>
         public static string RunRaidCheck()
         {
             if (EditorApplication.isPlaying) return "FAIL: leave Play mode first";
             var generator = Object.FindFirstObjectByType<RaidGenerator>();
-            if (generator == null) return "FAIL: the open scene has no RaidGenerator (open Assets/Scenes/Tests/TileTest.unity)";
+            if (generator == null) return "FAIL: the open scene has no RaidGenerator (open Assets/Scenes/MainScene.unity)";
 
             var item = Item("Papers");
             var library = AssetDatabase.LoadAssetAtPath<RoomLibrary>(RoomFactory.LibraryPath);
@@ -83,7 +152,7 @@ namespace ProjectMayham.EditorTools
 
         // Walkable tiles that cannot be reached from the tile at world (0, 0), where the player starts.
         // Barricades and holes do not count as obstacles: the player gets past them.
-        private static int CutOffTiles(RaidGenerator generator)
+        private static int CutOffTiles(RaidGenerator generator, bool includeFurniture = true)
         {
             var maze = generator.transform;
             var floor = maze.Find("Floor").GetComponent<Tilemap>();
@@ -105,7 +174,7 @@ namespace ProjectMayham.EditorTools
             }
 
             int furniture = LayerMask.NameToLayer("Furniture");
-            foreach (var box in maze.GetComponentsInChildren<BoxCollider2D>())
+            foreach (var box in includeFurniture ? maze.GetComponentsInChildren<BoxCollider2D>() : System.Array.Empty<BoxCollider2D>())
             {
                 if (box.isTrigger || box.gameObject.layer != furniture) continue;
                 if (box.GetComponentInParent<Barricade>() != null || box.GetComponentInParent<WallHole>() != null) continue;

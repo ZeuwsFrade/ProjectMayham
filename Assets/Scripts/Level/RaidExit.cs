@@ -11,7 +11,7 @@ namespace ProjectMayham.Level
     /// </summary>
     public class RaidExit : MonoBehaviour, IInteractable
     {
-        /// <summary>The exit of the raid that is on, or null: a raid without one lets Esc leave from anywhere.</summary>
+        /// <summary>The active extraction point, or null if the current map has none.</summary>
         public static RaidExit Active { get; private set; }
 
         public string Prompt => GameText.Translate("Выйти из рейда");

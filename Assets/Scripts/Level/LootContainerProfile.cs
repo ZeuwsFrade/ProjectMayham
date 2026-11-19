@@ -52,22 +52,23 @@ namespace ProjectMayham.Level
         /// Decides what a container of this kind holds in one raid: nothing, or a few stacks from its own table and
         /// now and then one from the table of the room. The same generator state gives the same answer.
         /// </summary>
-        public List<(ItemDefinition item, int count)> Roll(System.Random rng, LootTable roomLoot = null)
+        public List<(ItemDefinition item, int count)> Roll(System.Random rng, LootTable roomLoot = null, RaidZone? zone = null)
         {
             var result = new List<(ItemDefinition item, int count)>();
-            if (rng.NextDouble() < emptyChance) return result;
+            float chance = zone == RaidZone.Deep ? emptyChance * 0.5f : emptyChance;
+            if (rng.NextDouble() < chance) return result;
 
             int min = Mathf.Max(1, minStacks);
             int stacks = rng.Next(min, Mathf.Max(min, maxStacks) + 1);
-            for (int i = 0; i < stacks; i++) AddRoll(result, loot, rng);
-            if (roomLoot != null && rng.NextDouble() < roomLootChance) AddRoll(result, roomLoot, rng);
+            for (int i = 0; i < stacks; i++) AddRoll(result, loot, rng, zone);
+            if (roomLoot != null && rng.NextDouble() < roomLootChance) AddRoll(result, roomLoot, rng, zone);
             return result;
         }
 
-        private static void AddRoll(List<(ItemDefinition item, int count)> result, LootTable table, System.Random rng)
+        private void AddRoll(List<(ItemDefinition item, int count)> result, LootTable table, System.Random rng, RaidZone? zone)
         {
             if (table == null) return;
-            var entry = table.Roll(rng);
+            var entry = zone.HasValue ? table.RollForZone(rng, zone.Value, Fits) : table.Roll(rng);
             if (entry == null || entry.item == null) return;
             result.Add((entry.item, table.RollCount(entry, rng)));
         }

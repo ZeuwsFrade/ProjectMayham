@@ -2,27 +2,18 @@ using ProjectMayham.Localization;
 using ProjectMayham.Core;
 using ProjectMayham.Interaction;
 using ProjectMayham.UI;
-using ProjectMayham.World;
+using ProjectMayham.Player;
 using UnityEngine;
 
 namespace ProjectMayham.Level
 {
     /// <summary>
-    /// A plan of the floor on a corridor wall. Studied for a few seconds (the Interact key held), it tells which way
-    /// the exit of the raid lies: one of eight points of the compass, north being up, the short way round the wrapped
-    /// maze. Put on corridor walls by <see cref="RaidGenerator"/>.
+    /// A corridor sign that unlocks the exit guide for this raid.
     /// </summary>
-    public class WallMap : MonoBehaviour, IHoldInteractable
+    public class WallMap : MonoBehaviour, IInteractable
     {
-        [Tooltip("Seconds the Interact key is held to read the map.")]
-        [SerializeField, Min(0.5f)] private float studySeconds = 5f;
-        [Tooltip("Seconds the answer stays on the screen.")]
-        [SerializeField, Min(1f)] private float noteSeconds = 5f;
-
-        public string Prompt => "Изучить карту";
+        public string Prompt => GameText.Translate("Прочитать указатель выхода");
         public Vector2 Position => transform.position;
-        public float HoldSeconds => studySeconds;
-        public string HoldLabel => "Изучаю карту";
 
         private void OnEnable() => Interactables.Register(this);
         private void OnDisable() => Interactables.Unregister(this);
@@ -32,15 +23,23 @@ namespace ProjectMayham.Level
         public void Interact(GameObject actor)
         {
             var exit = RaidExit.Active;
-            ScreenNote.Show(Reading(transform.position, exit != null ? exit.transform.position : (Vector2?)null), noteSeconds);
+            if (exit == null)
+            {
+                ScreenNote.Show("Выхода на карте нет", 5f);
+                return;
+            }
+
+            var player = actor != null ? actor.GetComponentInParent<PlayerStats>() : null;
+            if (player == null || player.IsDead) return;
+            if (!player.TryGetComponent<RaidExitGuide>(out var guide)) guide = player.gameObject.AddComponent<RaidExitGuide>();
+            guide.ReadSign(exit);
         }
 
         /// <summary>What a map at <paramref name="from"/> says about the exit: "Выход — на северо-востоке".</summary>
         public static string Reading(Vector2 from, Vector2? exit)
         {
             if (!exit.HasValue) return "Выхода на карте нет";
-            var wrap = WrapWorld.Active;
-            Vector2 delta = wrap != null ? wrap.Delta(from, exit.Value) : exit.Value - from;
+            Vector2 delta = RaidExitGuide.Direction(from, exit.Value);
             return GameText.Format("Выход — {0}", CompassText.Describe(delta));
         }
     }

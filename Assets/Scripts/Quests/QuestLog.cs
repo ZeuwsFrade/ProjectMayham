@@ -4,6 +4,7 @@ using ProjectMayham.Core;
 using ProjectMayham.Items;
 using ProjectMayham.Level;
 using ProjectMayham.Npcs;
+using UnityEngine;
 
 namespace ProjectMayham.Quests
 {
@@ -187,6 +188,7 @@ namespace ProjectMayham.Quests
             {
                 record.state = StateActive;
                 record.marks = new List<string>();
+                record.raidKills = 0;
             }
             else Records.Add(new QuestProgressData { quest = quest.Id, state = StateActive });
             return true;
@@ -207,6 +209,7 @@ namespace ProjectMayham.Quests
             var record = Record(quest);
             record.state = record.done > 0 ? StateTurnedIn : StateAbandoned;
             record.marks = new List<string>();
+            record.raidKills = 0;
             record.again = Day + (quest.Repeatable ? quest.RepeatAfterRaids : 1);
             if (quest.Giver != null) Loyalty.Add(quest.Giver.Id, -quest.AbandonPenalty);
             return true;
@@ -230,10 +233,15 @@ namespace ProjectMayham.Quests
             foreach (var objective in quest.Objectives)
             {
                 var line = new ObjectiveProgress { Objective = objective };
-                if (objective.Kind == QuestObjectiveKind.VisitRoom)
+                if (objective.Kind == QuestObjectiveKind.VisitRoom || objective.Kind == QuestObjectiveKind.VisitZone)
                 {
                     line.Need = 1;
                     line.Have = record != null && record.marks != null && record.marks.Contains(objective.VisitMark) ? 1 : 0;
+                }
+                else if (objective.Kind == QuestObjectiveKind.KillEnemies)
+                {
+                    line.Need = objective.Count;
+                    line.Have = Mathf.Clamp(record?.raidKills ?? 0, 0, line.Need);
                 }
                 else if (objective.Kind == QuestObjectiveKind.Rescue)
                 {
@@ -300,22 +308,30 @@ namespace ProjectMayham.Quests
         /// Marks the kinds of rooms the player reached in a raid and came back from, for every active quest that
         /// asks for them. Marking twice changes nothing.
         /// </summary>
-        public static void CommitVisits(IEnumerable<RoomKind> visited)
+        public static void CommitVisits(IEnumerable<RoomKind> visited) => CommitRaid(visited, System.Array.Empty<RaidZone>(), 0);
+
+        public static void CommitRaid(IEnumerable<RoomKind> visited, IEnumerable<RaidZone> zones, int kills)
         {
             var kinds = new HashSet<RoomKind>(visited);
-            if (kinds.Count == 0) return;
+            var visitedZones = new HashSet<RaidZone>(zones);
+            if (kinds.Count == 0 && visitedZones.Count == 0 && kills <= 0) return;
 
             foreach (var quest in QuestCatalog.All)
             {
                 var record = Record(quest);
                 if (record == null || record.state != StateActive) continue;
 
+                int maxKills = 0;
                 foreach (var objective in quest.Objectives)
                 {
-                    if (objective.Kind != QuestObjectiveKind.VisitRoom || !kinds.Contains(objective.Room)) continue;
+                    if (objective.Kind == QuestObjectiveKind.KillEnemies) maxKills = Mathf.Max(maxKills, objective.Count);
+                    bool reached = (objective.Kind == QuestObjectiveKind.VisitRoom && kinds.Contains(objective.Room)) ||
+                                   (objective.Kind == QuestObjectiveKind.VisitZone && visitedZones.Contains(objective.Zone));
+                    if (!reached) continue;
                     record.marks ??= new List<string>();
                     if (!record.marks.Contains(objective.VisitMark)) record.marks.Add(objective.VisitMark);
                 }
+                if (maxKills > record.raidKills && kills > 0) record.raidKills += Mathf.Min(kills, maxKills - record.raidKills);
             }
         }
 
@@ -344,7 +360,7 @@ namespace ProjectMayham.Quests
                     else if (objective.Kind == QuestObjectiveKind.FindSpecial)
                     {
                         int missing = objective.Count - Owned(data, objective.Item);
-                        if (missing > 0) demands.AddItem(objective.Item, missing, objective.Room, objective.Hidden);
+                        if (missing > 0) demands.AddItem(objective.Item, missing, objective.Room, objective.Hidden, objective.MinimumRaidZone);
                     }
                 }
             }

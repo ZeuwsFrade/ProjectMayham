@@ -54,7 +54,7 @@ namespace ProjectMayham.EditorTools
                     "Она. Даже не помята. С тобой приятно работать, [ИГРОК].",
                     60);
                 Require(so, first);
-                AddObjective(so, QuestObjectiveKind.FindSpecial, folder, 1, RoomKind.BossOffice);
+                AddObjective(so, QuestObjectiveKind.FindSpecial, folder, 1, RoomKind.BossOffice, RaidZone.Deep);
                 AddReward(so, mug, 1);
             });
 
@@ -199,7 +199,8 @@ namespace ProjectMayham.EditorTools
             list.GetArrayElementAtIndex(list.arraySize - 1).objectReferenceValue = required;
         }
 
-        private static void AddObjective(SerializedObject quest, QuestObjectiveKind kind, ItemDefinition item, int count, RoomKind room)
+        private static void AddObjective(SerializedObject quest, QuestObjectiveKind kind, ItemDefinition item, int count, RoomKind room,
+            RaidZone minimumZone = RaidZone.Entry)
         {
             var list = quest.FindProperty("objectives");
             list.arraySize++;
@@ -208,6 +209,7 @@ namespace ProjectMayham.EditorTools
             entry.FindPropertyRelative("item").objectReferenceValue = item;
             entry.FindPropertyRelative("count").intValue = count;
             entry.FindPropertyRelative("room").intValue = (int)room;
+            entry.FindPropertyRelative("minimumRaidZone").intValue = (int)minimumZone;
             entry.FindPropertyRelative("text").stringValue = string.Empty;
         }
 
